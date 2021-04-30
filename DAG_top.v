@@ -55,15 +55,12 @@ begin
 			end
 		end
 	end 
-	else 
-	begin 
-		if(ps_dg_en & ~ps_dg_mdfy) 
+	else if(ps_dg_en & ~ps_dg_mdfy) 
+	begin
+		if(ps_dg_dgsclt)
 		begin
-			if(ps_dg_dgsclt)
-			begin
-				i[ps_dg_iadd+4'b1000]<=i[ps_dg_iadd+4'b1000]+m[ps_dg_madd+4'b1000];
-			end 
-		end
+			i[ps_dg_iadd+4'b1000]<=i[ps_dg_iadd+4'b1000]+m[ps_dg_madd+4'b1000];
+		end 
 		else 
 		begin
 			i[ps_dg_iadd]<=i[ps_dg_iadd]+m[ps_dg_madd];
