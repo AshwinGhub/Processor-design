@@ -13,22 +13,72 @@ reg [15:0] dg_dm_add,dg_pm_add;
 reg[15:0] dg_bc_dt,dg_rd_dt;
 
 
-always@(posedge clk) begin
-	if(ps_dg_en & ~ps_dg_mdfy) begin
-		if(ps_dg_dgsclt) begin
-			i[ps_dg_iadd+4'b1000]<=i[ps_dg_iadd+4'b1000]+m[ps_dg_madd+4'b1000];
+always@(posedge clk)
+begin
+	if (ps_dg_wrt_en) 
+	begin
+		if(ps_dg_wrt_add == {1'b1, ps_dg_dgsclt, ps_dg_iadd} | ps_dg_wrt_add == {1'b0, ps_dg_dgsclt, ps_dg_madd}) 
+		begin
+			if(ps_dg_en & ~ps_dg_mdfy) 
+			begin
+				if(ps_dg_dgsclt) 
+				begin
+					i[ps_dg_iadd+4'b1000]<=i[ps_dg_iadd+4'b1000]+m[ps_dg_madd+4'b1000];
+				end
+				else 
+				begin
+					i[ps_dg_iadd]<=i[ps_dg_iadd]+m[ps_dg_madd];
+				end
+			end 
+			else 
+			begin
+				if(ps_dg_wrt_add[4]) 
+				begin
+					i[ps_dg_wrt_add[3:0]]<=bc_dt_out;
+				end
+			end
+		end 
+		else 
+		begin
+			if(ps_dg_wrt_add[4]) 
+			begin
+				i[ps_dg_wrt_add[3:0]]<=bc_dt_out;
+			end	
+			if(ps_dg_en & ~ps_dg_mdfy) 
+			begin
+				if(ps_dg_dgsclt) 
+				begin
+					i[ps_dg_iadd+4'b1000]<=i[ps_dg_iadd+4'b1000]+m[ps_dg_madd+4'b1000];
+				end 
+				else 
+				begin
+					i[ps_dg_iadd]<=i[ps_dg_iadd]+m[ps_dg_madd];
+				end
+			end
 		end
-		else begin
+	end 
+	else 
+	begin 
+		if(ps_dg_en & ~ps_dg_mdfy) 
+		begin
+			if(ps_dg_dgsclt) 
+			begin
+				i[ps_dg_iadd+4'b1000]<=i[ps_dg_iadd+4'b1000]+m[ps_dg_madd+4'b1000];
+			end
+		end 
+		else 
+		begin
 			i[ps_dg_iadd]<=i[ps_dg_iadd]+m[ps_dg_madd];
 		end
-	end if(ps_dg_wrt_en) begin
-		if(ps_dg_wrt_add[4]) begin
-			i[ps_dg_wrt_add[3:0]]<=bc_dt_out;
-		end else begin
-			m[ps_dg_wrt_add[3:0]]<=bc_dt_out;  
-		end
 	end
-
+	
+	if(ps_dg_wrt_en) 
+	begin
+		if(~ps_dg_wrt_add[4]) 
+		begin
+	      		m[ps_dg_wrt_add[3:0]]<=bc_dt_out;  
+  		end
+	end
 end
 
 always@(*) begin 
@@ -50,17 +100,6 @@ always@(*) begin
 	end else begin
 		dg_pm_add=16'b0;
 		dg_dm_add=16'b0;
-	end
-end
-
-always@(posedge clk) begin
-
-	if(ps_dg_wrt_en) begin
-		if(ps_dg_wrt_add[4]) begin
-			i[ps_dg_wrt_add[3:0]]<=bc_dt_out;
-		end else begin
-			m[ps_dg_wrt_add[3:0]]<=bc_dt_out;  
-		end
 	end
 end
 
