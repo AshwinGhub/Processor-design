@@ -15,63 +15,53 @@ reg[15:0] dg_bc_dt,dg_rd_dt;
 
 always@(posedge clk)
 begin
-	if (ps_dg_wrt_en) 
-	begin
-		if(ps_dg_wrt_add == {1'b1, ps_dg_dgsclt, ps_dg_iadd} | ps_dg_wrt_add == {1'b0, ps_dg_dgsclt, ps_dg_madd}) 
-		begin
-			if(ps_dg_en & ~ps_dg_mdfy) 
-			begin
-				if(ps_dg_dgsclt) 
-				begin
-					i[ps_dg_iadd+4'b1000]<=i[ps_dg_iadd+4'b1000]+m[ps_dg_madd+4'b1000];
+	if (ps_dg_wrt_en) begin
+		if(ps_dg_wrt_add=={1'b1,ps_dg_dgsclt,ps_dg_iadd}) begin 
+			if(ps_dg_en & ~ps_dg_mdfy) begin
+				if(ps_dg_dgsclt) begin
+					i[ps_dg_iadd+4'b1000]<=bc_dt_out+m[ps_dg_madd+4'b1000];
 				end
-				else 
-				begin
-					i[ps_dg_iadd]<=i[ps_dg_iadd]+m[ps_dg_madd];
+				else begin
+					i[ps_dg_iadd]<=bc_dt_out+m[ps_dg_madd];
 				end
-			end 
-			else 
-			begin
-				if(ps_dg_wrt_add[4]) 
-				begin
+			end else begin
+				if(ps_dg_wrt_add[4]) begin
 					i[ps_dg_wrt_add[3:0]]<=bc_dt_out;
 				end
 			end
-		end 
-		else 
-		begin
-			if(ps_dg_wrt_add[4]) 
-			begin
+		end else if(ps_dg_wrt_add=={1'b0,ps_dg_dgsclt,ps_dg_madd}) begin
+			if(ps_dg_en & ~ps_dg_mdfy) begin
+				if(ps_dg_dgsclt) begin
+					i[ps_dg_iadd+4'b1000]<==i[ps_dg_iadd+4'b1000]+bc_dt_out;
+				end
+				else begin
+					i[ps_dg_iadd]<=i[ps_dg_iadd]+bc_dt_out;
+				end
+			end else begin
+				if(ps_dg_wrt_add[4]) begin
+					i[ps_dg_wrt_add[3:0]]<=bc_dt_out;
+				end
+			end
+		end else begin
+			if(ps_dg_wrt_add[4]) begin
 				i[ps_dg_wrt_add[3:0]]<=bc_dt_out;
 			end	
-			if(ps_dg_en & ~ps_dg_mdfy) 
-			begin
-				if(ps_dg_dgsclt) 
-				begin
+			if(ps_dg_en & ~ps_dg_mdfy) begin
+				if(ps_dg_dgsclt) begin
 					i[ps_dg_iadd+4'b1000]<=i[ps_dg_iadd+4'b1000]+m[ps_dg_madd+4'b1000];
-				end 
-				else 
-				begin
+				end else begin
 					i[ps_dg_iadd]<=i[ps_dg_iadd]+m[ps_dg_madd];
 				end
 			end
 		end
-	end 
-	else 
-	begin 
-		if(ps_dg_en & ~ps_dg_mdfy) 
-		begin
-			if(ps_dg_dgsclt) 
-			begin
-				i[ps_dg_iadd+4'b1000]<=i[ps_dg_iadd+4'b1000]+m[ps_dg_madd+4'b1000];
-			end
-		end 
-		else 
-		begin
+	end else begin if(ps_dg_en & ~ps_dg_mdfy) begin
+		if(ps_dg_dgsclt) begin
+			i[ps_dg_iadd+4'b1000]<=i[ps_dg_iadd+4'b1000]+m[ps_dg_madd+4'b1000];
+		end else begin
 			i[ps_dg_iadd]<=i[ps_dg_iadd]+m[ps_dg_madd];
 		end
 	end
-	
+
 	if(ps_dg_wrt_en) 
 	begin
 		if(~ps_dg_wrt_add[4]) 
