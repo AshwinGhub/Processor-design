@@ -29,7 +29,7 @@ always @(*) begin
 			ps_bc_drr_slct= 2'b10;	
 		end else if((ps_ureg1_add[7:4]==4'b0110) | (ps_ureg1_add[7:4]==4'b0111)) begin
 			ps_bc_drr_slct= 2'b01;	
-		end else if((ps_ureg1_add[7:4]==4'b0010) | (ps_ureg1_add==4'b0001)) begin
+		end else if((ps_ureg1_add[7:4]==4'b0010) | (ps_ureg1_add[7:4]==4'b0001)) begin
 			ps_bc_drr_slct= 2'b0;
 		end else begin
 			ps_bc_drr_slct= 2'b11;
@@ -42,7 +42,7 @@ always @(*) begin
 			ps_bc_drr_slct= 2'b10;
 		end else if((ps_ureg2_add[7:4]==4'b0110) | (ps_ureg2_add[7:4]==4'b0111)) begin
 			ps_bc_drr_slct= 2'b01;	
-		end else if((ps_ureg2_add[7:4]==4'b0010) | (ps_ureg2_add==4'b0001)) begin
+		end else if((ps_ureg2_add[7:4]==4'b0010) | (ps_ureg2_add[7:4]==4'b0001)) begin
 			ps_bc_drr_slct= 2'b0;	
 		end else begin
 			ps_bc_drr_slct= 2'b11;

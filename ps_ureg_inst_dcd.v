@@ -21,7 +21,7 @@ always@(*) begin
 			ps_rf_dm_rd_add= 4'h0;
 		end
 
-		if( (ps_ureg1_add[7:4]==4'b0010) | (ps_ureg1_add==4'b0001) ) begin
+		if( (ps_ureg1_add[7:4]==4'b0010) | (ps_ureg1_add[7:4]==4'b0001) ) begin
 			ps_dg_rd_add= ps_ureg1_add[4:0];
 		end else begin
 			ps_dg_rd_add= 5'b00000;
@@ -41,7 +41,7 @@ always@(*) begin
 			ps_rf_dm_rd_add= 4'h0;
 		end
 
-		if( (ps_ureg2_add[7:4]==4'b0010) | (ps_ureg2_add==4'b0001) ) begin
+		if( (ps_ureg2_add[7:4]==4'b0010) | (ps_ureg2_add[7:4]==4'b0001) ) begin
 			ps_dg_rd_add= ps_ureg2_add[4:0];
 		end else begin
 			ps_dg_rd_add= 5'b00000;

@@ -1,21 +1,4 @@
-module PS_top
-		(
-			clk, rst,
-		       	shf_ps_ss, shf_ps_sz, shf_ps_sv, mul_ps_mv, mul_ps_mn, alu_ps_as, alu_ps_ac, alu_ps_an, alu_ps_av, alu_ps_az,
-			pm_ps_op, 
-			bc_dt_out, 
-			ps_pm_cslt, ps_pm_wrb, ps_pm_add, 
-			ps_alu_en, ps_mul_en, ps_shf_en, ps_alu_log, ps_mul_otreg, ps_alu_hc, ps_mul_cls, ps_shf_cls, ps_alu_sc, ps_mul_dtsts, 
-			ps_rf_rd_a1, 
-			ps_rf_wrt_en, 
-			ps_rf_mx_wrt_add, 
-			ps_rf_mx_rd_a0, 
-			ps_rf_dm_wrt_en, 
-			ps_dg_wrt_en, ps_dg_rd_add, ps_dg_wrt_add, 
-			ps_bc_immdt,
-			ps_dm_cslt, ps_dm_wrb, ps_dg_en, ps_dg_dgsclt, ps_dg_mdfy, ps_dg_iadd, ps_dg_madd,
-			ps_bc_drr_slct, ps_bc_di_slct, ps_bc_dt
-		);
+module PS_top (clk,rst,shf_ps_ss,shf_ps_sz,shf_ps_sv,mul_ps_mv,mul_ps_mn,alu_ps_as,alu_ps_ac,alu_ps_an,alu_ps_av,alu_ps_az,pm_ps_op,bc_dt_out,ps_pm_cslt,ps_pm_wrb,ps_pm_add,ps_alu_en,ps_mul_en,ps_shf_en,ps_alu_log,ps_mul_otreg,ps_alu_hc,ps_mul_cls,ps_shf_cls,ps_alu_sc,ps_mul_dtsts,ps_rf_rd_a1,ps_rf_wrt_en,ps_rf_mx_wrt_add,ps_rf_mx_rd_a0,ps_rf_dm_wrt_en,ps_dg_wrt_en,ps_dg_rd_add,ps_dg_wrt_add,ps_bc_immdt,ps_dm_cslt,ps_dm_wrb,ps_dg_en,ps_dg_dgsclt,ps_dg_mdfy,ps_dg_iadd,ps_dg_madd,ps_bc_drr_slct,ps_bc_di_slct,ps_bc_dt);
 
 input clk,rst;//
 input shf_ps_ss,shf_ps_sz,shf_ps_sv,mul_ps_mv,mul_ps_mn,alu_ps_as,alu_ps_ac,alu_ps_an,alu_ps_av,alu_ps_az; 
@@ -146,7 +129,7 @@ always @(*) begin
 	//Conditional decoding
 	opc_cnd= pm_ps_op[4:0];
 	cnd_en= pm_ps_op[31];
-	astat_bts= { ps_astat[8:5],ps_astat[3:0] };   				//ASTAT bits given to condition checking module
+	astat_bts= { shf_ps_sz, shf_ps_sv, mul_ps_mv, mul_ps_mn, alu_ps_ac, alu_ps_an, alu_ps_av, alu_ps_az };   		//ASTAT bits given to condition checking module
 	cnd_tru= ( cnd_stat | !pm_ps_op[31] );
 
 	//Instruction Identification
