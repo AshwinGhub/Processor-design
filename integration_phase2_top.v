@@ -121,8 +121,13 @@ module phase2_top	#(parameter PMA_SIZE=16, PMD_SIZE=32, DMA_SIZE=16, DMD_SIZE=16
 					clk, reset,
 					
 					//flags
-					shf_ss,shf_sz,shf_sv,mul_ps_ov,mul_ps_mn,alu_as,alu_ac,alu_an,alu_av,alu_az,
-					
+					//shf_ss,shf_sz,shf_sv,
+					1'b0,     1'b0, 1'b0,
+					mul_ps_ov, mul_ps_mn,
+					//alu_as,alu_ac,alu_an,alu_av,alu_az,
+					1'b0,     1'b0,   1'b0, 1'b0, 1'b0,
+
+
 					//pm_ps
 					pmDataOut, 
 					
