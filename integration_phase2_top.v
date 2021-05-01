@@ -27,10 +27,13 @@ module phase2_top	#(parameter PMA_SIZE=16, PMD_SIZE=32, DMA_SIZE=16, DMD_SIZE=16
 		//Shifter to PS flags
 		wire shf_ovflag, shf_zeroflag;
 
-		//unused currently
+		//ALU signals from PS
 		wire ps_alu_en, ps_alu_log;
 		wire[1:0] ps_alu_hc;
 		wire[2:0] ps_alu_sc;
+
+		//ALU to PS flags
+		wire alu_zero, alu_neg, alu_carry, alu_of;
 
 
 		cu_top #(.RF_DATASIZE(RF_DATASIZE), .ADDRESS_WIDTH(ADDRESS_WIDTH), .SIGNAL_WIDTH(SIGNAL_WIDTH))
@@ -59,7 +62,16 @@ module phase2_top	#(parameter PMA_SIZE=16, PMD_SIZE=32, DMA_SIZE=16, DMD_SIZE=16
 					ps_shf_cls,
 					
 					//Shifter to ps flags
-					shf_ovflag, shf_zeroflag
+					shf_ovflag, shf_zeroflag,
+
+					//Alu signals from ps
+					ps_alu_en, ps_alu_log,
+					ps_alu_hc,
+					ps_alu_sc,
+					alu_sat,
+			
+					//ALU flags
+					alu_zero, alu_neg, alu_carry, alu_of
 				);
 
 		

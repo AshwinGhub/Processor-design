@@ -24,7 +24,16 @@ module cu_top 	#(parameter RF_DATASIZE, ADDRESS_WIDTH, SIGNAL_WIDTH)
 			input wire [1:0] ps_shf_cls,
 
 			//Shifter to ps flag signals
-			output wire shf_ovflag, shf_zeroflag
+			output wire shf_ovflag, shf_zeroflag,
+
+			//Alu signals from ps
+			input wire ps_alu_en, ps_alu_log,
+			input wire [1:0]ps_alu_hc,
+			input wire [2:0]ps_alu_sc,
+			input wire alu_sat,
+			
+			//ALU flags
+			output wire alu_zero, alu_neg, alu_carry, alu_of
 		);
 
 			
@@ -72,6 +81,16 @@ module cu_top 	#(parameter RF_DATASIZE, ADDRESS_WIDTH, SIGNAL_WIDTH)
 				ps_shf_en, ps_shf_cls, 
 				xb_cu_rx, xb_cu_ry, 
 				shf_xb_rn, shf_ovflag, shf_zeroflag
+			);
+
+	alu #(.DATA_WIDTH(RF_DATASIZE)) alu_obj
+			(
+				clk, 
+				xb_cu_rx, xb_cu_ry, 
+				ps_alu_en, ps_alu_log, ps_alu_hc, ps_alu_sc, 
+				alu_xb_rn, 
+				alu_sat, 
+				alu_zero, alu_neg, alu_carry, alu_of
 			);
 
 endmodule
