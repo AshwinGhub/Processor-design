@@ -2,8 +2,8 @@ module multiplier
 			#(parameter RF_DATASIZE)
 			(	
 				//data below
-				input wire[RF_DATASIZE-1:0] xb_cu_rx, xb_cu_ry, 
-				output wire[RF_DATASIZE-1:0] mul_xb_rn,
+				input wire[RF_DATASIZE-1:0] xb_dtx, xb_dty, 
+				output wire[RF_DATASIZE-1:0] mul_xb_dt,
 				
 				//control signals below
 				input wire ps_mul_en, ps_mul_otreg,
@@ -49,8 +49,8 @@ module multiplier
 		//latch Register File inputs multiplier entry
 		always@(posedge clk)
 		begin
-			Rx16_latched <= (ps_mul_en & ps_mul_cls!=2'b00) ? xb_cu_rx : Rx16_latched;	//latch only when multiplier enabled and also its not a saturate instruction which only requires MR
-			Ry16_latched <= (ps_mul_en & ps_mul_cls!=2'b00) ? xb_cu_ry : Ry16_latched;
+			Rx16_latched <= (ps_mul_en & ps_mul_cls!=2'b00) ? xb_dtx : Rx16_latched;	//latch only when multiplier enabled and also its not a saturate instruction which only requires MR
+			Ry16_latched <= (ps_mul_en & ps_mul_cls!=2'b00) ? xb_dty : Ry16_latched;
 		end
 
 		wire[RF_DATASIZE:0] U_Rx, S_Rx, U_Ry, S_Ry;	//17 bit wires for converting to signed
@@ -211,7 +211,7 @@ module multiplier
 		
 		
 		//16 bit data extraction from mul40_out_data for passing to Rn
-		assign mul_xb_rn = mul_IbF ? mul40_out_data[(2*RF_DATASIZE-1):RF_DATASIZE] : mul40_out_data[RF_DATASIZE-1:0];
+		assign mul_xb_dt = mul_IbF ? mul40_out_data[(2*RF_DATASIZE-1):RF_DATASIZE] : mul40_out_data[RF_DATASIZE-1:0];
 		
 		//mul40_out_data[31:16] : mul40_out_data[15:0]
 
