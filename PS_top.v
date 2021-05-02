@@ -1,36 +1,20 @@
-module PS_top
-		(
-			clk, rst,
-		       	shf_ps_ss, shf_ps_sz, shf_ps_sv, mul_ps_mv, mul_ps_mn, alu_ps_as, alu_ps_ac, alu_ps_an, alu_ps_av, alu_ps_az,
-			pm_ps_op, 
-			bc_dt_out, 
-			ps_pm_cslt, ps_pm_wrb, ps_pm_add, 
-			ps_alu_en, ps_mul_en, ps_shf_en, ps_alu_log, ps_mul_otreg, ps_alu_hc, ps_mul_cls, ps_shf_cls, ps_alu_sc, ps_mul_dtsts, 
-			ps_rf_rd_a1, 
-			ps_rf_wrt_en, 
-			ps_rf_mx_wrt_add, 
-			ps_rf_mx_rd_a0, 
-			ps_rf_dm_wrt_en, 
-			ps_dg_wrt_en, ps_dg_rd_add, ps_dg_wrt_add, 
-			ps_bc_immdt,
-			ps_dm_cslt, ps_dm_wrb, ps_dg_en, ps_dg_dgsclt, ps_dg_mdfy, ps_dg_iadd, ps_dg_madd,
-			ps_bc_drr_slct, ps_bc_di_slct, ps_bc_dt
-		);
+module prg_sqncr(clk,rst,shf_ps_ss,shf_ps_sz,shf_ps_sv,mul_ps_mv,mul_ps_mn,alu_ps_as,alu_ps_ac,alu_ps_an,alu_ps_av,alu_ps_az,pm_ps_op,bc_dt,ps_pm_cslt,ps_pm_wrb,ps_pm_add,ps_alu_en,ps_mul_en,ps_shf_en,ps_alu_log,ps_mul_otreg,ps_alu_hc,ps_mul_cls,ps_shf_cls,ps_alu_sc,ps_mul_dtsts,ps_xb_raddy,ps_xb_w_cuEn,ps_xb_wadd,ps_xb_raddx,ps_xb_w_bcEn,ps_dg_wrt_en,ps_dg_rd_add,ps_dg_wrt_add,ps_bc_immdt,ps_dm_cslt,ps_dm_wrb,ps_dg_en,ps_dg_dgsclt,ps_dg_mdfy,ps_dg_iadd,ps_dg_madd,ps_bc_drr_slct,ps_bc_di_slct,ps_bc_dt,dg_ps_add);
 
 input clk,rst;//
 input shf_ps_ss,shf_ps_sz,shf_ps_sv,mul_ps_mv,mul_ps_mn,alu_ps_as,alu_ps_ac,alu_ps_an,alu_ps_av,alu_ps_az; 
 input[31:0] pm_ps_op;//
-input[15:0] bc_dt_out;//
+input[15:0] bc_dt;//
+input[15:0] dg_ps_add;                           //Add pm address bus mux logic
 output ps_pm_cslt,ps_pm_wrb;//
 output [15:0] ps_pm_add;//
 output ps_alu_en, ps_mul_en, ps_shf_en, ps_alu_log, ps_mul_otreg;//
 output[1:0] ps_alu_hc, ps_mul_cls, ps_shf_cls;//
 output[2:0] ps_alu_sc;//
-output[3:0] ps_mul_dtsts, ps_rf_rd_a1;//                           
-output[2:0] ps_rf_wrt_en;//
-output[3:0] ps_rf_mx_wrt_add;//
-output[3:0] ps_rf_mx_rd_a0;//
-output ps_rf_dm_wrt_en,ps_dg_wrt_en;//
+output[3:0] ps_mul_dtsts, ps_xb_raddy;//                           
+output[2:0] ps_xb_w_cuEn;//
+output[3:0] ps_xb_wadd;//
+output[3:0] ps_xb_raddx;//
+output ps_xb_w_bcEn,ps_dg_wrt_en;//
 output[4:0] ps_dg_rd_add,ps_dg_wrt_add;//
 output[15:0] ps_bc_immdt;//
 output ps_dm_cslt,ps_dm_wrb;//
@@ -59,9 +43,9 @@ reg [20:0] bt_5t25;//
 wire ps_alu_en, ps_mul_en, ps_shf_en, ps_alu_log, ps_mul_otreg;//
 wire[1:0] ps_alu_hc, ps_mul_cls, ps_shf_cls;//
 wire[2:0] ps_alu_sc;//
-wire[3:0] ps_mul_dtsts, ps_rf_rd_a0, ps_rf_rd_a1;//
-wire[2:0] ps_rf_wrt_en;//
-wire[3:0] ps_rf_wrt_a;//
+wire[3:0] ps_mul_dtsts, ps_xb_rd_a0, ps_xb_raddy;//
+wire[2:0] ps_xb_w_cuEn;//
+wire[3:0] ps_xb_wrt_a;//
 
 //Used for condition decoding
 reg cnd_en;//
@@ -74,18 +58,18 @@ wire cnd_stat;//
 reg ps_pshstck,ps_popstck,ps_imminst,ps_dminst,ps_urgtrnsinst;//
 reg[7:0] ps_ureg1_add,ps_ureg2_add;//
 
-wire ps_rf_dm_wrt_en,ps_dg_wrt_en,ps_wrt_en;//
-wire[3:0] ps_rf_dm_rd_add, ps_rf_dm_wrt_add;//
+wire ps_xb_w_bcEn,ps_dg_wrt_en,ps_wrt_en;//
+wire[3:0] ps_xb_dm_rd_add, ps_xb_dm_wrt_add;//
 wire[4:0] ps_dg_rd_add,ps_rd_add,ps_dg_wrt_add,ps_wrt_add;//
 
 //Used for memory
 reg ps_pm_cslt,ps_pm_wrb;//
 reg ps_dm_cslt,ps_dm_wrb;//
-reg [15:0] ps_pm_add;
+reg ps_pm_add;
 
 //Used for RF specifically
-reg[3:0] ps_rf_mx_rd_a0;
-reg[3:0] ps_rf_mx_wrt_add;//
+reg[3:0] ps_xb_raddx;
+reg[3:0] ps_xb_wadd;//
 
 //Used for bus connect
 reg[15:0] ps_bc_immdt,ps_bc_dt;//
@@ -98,13 +82,13 @@ reg[2:0] ps_dg_iadd,ps_dg_madd;//
 
 
 //Compute Decoing hardware
-inst_compute cpt(clk,rst,cpt_en,bt_5t25, ps_alu_en,ps_mul_en, ps_shf_en, ps_alu_log, ps_mul_otreg, ps_alu_hc, ps_mul_cls, ps_shf_cls, ps_alu_sc, ps_rf_wrt_en,ps_mul_dtsts, ps_rf_rd_a0, ps_rf_rd_a1, ps_rf_wrt_a);
+inst_compute cpt(clk,rst,cpt_en,bt_5t25, ps_alu_en,ps_mul_en, ps_shf_en, ps_alu_log, ps_mul_otreg, ps_alu_hc, ps_mul_cls, ps_shf_cls, ps_alu_sc, ps_xb_w_cuEn,ps_mul_dtsts, ps_xb_rd_a0, ps_xb_raddy, ps_xb_wrt_a);
 
 //Condition decoding hardware
 cond cnd(cnd_en,opc_cnd,cnd_stat,astat_bts);
 
 //Ureg related decoding hardware
-ureg_dcd urdcd(clk,ps_pshstck,ps_popstck,ps_imminst,ps_dminst,ps_urgtrnsinst,ps_dm_wrb,ps_ureg1_add,ps_ureg2_add,ps_rf_dm_wrt_en,ps_dg_wrt_en,ps_wrt_en,ps_rf_dm_rd_add,ps_rf_dm_wrt_add,ps_dg_rd_add,ps_rd_add,ps_dg_wrt_add,ps_wrt_add);
+ureg_dcd urdcd(clk,ps_pshstck,ps_popstck,ps_imminst,ps_dminst,ps_urgtrnsinst,ps_dm_wrb,ps_ureg1_add,ps_ureg2_add,ps_xb_w_bcEn,ps_dg_wrt_en,ps_wrt_en,ps_xb_dm_rd_add,ps_xb_dm_wrt_add,ps_dg_rd_add,ps_rd_add,ps_dg_wrt_add,ps_wrt_add);
 
 //Bus connect selection logic
 bsslctcontrol bsc(clk,ps_pshstck,ps_popstck,ps_imminst,ps_dminst,ps_urgtrnsinst,ps_dm_wrb,ps_ureg1_add,ps_ureg2_add,ps_bc_drr_slct,ps_bc_di_slct);
@@ -129,9 +113,9 @@ always @ (posedge clk or negedge rst) begin
 
 	//RF write address muxing
 	if(cpt_en) begin
-		ps_rf_mx_wrt_add<= ps_rf_wrt_a;
+		ps_xb_wadd<= ps_xb_wrt_a;
 	end else begin
-		ps_rf_mx_wrt_add<= ps_rf_dm_wrt_add;
+		ps_xb_wadd<= ps_xb_dm_wrt_add;
 	end
 
 	//Immediate data
@@ -146,7 +130,7 @@ always @(*) begin
 	//Conditional decoding
 	opc_cnd= pm_ps_op[4:0];
 	cnd_en= pm_ps_op[31];
-	astat_bts= { ps_astat[8:5],ps_astat[3:0] };   				//ASTAT bits given to condition checking module
+	astat_bts= { shf_ps_sz, shf_ps_sv, mul_ps_mv, mul_ps_mn, alu_ps_ac, alu_ps_an, alu_ps_av, alu_ps_az };   		//ASTAT bits given to condition checking module
 	cnd_tru= ( cnd_stat | !pm_ps_op[31] );
 
 	//Instruction Identification
@@ -191,9 +175,9 @@ always @(*) begin
 
 	//RF read address muxing
 	if(cpt_en) begin
-		ps_rf_mx_rd_a0= ps_rf_rd_a0;	
+		ps_xb_raddx= ps_xb_rd_a0;	
 	end else begin
-		ps_rf_mx_rd_a0= ps_rf_dm_rd_add;
+		ps_xb_raddx= ps_xb_dm_rd_add;
 	end
 
 	//Read from ps registers to bus connect
@@ -218,7 +202,7 @@ always @(*) begin
 
 	//Bypass
 	if(ps_wrt_add==ps_rd_add)
-		ps_bc_dt= bc_dt_out;
+		ps_bc_dt= bc_dt;
 	else
 		ps_bc_dt= ps_rd_dt;
 
@@ -267,17 +251,17 @@ always@(posedge clk or negedge rst) begin					//A write to pc stck doesnt affect
 		
 		//PC stck writing
 		if( (ps_wrt_add==5'b00100) & ps_wrt_en ) begin			//Should include jump logic too later
-			ps_pcstck[ps_pcstck_pntr]<= bc_dt_out;
+			ps_pcstck[ps_pcstck_pntr]<= bc_dt;
 		end
 		
 		//ps_mode1 writing
 		if( (ps_wrt_add==5'b11011) & ps_wrt_en ) begin
-			ps_mode1<= bc_dt_out[0];
+			ps_mode1<= bc_dt[0];
 		end
 
 		//AStat writing
 		if( (ps_wrt_add==5'b11100) & ps_wrt_en ) begin
-			ps_astat<= bc_dt_out;
+			ps_astat<= bc_dt;
 		end else begin
 			ps_astat<= { ps_astat[15:10], shf_ps_ss, shf_ps_sz, shf_ps_sv, mul_ps_mv, mul_ps_mn, alu_ps_as, alu_ps_ac, alu_ps_an, alu_ps_av, alu_ps_az };
 		end
