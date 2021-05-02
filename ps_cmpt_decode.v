@@ -1,4 +1,4 @@
-module inst_compute(clk,rst,cpt_en,bt_5t25, ps_alu_en,ps_mul_en, ps_shf_en, ps_alu_log, ps_mul_otreg, ps_alu_hc, ps_mul_cls, ps_shf_cls, ps_alu_sc, ps_rf_wrt_en,ps_mul_dtsts, ps_rf_rd_a0, ps_rf_rd_a1, ps_rf_wrt_a);
+module cmpt_inst_dcdr(clk,rst,cpt_en,bt_5t25, ps_alu_en,ps_mul_en, ps_shf_en, ps_alu_log, ps_mul_otreg, ps_alu_hc, ps_mul_cls, ps_shf_cls, ps_alu_sc, ps_xb_w_cuEn,ps_mul_dtsts, ps_xb_rd_a0, ps_xb_raddy, ps_xb_wrt_a);
 
 parameter wrt=16;
 
@@ -7,16 +7,16 @@ input[20:0] bt_5t25;
 
 output ps_alu_en, ps_mul_en, ps_shf_en, ps_alu_log, ps_mul_otreg;
 output[1:0] ps_alu_hc, ps_mul_cls, ps_shf_cls;
-output[2:0] ps_alu_sc, ps_rf_wrt_en;
-output[3:0] ps_mul_dtsts, ps_rf_rd_a0, ps_rf_rd_a1, ps_rf_wrt_a;
+output[2:0] ps_alu_sc, ps_xb_w_cuEn;
+output[3:0] ps_mul_dtsts, ps_xb_rd_a0, ps_xb_raddy, ps_xb_wrt_a;
 
 reg ps_alu_en, ps_mul_en, ps_shf_en, ps_alu_log, ps_mul_otreg;
 reg[1:0] ps_alu_hc, ps_mul_cls, ps_shf_cls;
 reg[2:0] ps_alu_sc,wrt_en;
-reg[3:0] ps_mul_dtsts, ps_rf_rd_a0, ps_rf_rd_a1;
+reg[3:0] ps_mul_dtsts, ps_xb_rd_a0, ps_xb_raddy;
 
-reg[2:0] ps_rf_wrt_en;
-reg[3:0] ps_rf_wrt_a;
+reg[2:0] ps_xb_w_cuEn;
+reg[3:0] ps_xb_wrt_a;
 
 //CU Enables
 always @* begin
@@ -89,31 +89,31 @@ always @(*) begin
 	
 	if( ps_alu_en | (ps_mul_en & (|bt_5t25[18:17])) | ps_shf_en ) begin
 
-		ps_rf_rd_a0= bt_5t25[7:4];          //Input 1 read Address 
+		ps_xb_rd_a0= bt_5t25[7:4];          //Input 1 read Address 
 		
 	end else begin
 
-		ps_rf_rd_a0= 4'h0;
+		ps_xb_rd_a0= 4'h0;
 
 	end
 
 	if( (ps_alu_en & !bt_5t25[16]) | (ps_mul_en & (|bt_5t25[18:17])) | (ps_shf_en & !bt_5t25[16]) ) begin
 
-		ps_rf_rd_a1= bt_5t25[3:0];           //Input 2 read Address
+		ps_xb_raddy= bt_5t25[3:0];           //Input 2 read Address
 
 	end else begin
 
-		ps_rf_rd_a1= 4'h0;
+		ps_xb_raddy= 4'h0;
 
 	end
 
 	if(|wrt_en) begin
 				
-		ps_rf_wrt_a= bt_5t25[11:8];        //Write address
+		ps_xb_wrt_a= bt_5t25[11:8];        //Write address
 		
 	end else begin
 		
-		ps_rf_wrt_a= 4'h0;
+		ps_xb_wrt_a= 4'h0;
 	
 	end
 
@@ -124,13 +124,13 @@ always @(posedge clk or negedge rst) begin
 
 	if(!rst) begin
 
-		ps_rf_wrt_en<= 3'b0;
+		ps_xb_w_cuEn<= 3'b0;
 
 	end else begin
 	
-		ps_rf_wrt_en[0]<= wrt_en[0];                //Write enable for ALU
-		ps_rf_wrt_en[1]<= wrt_en[1];		    //for MUL
-		ps_rf_wrt_en[2]<= wrt_en[2];		    //for Shifter
+		ps_xb_w_cuEn[0]<= wrt_en[0];                //Write enable for ALU
+		ps_xb_w_cuEn[1]<= wrt_en[1];		    //for MUL
+		ps_xb_w_cuEn[2]<= wrt_en[2];		    //for Shifter
 
 
 	end

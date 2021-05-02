@@ -1,4 +1,4 @@
-module bsslctcontrol(clk,ps_pshstck,ps_popstck,ps_imminst,ps_dminst,ps_urgtrnsinst,ps_dm_wrb,ps_ureg1_add,ps_ureg2_add,ps_bc_drr_slct,ps_bc_di_slct);
+module bc_slct_cntrl(clk,ps_pshstck,ps_popstck,ps_imminst,ps_dminst,ps_urgtrnsinst,ps_dm_wrb,ps_ureg1_add,ps_ureg2_add,ps_bc_drr_slct,ps_bc_di_slct);
 
 input clk,ps_pshstck,ps_popstck,ps_imminst,ps_dminst,ps_urgtrnsinst,ps_dm_wrb;
 input[7:0] ps_ureg1_add,ps_ureg2_add;
@@ -65,5 +65,3 @@ always @ (posedge clk) begin
 end
 
 endmodule
-
-
