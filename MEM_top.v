@@ -1,14 +1,14 @@
 module memory #(parameter PMA_SIZE, PMD_SIZE, DMA_SIZE, DMD_SIZE)
 			(
 				input wire clk,
-				input wire ps_pm_chipSelect, ps_dm_a_chipSelect,
-				input wire[PMA_SIZE-1:0] ps_pm_a,
+				input wire ps_pm_cslt, ps_dm_cslt,
+				input wire[PMA_SIZE-1:0] ps_pm_add,
 				//input wire[PMD_SIZE-1:0] pmDataIn, (future scope)
-				input wire ps_pm_RbW, ps_dm_a_RbW,
-				input wire[DMA_SIZE-1:0] ps_dm_a,
-				input wire[DMD_SIZE-1:0] dmDataIn,
-				output reg[PMD_SIZE-1:0] pmDataOut,
-				output reg[DMD_SIZE-1:0] dmDataOut
+				input wire ps_pm_wrb, ps_dm_wrb,
+				input wire[DMA_SIZE-1:0] dg_dm_add,
+				input wire[DMD_SIZE-1:0] bc_dt,
+				output reg[PMD_SIZE-1:0] pm_ps_op,
+				output reg[DMD_SIZE-1:0] dm_bc_dt
 			);
 
 
@@ -23,12 +23,12 @@ module memory #(parameter PMA_SIZE, PMD_SIZE, DMA_SIZE, DMD_SIZE)
 
 		always@(posedge clk)
 		begin
-			if(ps_pm_chipSelect)
+			if(ps_pm_cslt)
 			begin
 					//PM reading
-					if(~ps_pm_RbW)
+					if(~ps_pm_wrb)
 					begin
-						pmDataOut<=pmInsts[ps_pm_a];
+						pm_ps_op<=pmInsts[ps_pm_add];
 					end
 					else;	//writing condition. data from assembler or PM(I,M)=ureg instruction (future expansion scope)
 			end
@@ -43,9 +43,9 @@ module memory #(parameter PMA_SIZE, PMD_SIZE, DMA_SIZE, DMD_SIZE)
 		reg [DMD_SIZE-1:0] dmData [(2**DMA_SIZE)-1:0];
 
 		integer file, i;
-		reg dm_chipSelect;
-		reg dm_RbW;
-		reg [DMA_SIZE-1:0] dm_a;
+		reg dm_cslt;
+		reg dm_wrb;
+		reg [DMA_SIZE-1:0] dm_add;
 		wire [DMD_SIZE-1:0] dmBypData;
 
 
@@ -58,18 +58,18 @@ module memory #(parameter PMA_SIZE, PMD_SIZE, DMA_SIZE, DMD_SIZE)
 
 		
 		//DM bypass
-		assign dmBypData = (dm_a==ps_dm_a) ? dmDataIn : dmData[ps_dm_a];
+		assign dmBypData = (dm_add==dg_dm_add) ? bc_dt : dmData[dg_dm_add];
 		
 
 		//DM reading
 		always@(posedge clk)
 		begin
-			if(ps_dm_a_chipSelect)
+			if(ps_dm_cslt)
 			begin
-				if(~ps_dm_a_RbW)
+				if(~ps_dm_wrb)
 				begin
 					$readmemh("C:/Users/Ashwin Pradeep/Desktop/Project Final Year/codes/project_integration_phase2/memory_txt_file/dm_file.txt",dmData);
-					dmDataOut<=dmBypData;
+					dm_bc_dt<=dmBypData;
 				end
 			end
 		end
@@ -77,19 +77,19 @@ module memory #(parameter PMA_SIZE, PMD_SIZE, DMA_SIZE, DMD_SIZE)
 		//control signal latching for writing purpose only (Write to memory at execute+1 cycle)
 		always@(posedge clk)
 		begin
-			dm_chipSelect <= ps_dm_a_chipSelect;
-			dm_RbW <= ps_dm_a_RbW;
-			dm_a<=ps_dm_a;
+			dm_cslt <= ps_dm_cslt;
+			dm_wrb <= ps_dm_wrb;
+			dm_add<=dg_dm_add;
 		end
 
 		//DM writing
 		always@(posedge clk)
 		begin
-			if(dm_chipSelect)
+			if(dm_cslt)
 			begin
-				if(dm_RbW)
+				if(dm_wrb)
 				begin
-					dmData[dm_a]=dmDataIn;
+					dmData[dm_add]=bc_dt;
 					file=$fopen("C:/Users/Ashwin Pradeep/Desktop/Project Final Year/codes/project_integration_phase2/memory_txt_file/dm_file.txt");
 					for(i=0; i<((2**DMA_SIZE)-1); i=i+1)
 					begin
@@ -107,71 +107,71 @@ module test_memory();
 
 parameter PMA_SIZE=16, PMD_SIZE=32, DMA_SIZE=17, DMD_SIZE=16;
 
-reg clk, ps_pm_chipSelect, ps_dm_a_chipSelect, ps_pm_RbW, ps_dm_a_RbW;
-reg[PMA_SIZE-1:0] ps_pm_a;
-wire[PMD_SIZE-1:0] pmDataOut;
-wire[DMD_SIZE-1:0] dmDataOut;
-reg[DMA_SIZE-1:0] ps_dm_a;
-reg[DMD_SIZE-1:0] dmDataIn;
+reg clk, ps_pm_cslt, ps_dm_cslt, ps_pm_wrb, ps_dm_wrb;
+reg[PMA_SIZE-1:0] ps_pm_add;
+wire[PMD_SIZE-1:0] pm_ps_op;
+wire[DMD_SIZE-1:0] dm_bc_dt;
+reg[DMA_SIZE-1:0] dg_dm_add;
+reg[DMD_SIZE-1:0] bc_dt;
 
 memory #(.PMA_SIZE(PMA_SIZE), .PMD_SIZE(PMD_SIZE), .DMA_SIZE(DMA_SIZE), .DMD_SIZE(DMD_SIZE))
 		testMem1	(
 					clk,
-					ps_pm_chipSelect, ps_dm_a_chipSelect,
-					ps_pm_a,
+					ps_pm_cslt, ps_dm_cslt,
+					ps_pm_add,
 					//pmDataIn,
-					ps_pm_RbW, ps_dm_a_RbW,
-					ps_dm_a,
-					dmDataIn,
-					pmDataOut,
-					dmDataOut
+					ps_pm_wrb, ps_dm_wrb,
+					dg_dm_add,
+					bc_dt,
+					pm_ps_op,
+					dm_bc_dt
 				);
 
 initial
 begin
-	clk=1; ps_pm_a=16'h0;
+	clk=1; ps_pm_add=16'h0;
 	forever begin #5 clk=~clk; end
 end
 
 initial
 begin
-	ps_pm_chipSelect=0;
-	#12 ps_pm_chipSelect=1;
+	ps_pm_cslt=0;
+	#12 ps_pm_cslt=1;
 end
 
 always@(posedge clk)
 begin
-	ps_pm_a<=ps_pm_a+1;
+	ps_pm_add<=ps_pm_add+1;
 end
 	
 initial
 begin
-	ps_pm_RbW=0;
+	ps_pm_wrb=0;
 end
 
 initial
 begin
-	ps_dm_a_chipSelect=0;
-	#11 ps_dm_a_chipSelect=1;
+	ps_dm_cslt=0;
+	#11 ps_dm_cslt=1;
 end
 
 initial
 begin
-	//ps_dm_a=17'h0_0000;
-	//#6 ps_dm_a=17'h0_0003;
-	#12 ps_dm_a=17'h0_000a;
-	#10 ps_dm_a=17'h0_000f;
+	//dg_dm_add=17'h0_0000;
+	//#6 dg_dm_add=17'h0_0003;
+	#12 dg_dm_add=17'h0_000a;
+	#10 dg_dm_add=17'h0_000f;
 end
 
 initial
 begin
-	#12 ps_dm_a_RbW=0;
-	#10 ps_dm_a_RbW=1;
+	#12 ps_dm_wrb=0;
+	#10 ps_dm_wrb=1;
 end
 
 initial
 begin
-	dmDataIn=16'hffee;
+	bc_dt=16'hffee;
 end
 
 endmodule

@@ -17,7 +17,7 @@ module phase2_top	#(parameter PMA_SIZE=16, PMD_SIZE=32, DMA_SIZE=16, DMD_SIZE=16
 		wire[(SIGNAL_WIDTH-1):0]ps_xb_cuEn;
 		wire ps_xb_dmEn;
 		wire[(ADDRESS_WIDTH-1):0] ps_rf_xA, ps_rf_yA, ps_rf_wrtA;
-		wire [RF_DATASIZE-1:0] bc_dt_out;
+		wire [RF_DATASIZE-1:0] bc_dt;
 		wire [RF_DATASIZE-1:0] rf_bc_dt;
 
 		//Shifter signals from PS
@@ -27,10 +27,13 @@ module phase2_top	#(parameter PMA_SIZE=16, PMD_SIZE=32, DMA_SIZE=16, DMD_SIZE=16
 		//Shifter to PS flags
 		wire shf_ovflag, shf_zeroflag;
 
-		//unused currently
+		//ALU signals from PS
 		wire ps_alu_en, ps_alu_log;
 		wire[1:0] ps_alu_hc;
 		wire[2:0] ps_alu_sc;
+
+		//ALU to PS flags
+		wire alu_zero, alu_neg, alu_carry, alu_of;
 
 
 		cu_top #(.RF_DATASIZE(RF_DATASIZE), .ADDRESS_WIDTH(ADDRESS_WIDTH), .SIGNAL_WIDTH(SIGNAL_WIDTH))
@@ -50,7 +53,7 @@ module phase2_top	#(parameter PMA_SIZE=16, PMD_SIZE=32, DMA_SIZE=16, DMD_SIZE=16
 					ps_xb_cuEn,
 					ps_xb_dmEn,
 					ps_rf_xA, ps_rf_yA, ps_rf_wrtA,
-					bc_dt_out,
+					bc_dt,
 
 					rf_bc_dt, 
 
@@ -59,7 +62,16 @@ module phase2_top	#(parameter PMA_SIZE=16, PMD_SIZE=32, DMA_SIZE=16, DMD_SIZE=16
 					ps_shf_cls,
 					
 					//Shifter to ps flags
-					shf_ovflag, shf_zeroflag
+					shf_ovflag, shf_zeroflag,
+
+					//Alu signals from ps
+					ps_alu_en, ps_alu_log,
+					ps_alu_hc,
+					ps_alu_sc,
+					alu_sat,
+			
+					//ALU flags
+					alu_zero, alu_neg, alu_carry, alu_of
 				);
 
 		
@@ -69,9 +81,8 @@ module phase2_top	#(parameter PMA_SIZE=16, PMD_SIZE=32, DMA_SIZE=16, DMD_SIZE=16
 		//wire[PMD_SIZE-1:0] pmDataIn; (future scope)
 		wire ps_pm_wrb, ps_dm_wrb;
 		wire[DMA_SIZE-1:0] dg_dm_add;
-		wire[DMD_SIZE-1:0] dmDataIn;
-		wire[PMD_SIZE-1:0] pmDataOut;
-		wire[DMD_SIZE-1:0] dmDataOut;
+		wire[PMD_SIZE-1:0] pm_ps_op;
+		wire[DMD_SIZE-1:0] dm_bc_dt;
 
 		memory #(.PMA_SIZE(PMA_SIZE), .PMD_SIZE(PMD_SIZE), .DMA_SIZE(DMA_SIZE), .DMD_SIZE(DMD_SIZE))
 			mem_obj	(
@@ -81,24 +92,23 @@ module phase2_top	#(parameter PMA_SIZE=16, PMD_SIZE=32, DMA_SIZE=16, DMD_SIZE=16
 					//pmDataIn,
 					ps_pm_wrb, ps_dm_wrb,
 					dg_dm_add,
-					bc_dt_out,
-					pmDataOut,
-					dmDataOut
+					bc_dt,
+					pm_ps_op,
+					dm_bc_dt
 				);
 
 
 		wire[1:0] ps_bc_drr_slct, ps_bc_di_slct;
-		wire[15:0] dm_bc_dt, dg_bc_dt, ps_bc_dt, ps_bc_immdt;
-		//wire[RF_DATASIZE-1:0] bc_dt_out;
+		wire[15:0] dg_bc_dt, ps_bc_dt, ps_bc_immdt;
 		wire[15:0] ps_bc_drr_dt;
 				
 		BC_top  bc_obj
 			(
 				clk,
 				ps_bc_drr_slct, ps_bc_di_slct,
-				dmDataOut, dg_bc_dt, ps_bc_dt, 
+				dm_bc_dt, dg_bc_dt, ps_bc_dt, 
 				rf_bc_dt, ps_bc_immdt,
-				bc_dt_out	// dm bus
+				bc_dt	// dm bus
 			);
 
 		
@@ -111,7 +121,7 @@ module phase2_top	#(parameter PMA_SIZE=16, PMD_SIZE=32, DMA_SIZE=16, DMD_SIZE=16
 		DAG_top dag_obj
 			(
 				clk, ps_dg_en, ps_dg_dgsclt, ps_dg_mdfy, 
-				dg_dm_add, dg_pm_add, ps_dg_iadd, ps_dg_madd, bc_dt_out, ps_dg_wrt_en, 
+				dg_dm_add, dg_pm_add, ps_dg_iadd, ps_dg_madd, bc_dt, ps_dg_wrt_en, 
 				dg_bc_dt, ps_dg_wrt_add, ps_dg_rd_add
 			);
 		
@@ -121,13 +131,18 @@ module phase2_top	#(parameter PMA_SIZE=16, PMD_SIZE=32, DMA_SIZE=16, DMD_SIZE=16
 					clk, reset,
 					
 					//flags
-					shf_ss,shf_sz,shf_sv,mul_ps_ov,mul_ps_mn,alu_as,alu_ac,alu_an,alu_av,alu_az,
-					
+					//shf_ss,shf_sz,shf_sv,
+					1'b0,     1'b0, 1'b0,
+					mul_ps_ov, mul_ps_mn,
+					//alu_as,alu_ac,alu_an,alu_av,alu_az,
+					1'b0,     1'b0,   1'b0, 1'b0, 1'b0,
+
+
 					//pm_ps
-					pmDataOut, 
+					pm_ps_op, 
 					
 					//bc_ps	
-					bc_dt_out,
+					bc_dt,
 
 					//ps_pm	
 					ps_pm_cslt, ps_pm_wrb, ps_pm_add, 
