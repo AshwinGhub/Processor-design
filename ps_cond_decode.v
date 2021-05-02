@@ -1,4 +1,4 @@
-module cond(cnd_en,op_cnd,cnd_stat,astat_bts);
+module cnd_dcdr(cnd_en,op_cnd,cnd_stat,astat_bts);
 
 input cnd_en;
 input[4:0] op_cnd;
@@ -59,5 +59,6 @@ always @(*) begin
 end
 
 endmodule
+
 
 
