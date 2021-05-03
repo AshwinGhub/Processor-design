@@ -1,18 +1,22 @@
-module shifter #(parameter DATASIZE)
+
+
+module shifter #(parameter DATASIZE = 16)
 		(
 			clk, 
 			ps_shf_en, ps_shf_cls, 
-			xb_cu_rx, xb_cu_ry, 
-			shf_xb_rn, shf_ovflag, shf_zeroflag
+			xb_dtx, xb_dty, 
+			shf_xb_dt, shf_ps_sv, shf_ps_sz
 		);
+
+
 
 input wire clk;
 input wire ps_shf_en;
 input wire [1:0]ps_shf_cls;
-input wire [DATASIZE-1:0]xb_cu_rx;
-input wire [DATASIZE-1:0]xb_cu_ry;
-output reg [DATASIZE-1:0]shf_xb_rn;
-output reg shf_ovflag, shf_zeroflag;
+input wire [DATASIZE-1:0]xb_dtx;
+input wire [DATASIZE-1:0]xb_dty;
+output reg [DATASIZE-1:0]shf_xb_dt;
+output reg shf_ps_sv, shf_ps_sz;
 
 reg [DATASIZE-1:0]ip1, ip2; 
 reg [1:0]shf_classif;
@@ -39,26 +43,26 @@ begin
 			
 			if(ip2[DATASIZE-1])				//Rn = ip2_2c Rx BY Ry	//negative ry will right shift; positive Ry will left shift.
 			begin
-				shf_xb_rn=$signed(ip1)>>>ip2_2c;
-				shf_ovflag=1'b0;	//overflow flag
+				shf_xb_dt=$signed(ip1)>>>ip2_2c;
+				shf_ps_sv=1'b0;	//overflow flag
 			end
 			else	
 			begin		
-				shf_xb_rn=ip1<<<ip2;
+				shf_xb_dt=ip1<<<ip2;
 				
 			//overflow flag
-			if(ip1[DATASIZE-1]!=shf_xb_rn[DATASIZE-1])
-				shf_ovflag=1'b1;
+			if(ip1[DATASIZE-1]!=shf_xb_dt[DATASIZE-1])
+				shf_ps_sv=1'b1;
 			else 
-				shf_ovflag=1'b0;
+				shf_ps_sv=1'b0;
 
 			end
 
 			//zero flag					
-			if(shf_xb_rn==16'h0000)
-				shf_zeroflag=1'b1;
+			if(shf_xb_dt==16'h0000)
+				shf_ps_sz=1'b1;
 			else 
-				shf_zeroflag=1'b0;
+				shf_ps_sz=1'b0;
 
 			
 				
@@ -76,17 +80,17 @@ begin
 				rot2=rot;
 			end
 
-			shf_xb_rn = (ip1>>rot1) | (ip1<<rot2);
+			shf_xb_dt = (ip1>>rot1) | (ip1<<rot2);
 
 			
 			//zero flag
-			if(shf_xb_rn==16'h0000)
-				shf_zeroflag=1'b1;
+			if(shf_xb_dt==16'h0000)
+				shf_ps_sz=1'b1;
 			else 
-				shf_zeroflag=1'b0;
+				shf_ps_sz=1'b0;
 					
 			//overflow flag
-			shf_ovflag=1'b0;
+			shf_ps_sv=1'b0;
 
 			end	
 			
@@ -103,19 +107,19 @@ begin
 					leftz[0] = leftz[1] ? ~zval4[1] : ~zval4[3];
 				end
 				
-				shf_xb_rn=leftz;	
+				shf_xb_dt=leftz;	
 
 					//zero flag
 				if(ip1[DATASIZE-1])
-					shf_zeroflag=1'b1;
+					shf_ps_sz=1'b1;
 				else 
-					shf_zeroflag=1'b0;
+					shf_ps_sz=1'b0;
 				
 				//overflow flag
-				if(shf_xb_rn==16'h0010)
-					shf_ovflag=1'b1;
+				if(shf_xb_dt==16'h0010)
+					shf_ps_sv=1'b1;
 				else 
-					shf_ovflag=1'b0;
+					shf_ps_sv=1'b0;
 			
 		end
 
@@ -132,19 +136,19 @@ begin
 					lefto[0] = lefto[1] ? oval4[1] : oval4[3];
 				end
 				
-				shf_xb_rn=lefto;
+				shf_xb_dt=lefto;
 
 					//zero flag
 				if(!ip1[DATASIZE-1])
-					shf_zeroflag=1'b1;
+					shf_ps_sz=1'b1;
 				else 
-					shf_zeroflag=1'b0;
+					shf_ps_sz=1'b0;
 					
 				//overflow flag
-				if(shf_xb_rn==16'h0010)
-					shf_ovflag=1'b1;
+				if(shf_xb_dt==16'h0010)
+					shf_ps_sv=1'b1;
 				else 
-					shf_ovflag=1'b0;
+					shf_ps_sv=1'b0;
 				
 		end
 	endcase
@@ -158,9 +162,10 @@ begin
 		shf_classif<=ps_shf_cls;
 		shf_en<=ps_shf_en;
 	
-		ip1<=xb_cu_rx;
-		if(!ps_shf_cls[1])	ip2<=xb_cu_ry;
+		ip1<=xb_dtx;
+		if(!ps_shf_cls[1])	ip2<=xb_dty;
 	end
+	
 end
 
 endmodule
@@ -172,11 +177,11 @@ module test_shifter_b#(parameter DATASIZE = 16)();
 
 reg clk, ps_shf_en;
 reg [1:0]ps_shf_cls;
-reg [DATASIZE-1:0]xb_cu_rx, xb_cu_ry;
-wire[DATASIZE-1:0]shf_xb_rn;
-wire shf_ovflag, shf_zeroflag;
+reg [DATASIZE-1:0]xb_dtx, xb_dty;
+wire[DATASIZE-1:0]shf_xb_dt;
+wire shf_ps_sv, shf_ps_sz;
 
-shifter_b b_obj(clk, ps_shf_en, ps_shf_cls, xb_cu_rx, xb_cu_ry, shf_xb_rn, shf_ovflag, shf_zeroflag);
+shifter_b b_obj(clk, ps_shf_en, ps_shf_cls, xb_dtx, xb_dty, shf_xb_dt, shf_ps_sv, shf_ps_sz);
 
 initial
 begin
@@ -206,23 +211,23 @@ end
 
 initial
 begin
-	#11 xb_cu_rx=16'hf000;
-	#10 xb_cu_rx=16'hc000;
-	#10 xb_cu_rx=16'h0000;
-	#10 xb_cu_rx=16'hffa0;
-	#10 xb_cu_rx=16'ha690;
-	#10 xb_cu_rx=16'h8888;
+	#11 xb_dtx=16'hf000;
+	#10 xb_dtx=16'hc000;
+	#10 xb_dtx=16'h0000;
+	#10 xb_dtx=16'hffa0;
+	#10 xb_dtx=16'ha690;
+	#10 xb_dtx=16'h8888;
 
 end
 
 initial
 begin
-	#11 xb_cu_ry=16'hfffc;
-	#10 xb_cu_ry=16'h0002;
-	#10 xb_cu_ry=16'h00ab;
-	#10 xb_cu_ry=16'h0034;
-	#10 xb_cu_ry=16'h0006;
-	#10 xb_cu_ry=16'hfffe;
+	#11 xb_dty=16'hfffc;
+	#10 xb_dty=16'h0002;
+	#10 xb_dty=16'h00ab;
+	#10 xb_dty=16'h0034;
+	#10 xb_dty=16'h0006;
+	#10 xb_dty=16'hfffe;
 
 end
 

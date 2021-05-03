@@ -1,3 +1,4 @@
+//2nd may
 module PS_top (clk,rst,shf_ps_ss,shf_ps_sz,shf_ps_sv,mul_ps_mv,mul_ps_mn,alu_ps_as,alu_ps_ac,alu_ps_an,alu_ps_av,alu_ps_az,pm_ps_op,bc_dt,ps_pm_cslt,ps_pm_wrb,ps_pm_add,ps_alu_en,ps_mul_en,ps_shf_en,ps_alu_log,ps_mul_otreg,ps_alu_hc,ps_mul_cls,ps_shf_cls,ps_alu_sc,ps_mul_dtsts,ps_xb_raddy,ps_xb_w_cuEn,ps_xb_wadd,ps_xb_raddx,ps_xb_w_bcEn,ps_dg_wrt_en,ps_dg_rd_add,ps_dg_wrt_add,ps_bc_immdt,ps_dm_cslt,ps_dm_wrb,ps_dg_en,ps_dg_dgsclt,ps_dg_mdfy,ps_dg_iadd,ps_dg_madd,ps_bc_drr_slct,ps_bc_di_slct,ps_bc_dt,dg_ps_add);
 
 
@@ -66,7 +67,7 @@ wire[4:0] ps_dg_rd_add,ps_rd_add,ps_dg_wrt_add,ps_wrt_add;//
 //Used for memory
 reg ps_pm_cslt,ps_pm_wrb;//
 reg ps_dm_cslt,ps_dm_wrb;//
-reg ps_pm_add;
+reg [15:0] ps_pm_add;
 
 //Used for RF specifically
 reg[3:0] ps_xb_raddx;

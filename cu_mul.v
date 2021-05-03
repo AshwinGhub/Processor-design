@@ -14,7 +14,7 @@ module multiplier
 				input wire clk,
 
 				//flags
-				output reg mul_ps_ov, 
+				output reg mul_ps_mv, 
 				output wire mul_ps_mn
 			);
 		
@@ -222,16 +222,16 @@ module multiplier
 			case( {mul_rxUbS|mul_ryUbS , mul_IbF} )		
 			
 					2'b00:	//UI
-						mul_ps_ov = ~(mul40_out_data[(RF_DATASIZE*5/2)-1:RF_DATASIZE]=={24{1'h0}}); 			//DATA_IN[39:16]== 24 zeros
+						mul_ps_mv = ~(mul40_out_data[(RF_DATASIZE*5/2)-1:RF_DATASIZE]=={24{1'h0}}); 			//DATA_IN[39:16]== 24 zeros
 				
 					2'b01:	//UF
-						mul_ps_ov = ~(mul40_out_data[(RF_DATASIZE*5/2)-1:RF_DATASIZE*2]==8'h00); 			//data_in[39:32]==8'h00
+						mul_ps_mv = ~(mul40_out_data[(RF_DATASIZE*5/2)-1:RF_DATASIZE*2]==8'h00); 			//data_in[39:32]==8'h00
 				
 					2'b10:	//SI
-						mul_ps_ov = ~(mul40_out_data[(RF_DATASIZE*5/2)-1:RF_DATASIZE-1]=={25{1'h1}} | mul40_out_data[(RF_DATASIZE*5/2)-1:RF_DATASIZE-1]=={25{1'h0}});	//data_in[39:15]== 25 ones or 25 zeros
+						mul_ps_mv = ~(mul40_out_data[(RF_DATASIZE*5/2)-1:RF_DATASIZE-1]=={25{1'h1}} | mul40_out_data[(RF_DATASIZE*5/2)-1:RF_DATASIZE-1]=={25{1'h0}});	//data_in[39:15]== 25 ones or 25 zeros
 
 					2'b11:	//SF
-						mul_ps_ov = ~(mul40_out_data[(RF_DATASIZE*5/2)-1:RF_DATASIZE*2-1]=={9{1'h1}} | mul40_out_data[(RF_DATASIZE*5/2)-1:RF_DATASIZE*2-1]=={9{1'h0}});			//data_in[39:31]== 9 ones or 9 zeros
+						mul_ps_mv = ~(mul40_out_data[(RF_DATASIZE*5/2)-1:RF_DATASIZE*2-1]=={9{1'h1}} | mul40_out_data[(RF_DATASIZE*5/2)-1:RF_DATASIZE*2-1]=={9{1'h0}});			//data_in[39:31]== 9 ones or 9 zeros
 			endcase
 		end
 		

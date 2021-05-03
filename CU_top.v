@@ -8,7 +8,7 @@ module cu_top 	#(parameter RF_DATASIZE, ADDRESS_WIDTH, SIGNAL_WIDTH)
 			input wire[1:0] ps_mul_cls,
 
 			//Multiplier flags output back to PS
-			output wire mul_ps_ov, 
+			output wire mul_ps_mv, 
 			output wire mul_ps_mn,
 
 			//Crossbar and RF signals
@@ -47,7 +47,7 @@ module cu_top 	#(parameter RF_DATASIZE, ADDRESS_WIDTH, SIGNAL_WIDTH)
 	crossbar #(.DATA_WIDTH(RF_DATASIZE), .ADDRESS_WIDTH(ADDRESS_WIDTH), .SIGNAL_WIDTH(SIGNAL_WIDTH)) xb_obj
 		(
 			ps_xb_w_cuEn, ps_xb_w_bcEn,
-			ps_xb_raddx, ps_xb_raddy, ps_xb_wadd,
+			ps_xb_wadd, ps_xb_raddx, ps_xb_raddy,
 			bc_dt, alu_xb_dt, shf_xb_dt, mul_xb_dt, rf_xb_dtx, rf_xb_dty,
 			xb_dtx, xb_dty, 
 			xb_rf_w_En, 
@@ -71,7 +71,7 @@ module cu_top 	#(parameter RF_DATASIZE, ADDRESS_WIDTH, SIGNAL_WIDTH)
 				ps_mul_dtsts,
 				ps_mul_cls,
 				clk,
-				mul_ps_ov,
+				mul_ps_mv,
 				mul_ps_mn
 			);	
 	

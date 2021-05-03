@@ -1,4 +1,4 @@
-module phase2_top	#(parameter PMA_SIZE=16, PMD_SIZE=32, DMA_SIZE=16, DMD_SIZE=16, RF_DATASIZE=16, ADDRESS_WIDTH=4, SIGNAL_WIDTH=3)
+module   phase2_top	#(parameter PMA_SIZE=16, PMD_SIZE=32, DMA_SIZE=16, DMD_SIZE=16, RF_DATASIZE=16, ADDRESS_WIDTH=4, SIGNAL_WIDTH=3)
 			(
 				input wire clk,
 				input wire reset
@@ -11,21 +11,21 @@ module phase2_top	#(parameter PMA_SIZE=16, PMD_SIZE=32, DMA_SIZE=16, DMD_SIZE=16
 		wire[1:0] ps_mul_cls;
 
 		//Multiplier flags output back to PS
-		wire mul_ps_ov, mul_ps_mn;
+		wire mul_ps_mv, mul_ps_mn;
 
 		//Crossbar and RF signals
-		wire[(SIGNAL_WIDTH-1):0]ps_xb_cuEn;
-		wire ps_xb_dmEn;
-		wire[(ADDRESS_WIDTH-1):0] ps_rf_xA, ps_rf_yA, ps_rf_wrtA;
+		wire[(SIGNAL_WIDTH-1):0]ps_xb_w_cuEn;
+		wire ps_xb_w_bcEn;
+		wire[(ADDRESS_WIDTH-1):0] ps_xb_raddx, ps_xb_raddy, ps_xb_wadd;
 		wire [RF_DATASIZE-1:0] bc_dt;
-		wire [RF_DATASIZE-1:0] rf_bc_dt;
+		wire [RF_DATASIZE-1:0] xb_dtx;
 
 		//Shifter signals from PS
 		wire ps_shf_en;
 		wire [1:0] ps_shf_cls;
 
 		//Shifter to PS flags
-		wire shf_ovflag, shf_zeroflag;
+		wire shf_ps_sv, shf_ps_sz;
 
 		//ALU signals from PS
 		wire ps_alu_en, ps_alu_log;
@@ -33,7 +33,7 @@ module phase2_top	#(parameter PMA_SIZE=16, PMD_SIZE=32, DMA_SIZE=16, DMD_SIZE=16
 		wire[2:0] ps_alu_sc;
 
 		//ALU to PS flags
-		wire alu_zero, alu_neg, alu_carry, alu_of;
+		wire alu_ps_az, alu_ps_an, alu_ps_ac, alu_ps_av;
 
 
 		cu_top #(.RF_DATASIZE(RF_DATASIZE), .ADDRESS_WIDTH(ADDRESS_WIDTH), .SIGNAL_WIDTH(SIGNAL_WIDTH))
@@ -46,32 +46,32 @@ module phase2_top	#(parameter PMA_SIZE=16, PMD_SIZE=32, DMA_SIZE=16, DMD_SIZE=16
 					ps_mul_cls,
 
 					//Multiplier flags output back to PS
-					mul_ps_ov,
+					mul_ps_mv,
 					mul_ps_mn,
 
 					//Crossbar and RF signals
-					ps_xb_cuEn,
-					ps_xb_dmEn,
-					ps_rf_xA, ps_rf_yA, ps_rf_wrtA,
+					ps_xb_w_cuEn,
+					ps_xb_w_bcEn,
+					ps_xb_raddx, ps_xb_raddy, ps_xb_wadd,
 					bc_dt,
 
-					rf_bc_dt, 
+					xb_dtx, 
 
 					//Shifter signals from PS
 					ps_shf_en,
 					ps_shf_cls,
 					
 					//Shifter to ps flags
-					shf_ovflag, shf_zeroflag,
+					shf_ps_sv, shf_ps_sz,
 
 					//Alu signals from ps
 					ps_alu_en, ps_alu_log,
 					ps_alu_hc,
 					ps_alu_sc,
-					alu_sat,
+					ps_alu_sat,
 			
 					//ALU flags
-					alu_zero, alu_neg, alu_carry, alu_of
+					alu_ps_az, alu_ps_an, alu_ps_ac, alu_ps_av
 				);
 
 		
@@ -107,8 +107,8 @@ module phase2_top	#(parameter PMA_SIZE=16, PMD_SIZE=32, DMA_SIZE=16, DMD_SIZE=16
 				clk,
 				ps_bc_drr_slct, ps_bc_di_slct,
 				dm_bc_dt, dg_bc_dt, ps_bc_dt, 
-				rf_bc_dt, ps_bc_immdt,
-				bc_dt	// dm bus
+				xb_dtx, ps_bc_immdt,
+				bc_dt	
 			);
 
 		
@@ -116,12 +116,12 @@ module phase2_top	#(parameter PMA_SIZE=16, PMD_SIZE=32, DMA_SIZE=16, DMD_SIZE=16
 		wire ps_dg_en, ps_dg_dgsclt, ps_dg_mdfy, ps_dg_wrt_en;
 		wire [2:0] ps_dg_iadd,ps_dg_madd;
 		wire [4:0] ps_dg_wrt_add,ps_dg_rd_add;
-		wire [PMA_SIZE-1:0] dg_pm_add;
+		wire [PMA_SIZE-1:0] dg_ps_add;
 		
 		DAG_top dag_obj
 			(
 				clk, ps_dg_en, ps_dg_dgsclt, ps_dg_mdfy, 
-				dg_dm_add, dg_pm_add, ps_dg_iadd, ps_dg_madd, bc_dt, ps_dg_wrt_en, 
+				dg_dm_add, dg_ps_add, ps_dg_iadd, ps_dg_madd, bc_dt, ps_dg_wrt_en, 
 				dg_bc_dt, ps_dg_wrt_add, ps_dg_rd_add
 			);
 		
@@ -133,7 +133,7 @@ module phase2_top	#(parameter PMA_SIZE=16, PMD_SIZE=32, DMA_SIZE=16, DMD_SIZE=16
 					//flags
 					//shf_ss,shf_sz,shf_sv,
 					1'b0,     1'b0, 1'b0,
-					mul_ps_ov, mul_ps_mn,
+					mul_ps_mv, mul_ps_mn,
 					//alu_as,alu_ac,alu_an,alu_av,alu_az,
 					1'b0,     1'b0,   1'b0, 1'b0, 1'b0,
 
@@ -151,11 +151,11 @@ module phase2_top	#(parameter PMA_SIZE=16, PMD_SIZE=32, DMA_SIZE=16, DMD_SIZE=16
 					ps_alu_en, ps_mul_en, ps_shf_en, ps_alu_log, ps_mul_otreg, ps_alu_hc, ps_mul_cls, ps_shf_cls, ps_alu_sc, ps_mul_dtsts, 
 
 
-					ps_rf_yA, 
-					ps_xb_cuEn, //ps_rf_wrt_en, 
-					ps_rf_wrtA,  ////ps_rf_mx_wrt_add
-					ps_rf_xA, 
-					ps_xb_dmEn, //ps_rf_dm_wrt_en, 
+					ps_xb_raddy, 
+					ps_xb_w_cuEn, //ps_rf_wrt_en, 
+					ps_xb_wadd,  ////ps_rf_mx_wrt_add
+					ps_xb_raddx, 
+					ps_xb_w_bcEn, //ps_rf_dm_wrt_en, 
 
 					//ps_dg
 					ps_dg_wrt_en, ps_dg_rd_add, ps_dg_wrt_add, 
@@ -170,7 +170,9 @@ module phase2_top	#(parameter PMA_SIZE=16, PMD_SIZE=32, DMA_SIZE=16, DMD_SIZE=16
 					ps_dg_en, ps_dg_dgsclt, ps_dg_mdfy, ps_dg_iadd, ps_dg_madd, 
 					
 					//ps_bc
-					ps_bc_drr_slct,	ps_bc_di_slct, ps_bc_dt
+					ps_bc_drr_slct,	ps_bc_di_slct, ps_bc_dt,
+
+					dg_ps_add
 				);
 
 endmodule
