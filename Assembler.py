@@ -238,7 +238,7 @@ def clear():
     else:
         _=system("clear")
 #a=input("Enter name of file containing instructions:")
-g=open("instructions/p1.txt","rt")
+g=open("instructions/p1","rt")
 #b=input("Enter name of OpCode Destination file:")
 f=open("memory_txt_files/pm_file.txt","wt")
 l=[]
