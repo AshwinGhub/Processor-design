@@ -1,4 +1,4 @@
-module   core_top	#(parameter PMA_SIZE=16, PMD_SIZE=32, DMA_SIZE=16, DMD_SIZE=16, RF_DATASIZE=16, ADDRESS_WIDTH=4, SIGNAL_WIDTH=3)
+module   core_top	#(parameter PMA_SIZE, PMD_SIZE, DMA_SIZE, DMD_SIZE, RF_DATASIZE, ADDRESS_WIDTH, SIGNAL_WIDTH, PM_LOCATE, DM_LOCATE)
 			(
 				input wire clk,
 				input wire reset
@@ -84,7 +84,7 @@ module   core_top	#(parameter PMA_SIZE=16, PMD_SIZE=32, DMA_SIZE=16, DMD_SIZE=16
 		wire[PMD_SIZE-1:0] pm_ps_op;
 		wire[DMD_SIZE-1:0] dm_bc_dt;
 
-		memory #(.PMA_SIZE(PMA_SIZE), .PMD_SIZE(PMD_SIZE), .DMA_SIZE(DMA_SIZE), .DMD_SIZE(DMD_SIZE))
+		memory #(.PMA_SIZE(PMA_SIZE), .PMD_SIZE(PMD_SIZE), .DMA_SIZE(DMA_SIZE), .DMD_SIZE(DMD_SIZE), .PM_LOCATE(PM_LOCATE), .DM_LOCATE(DM_LOCATE))
 			mem_obj	(
 					clk,
 					ps_pm_cslt, ps_dm_cslt,
