@@ -3,7 +3,7 @@ module test_core();
 reg clk, reset;
 
 core_top #(.PMA_SIZE(16), .PMD_SIZE(32), .DMA_SIZE(16), .DMD_SIZE(16), .RF_DATASIZE(16), .ADDRESS_WIDTH(4), .SIGNAL_WIDTH(3))
-	phase2_obj	(
+	core_obj	(
 				clk,
 				reset
 			);
