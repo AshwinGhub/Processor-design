@@ -1,6 +1,6 @@
 
 
-module shifter #(parameter DATASIZE = 16)
+module shifter #(parameter DATASIZE)
 		(
 			clk, 
 			ps_shf_en, ps_shf_cls, 
