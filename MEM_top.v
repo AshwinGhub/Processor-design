@@ -19,7 +19,8 @@ module memory #(parameter PMA_SIZE, PMD_SIZE, DMA_SIZE, DMD_SIZE)
 		reg [PMD_SIZE-1:0] pmInsts [(2**PMA_SIZE)-1:0];	
 		initial
 		begin
-			$readmemb("C:/Users/Ashwin Pradeep/Desktop/Project Final Year/codes/project_integration_phase2/memory_txt_file/pm_file.txt",pmInsts);
+			//$readmemb("C:/Users/Ashwin Pradeep/Desktop/Project Final Year/codes/project_integration_phase2/memory_txt_file/pm_file.txt",pmInsts);
+			$readmemb("memory_txt_file/pm_file.txt",pmInsts);
 		end
 
 		always@(posedge clk)
@@ -53,7 +54,8 @@ module memory #(parameter PMA_SIZE, PMD_SIZE, DMA_SIZE, DMD_SIZE)
 		//Initially open and close to clear the DM file
 		initial
 		begin
-			file=$fopen("C:/Users/Ashwin Pradeep/Desktop/Project Final Year/codes/project_integration_phase2/memory_txt_file/dm_file.txt","w");
+			//file=$fopen("C:/Users/Ashwin Pradeep/Desktop/Project Final Year/codes/project_integration_phase2/memory_txt_file/dm_file.txt","w");
+			file=$fopen("memory_txt_file/dm_file.txt","w");			
 			$fclose(file);
 		end
 
@@ -69,7 +71,8 @@ module memory #(parameter PMA_SIZE, PMD_SIZE, DMA_SIZE, DMD_SIZE)
 			begin
 				if(~ps_dm_wrb)
 				begin
-					$readmemh("C:/Users/Ashwin Pradeep/Desktop/Project Final Year/codes/project_integration_phase2/memory_txt_file/dm_file.txt",dmData);
+					//$readmemh("C:/Users/Ashwin Pradeep/Desktop/Project Final Year/codes/project_integration_phase2/memory_txt_file/dm_file.txt",dmData);
+					$readmemh("memory_txt_file/dm_file.txt",dmData);
 					dm_bc_dt<=dmBypData;
 				end
 			end
@@ -91,7 +94,8 @@ module memory #(parameter PMA_SIZE, PMD_SIZE, DMA_SIZE, DMD_SIZE)
 				if(dm_wrb)
 				begin
 					dmData[dm_add]=bc_dt;
-					file=$fopen("C:/Users/Ashwin Pradeep/Desktop/Project Final Year/codes/project_integration_phase2/memory_txt_file/dm_file.txt");
+					//file=$fopen("C:/Users/Ashwin Pradeep/Desktop/Project Final Year/codes/project_integration_phase2/memory_txt_file/dm_file.txt");
+					file=$fopen("memory_txt_file/dm_file.txt");
 					for(i=0; i<((2**DMA_SIZE)-1); i=i+1)
 					begin
 						$fdisplayh(file,dmData[i[DMA_SIZE-1:0]]);
