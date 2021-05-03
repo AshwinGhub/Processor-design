@@ -240,7 +240,7 @@ def clear():
 #a=input("Enter name of file containing instructions:")
 g=open("instructions/p1","rt")
 #b=input("Enter name of OpCode Destination file:")
-f=open("memory_txt_files/pm_file.txt","wt")
+f=open("../memory_txt_files/pm_file.txt","wt")
 l=[]
 rewrite=False
 instr_list=[]
@@ -298,7 +298,7 @@ while(i<len(l)):
                 instr_list.append(instr)
                 print(instr,end='')
                 i=i+1
-print("\nOpcodes saved in memory_txt_files/pm_file.txt")
+print("\nOpcodes saved in ../memory_txt_files/pm_file.txt")
 f.close()
 g.close()
 if(rewrite==True):
