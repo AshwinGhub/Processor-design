@@ -298,7 +298,7 @@ while(i<len(l)):
                 instr_list.append(instr)
                 print(instr,end='')
                 i=i+1
-print("\nOpcodes saved in OpCode_list.txt")
+print("\nOpcodes saved in memory_txt_files/pm_file.txt")
 f.close()
 g.close()
 if(rewrite==True):
