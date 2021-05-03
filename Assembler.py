@@ -153,7 +153,7 @@ def compute(com):
     else:
         Comp_code = "EROR"
     reg=re.findall("R[0-9][0-9]?",com)
-    if(Comp_code!="000000101" and Comp_code!="01111"+sign and Comp_code!="01011"+sign and Comp_code!="01101"+sign):
+    if(Comp_code!="000000101" and Comp_code!="01111"+sign and Comp_code!="01011"+sign and Comp_code!="01101"+sign and Comp_code!="EROR"):
         for i in range(len(reg)):
             R[i]=register(reg[i])[4:]
     else:
@@ -237,16 +237,27 @@ def clear():
         _=system('cls')
     else:
         _=system("clear")
-f=open("C:\\Users\\Ashwin Pradeep\\Desktop\\Project Final Year\\codes\\project_integration_phase2\\memory_txt_file\\pm_file.txt","wt")
-print("Enter Instructions by line and '#' for terminating the program")
+
+f=open("memory_txt_file/pm_file.txt","wt")  # PM File writing
+
+print("Enter Instructions by line, '#' for comments and 'exit()' for terminating the program")
 instr=input()
 instr_list=[]
-while(instr!="#"):
-    OpCode=Assembler(instr)
+while(instr!="exit()"):
+    instr_list.append(instr)
+    if("#" in instr):
+        inst = re.split("#",instr)[0]
+    else:
+        inst = instr
+    if(re.match("^[ ]*#",instr)):
+        instr=input()
+        continue
+    OpCode=Assembler(inst)
     if("ERROR" in OpCode):
         clear()
+        instr_list.pop()
         for i in range(3,0,-1):
-            print("Enter Instructions by line and '#' for terminating the program")
+            print("Enter Instructions by line, '#' for comments and 'exit()' for terminating the program")
             display(instr_list)
             print(instr)
             print(instr,end=" ")
@@ -254,13 +265,12 @@ while(instr!="#"):
             print("You can re-enter in {} seconds".format(i))
             time.sleep(1)
             clear()
-        print("Enter Instructions by line and '#' for terminating the program")
+        print("Enter Instructions by line, '#' for comments and 'exit()' for terminating the program")
         display(instr_list)
     else:
-        instr_list.append(instr)
         f.write(OpCode)
         f.write("\n")
     instr=input()
-print("\nOpcodes C:\\Users\\Ashwin Pradeep\\Desktop\\Project Final Year\\codes\\project_integration_phase2\\memory_txt_file\\pm_file.txt")
+print("\nOpcodes saved in memory_txt_file/pm_file.txt")
 f.close()
 time.sleep(2)
