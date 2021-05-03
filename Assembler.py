@@ -237,40 +237,74 @@ def clear():
         _=system('cls')
     else:
         _=system("clear")
-
-f=open("memory_txt_file/pm_file.txt","wt")  # PM File writing
-
-print("Enter Instructions by line, '#' for comments and 'exit()' for terminating the program")
-instr=input()
+a=input("Enter name of file containing instructions:")
+g=open("instructions/"+a,"rt")
+#b=input("Enter name of OpCode Destination file:")
+f=open("../memory_txt_files/pm_file.txt","wt")
+l=[]
+rewrite=False
 instr_list=[]
-while(instr!="exit()"):
-    instr_list.append(instr)
-    if("#" in instr):
-        inst = re.split("#",instr)[0]
-    else:
-        inst = instr
-    if(re.match("^[ ]*#",instr)):
-        instr=input()
-        continue
-    OpCode=Assembler(inst)
-    if("ERROR" in OpCode):
-        clear()
-        instr_list.pop()
-        for i in range(3,0,-1):
-            print("Enter Instructions by line, '#' for comments and 'exit()' for terminating the program")
-            display(instr_list)
-            print(instr)
-            print(instr,end=" ")
-            print("contains error. Please re-enter")
-            print("You can re-enter in {} seconds".format(i))
-            time.sleep(1)
+for i in g:
+    l.append(i.strip("\n"))
+i=0
+while(i<len(l)):
+    time.sleep(.5)
+    instr=l[i]
+    i=i+1
+    if(instr!=" "):
+        print(instr)
+        instr_list.append(instr)
+        if("#" in instr):
+            inst = re.split("#",instr)[0]
+            if(re.match("^[ ]*#",instr)):
+                continue
+        elif("/*" in instr):
+            inst = instr.split("/")[0]
+            if(re.match("^[/][*]",instr)):
+                while("*/" not in instr):
+                    time.sleep(.5)
+                    instr=l[i]
+                    instr_list.append(instr)
+                    print(instr,end='')
+                    i=i+1
+                continue
+        else:
+            inst = instr
+        OpCode=Assembler(inst)
+        if("ERROR" in OpCode):
             clear()
-        print("Enter Instructions by line, '#' for comments and 'exit()' for terminating the program")
-        display(instr_list)
-    else:
-        f.write(OpCode)
-        f.write("\n")
-    instr=input()
-print("\nOpcodes saved in memory_txt_file/pm_file.txt")
+            instr_list.pop()
+            for z in range(3,0,-1):
+                display(instr_list)
+                print(instr)
+                print(instr,end=" ")
+                print("contains error. Please re-enter")
+                print("You can re-enter in {} seconds".format(z))
+                time.sleep(1)
+                clear()
+            display(instr_list)
+            instr = input()
+            i=i-1
+            l[i]=instr
+            instr_list.append(instr)
+            rewrite=True
+        else:
+            f.write(OpCode)
+            f.write("\n")
+        if("/*" in instr):
+            while("*/" not in instr):
+                time.sleep(.5)
+                instr=l[i]
+                instr_list.append(instr)
+                print(instr,end='')
+                i=i+1
+print("\nOpcodes saved in ../memory_txt_files/pm_file.txt")
 f.close()
+g.close()
+if(rewrite==True):
+    g=open(a,"wt")
+    for i in range(len(l)):
+        g.write(l[i])
+        g.write('\n')
+    g.close()
 time.sleep(2)

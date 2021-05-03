@@ -1,4 +1,4 @@
-module crossbar #(parameter DATA_WIDTH=16, ADDRESS_WIDTH, SIGNAL_WIDTH)
+module crossbar #(parameter DATA_WIDTH, ADDRESS_WIDTH, SIGNAL_WIDTH)
 		( 
 		
 		input wire[(SIGNAL_WIDTH-1):0] ps_xb_w_cuEn,

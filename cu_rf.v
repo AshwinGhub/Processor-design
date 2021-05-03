@@ -1,4 +1,4 @@
-module regfile #(parameter DATA_WIDTH=16,ADDRESS_WIDTH=4,SIGNAL_WIDTH=3)
+module regfile #(parameter DATA_WIDTH, ADDRESS_WIDTH, SIGNAL_WIDTH)
 			( 
 			
 			input wire clk,  xb_rf_w_En, 
