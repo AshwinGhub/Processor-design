@@ -1,5 +1,5 @@
 //2nd may
-module memory #(parameter PMA_SIZE, PMD_SIZE, DMA_SIZE, DMD_SIZE, PM_LOCATE, DM_LOCATE)
+module memory #(parameter PMA_SIZE, PMD_SIZE, DMA_SIZE, DMD_SIZE, PM_LOCATE="C:/Users/Ashwin Pradeep/Desktop/Project Final Year/GIT repo/memory_txt_files/pm_file.txt", DM_LOCATE="C:/Users/Ashwin Pradeep/Desktop/Project Final Year/GIT repo/memory_txt_files/dm_file.txt")
 			(
 				input wire clk,
 				input wire ps_pm_cslt, ps_dm_cslt,
