@@ -302,7 +302,7 @@ print("\nOpcodes saved in ../memory_txt_files/pm_file.txt")
 f.close()
 g.close()
 if(rewrite==True):
-    g=open(a,"wt")
+    g=open("instructions/"+a,"wt")
     for i in range(len(l)):
         g.write(l[i])
         g.write('\n')
