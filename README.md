@@ -3,7 +3,7 @@
 Integration in phase 2
 
 Units
-1. Assembler - updating...
+1. Assembler
 2. Compute units
 3. Register file and Crossbar
 4. DAG
