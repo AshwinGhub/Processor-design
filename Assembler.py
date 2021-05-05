@@ -164,6 +164,8 @@ def compute(com):
         return "EROR"
     else:
         return Comp_code
+ur1="^[ ]?[A,C,D,F,I,L,M,P,S,U][A,C,M,O,R,S,T,U][A,D,I,K,N,R,S,T]?[A,D,E,L,S,T,Y]?[C,K,L,R,T,1,2]?[N,P,1,2]?[T]?[R]?[ ]?$"
+d="^[ ]?DM[ ]?[(][ ]?I[0-7][ ]?,[ ]?M[0-7][ ]?[)][ ]?$"
 def Assembler(x):
     OpCode = "00000000000000000000000000000000"
     x=x.upper()
@@ -203,7 +205,7 @@ def Assembler(x):
             x=x[3:]
         if(re.match("[R,I,M][0-9]+[ ]?=[ ]?[R,I,M][0-9]+[ ]?$",x)):
             OpCode=OpCode[0]+"0000100"+register(re.findall("[R,I,M,L,B][0-9]+",x)[0])+register(re.findall("[R,I,M,L,B][0-9]+",x)[1])+"000"+conditions(condition)
-        elif((re.match("^[A,C,D,F,I,L,M,P,S,U][A,C,M,O,R,S,T,U][A,D,I,K,N,R,S,T]?[A,D,E,L,S,T,Y]?[C,K,L,R,T,1,2]?[N,P,1,2]?[T]?[R]?[ ]?$",x.split("=")[0]) or re.match("^[ ]?[A,C,D,F,I,L,M,P,S,U][A,C,M,O,R,S,T,U][A,D,I,K,N,R,S,T]?[A,D,E,L,S,T,Y]?[C,K,L,R,T,1,2]?[N,P,1,2]?[T]?[R]?[ ]?$",x.split("=")[-1])) and (not re.match("^MR[ ]?$",x.split("=")[0]))):
+        elif((re.match(ur1,x.split("=")[0]) or re.match(ur1,x.split("=")[-1])) and (not re.match("^MR[ ]?$",x.split("=")[0]))and (not re.match("^MR[ ]?$",x.split("=")[0])) and (not re.match(d,x.split("=")[0])) and (not re.match(d,x.split("=")[-1]))):
             temp=x.split("=")[0]
             if(("FADDR" in temp) or ("DADDR" in temp) or (re.match("^[ ]?PC[ ]?$",temp)) or ("STKY" in temp) or ("PCSTKP" in temp)):
                 OpCode="ERROR"
@@ -238,9 +240,9 @@ def clear():
     else:
         _=system("clear")
 a=input("Enter name of file containing instructions:")
-g=open("instructions/"+a,"rt")
+g=open("instructions/"+a,"rt")                              # changed
 #b=input("Enter name of OpCode Destination file:")
-f=open("../memory_txt_files/pm_file.txt","wt")
+f=open("../memory_txt_files/pm_file.txt","wt")              # changed
 l=[]
 rewrite=False
 instr_list=[]
@@ -248,7 +250,7 @@ for i in g:
     l.append(i.strip("\n"))
 i=0
 while(i<len(l)):
-    time.sleep(.5)
+    time.sleep(1)
     instr=l[i]
     i=i+1
     if(instr!=" "):
@@ -283,10 +285,12 @@ while(i<len(l)):
                 time.sleep(1)
                 clear()
             display(instr_list)
+            print("Faulty instruction : {}".format(instr))
             instr = input()
+            clear()
+            display(instr_list)
             i=i-1
             l[i]=instr
-            instr_list.append(instr)
             rewrite=True
         else:
             f.write(OpCode)
@@ -298,11 +302,12 @@ while(i<len(l)):
                 instr_list.append(instr)
                 print(instr,end='')
                 i=i+1
-print("\nOpcodes saved in ../memory_txt_files/pm_file.txt")
+#print("\nOpcodes saved in {}".format(b))
+print("\nOpcodes saved in ../memory_txt_files/pm_file.txt")     # changed
 f.close()
 g.close()
 if(rewrite==True):
-    g=open("instructions/"+a,"wt")
+    g=open("instructions/"+a,"wt")                              # changed
     for i in range(len(l)):
         g.write(l[i])
         g.write('\n')
