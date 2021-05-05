@@ -108,9 +108,6 @@ always @ (posedge clk or negedge rst) begin
 		ps_faddr <= ps_faddr + 16'b1;
 		ps_daddr <= ps_faddr;
 		ps_pc <= ps_daddr;
-		if(ps_faddr==16'd14) begin                      		//Replace with idle logic
-			ps_pm_cslt<=1'b0;
-		end
 	end
 
 	//RF write address muxing
