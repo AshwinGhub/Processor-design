@@ -13,13 +13,12 @@ module memory #(parameter PMA_SIZE, PMD_SIZE, DMA_SIZE, DMD_SIZE, PM_LOCATE, DM_
 			);
 
 
-	//------------------------------------------------------------------------------------------------------------------------------------
-	//					PM reading
-	//------------------------------------------------------------------------------------------------------------------------------------
+//------------------------------------------------------------------------------------------------------------------------------------
+//					PM reading
+//------------------------------------------------------------------------------------------------------------------------------------
 		reg [PMD_SIZE-1:0] pmInsts [(2**PMA_SIZE)-1:0];	
 		initial
 		begin
-			//$readmemb("C:/Users/Ashwin Pradeep/Desktop/Project Final Year/GIT repo/memory_txt_files/pm_file.txt",pmInsts);
 			$readmemb(PM_LOCATE,pmInsts);
 		end
 
@@ -38,9 +37,9 @@ module memory #(parameter PMA_SIZE, PMD_SIZE, DMA_SIZE, DMD_SIZE, PM_LOCATE, DM_
 		
 
 
-	//------------------------------------------------------------------------------------------------------------------------
-	//				DM reading and writing
-	//------------------------------------------------------------------------------------------------------------------------
+//------------------------------------------------------------------------------------------------------------------------
+//				DM reading and writing
+//------------------------------------------------------------------------------------------------------------------------
 		
 		reg [DMD_SIZE-1:0] dmData [(2**DMA_SIZE)-1:0];
 
@@ -51,14 +50,23 @@ module memory #(parameter PMA_SIZE, PMD_SIZE, DMA_SIZE, DMD_SIZE, PM_LOCATE, DM_
 		wire [DMD_SIZE-1:0] dmBypData;
 
 
+	//----------------------------------------------------------------------------------------
 		//Initially open and close to clear the DM file
 		initial
 		begin
-			//file=$fopen("C:/Users/Ashwin Pradeep/Desktop/Project Final Year/GIT repo/memory_txt_files/dm_file.txt","w");			
 			file=$fopen(DM_LOCATE,"w");
 			$fclose(file);
 		end
+	
+	//Comment above initial block if you want to access DM data present in data memory before startup.
+	//----------------------------------------------------------------------------------------
 
+
+		//initially load DM data from DM file (required when DM contains data to be read before startup)
+		initial
+		begin
+			$readmemh(DM_LOCATE,dmData);
+		end
 		
 		//DM bypass
 		assign dmBypData = (dm_add==dg_dm_add) ? bc_dt : dmData[dg_dm_add];
@@ -71,9 +79,8 @@ module memory #(parameter PMA_SIZE, PMD_SIZE, DMA_SIZE, DMD_SIZE, PM_LOCATE, DM_
 			begin
 				if(~ps_dm_wrb)
 				begin
-					//$readmemh("C:/Users/Ashwin Pradeep/Desktop/Project Final Year/GIT repo/memory_txt_files/dm_file.txt",dmData);
 					$readmemh(DM_LOCATE,dmData);
-					dm_bc_dt<=dmBypData;
+					dm_bc_dt=dmBypData;
 				end
 			end
 		end
@@ -94,7 +101,6 @@ module memory #(parameter PMA_SIZE, PMD_SIZE, DMA_SIZE, DMD_SIZE, PM_LOCATE, DM_
 				if(dm_wrb)
 				begin
 					dmData[dm_add]=bc_dt;
-					//file=$fopen("C:/Users/Ashwin Pradeep/Desktop/Project Final Year/GIT repo/memory_txt_files/dm_file.txt");
 					file=$fopen(DM_LOCATE);
 					for(i=0; i<((2**DMA_SIZE)-1); i=i+1)
 					begin
