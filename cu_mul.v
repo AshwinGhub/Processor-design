@@ -1,3 +1,4 @@
+//6th May 7:36 PM reset added
 module multiplier
 			#(parameter RF_DATASIZE)
 			(	
@@ -11,21 +12,32 @@ module multiplier
 				input wire[1:0] ps_mul_cls,
 				
 				//universal signals
-				input wire clk,
+				input wire clk, reset,
 
 				//flags
 				output reg mul_ps_mv, 
 				output wire mul_ps_mn
 			);
 		
-	//matching the port signal names given by ps team with the names used in my design
+	//latching the control signals for execute cycle usage
 	//=======================================================================================
 		reg mul_en, mul_otreg;
 		reg mul_rndPrdt, mul_IbF, mul_rxUbS, mul_ryUbS;		//mul_dtsts[3:0]
 		reg[1:0] mul_cls;
-		always@(posedge clk)
+		always@(posedge clk or negedge reset)
 		begin 
-			mul_en <= ps_mul_en;
+			if(~reset)
+			begin
+				mul_en <= 1'b0;
+				mul_otreg <= 1'b0;
+				mul_ryUbS <= 1'b0;
+				mul_rxUbS <= 1'b0;
+				mul_IbF <= 1'b0;
+				mul_rndPrdt <= 1'b0;
+				mul_cls <= 2'b00;
+			end
+			else
+				mul_en <= ps_mul_en;
 		end	
 		always@(posedge clk)
 		begin
@@ -47,10 +59,19 @@ module multiplier
 		reg[RF_DATASIZE-1:0] Rx16_latched, Ry16_latched;
 		
 		//latch Register File inputs multiplier entry
-		always@(posedge clk)
+		always@(posedge clk or negedge reset)
 		begin
-			Rx16_latched <= (ps_mul_en & ps_mul_cls!=2'b00) ? xb_dtx : Rx16_latched;	//latch only when multiplier enabled and also its not a saturate instruction which only requires MR
-			Ry16_latched <= (ps_mul_en & ps_mul_cls!=2'b00) ? xb_dty : Ry16_latched;
+			if(~reset)
+			begin
+				Rx16_latched <= 16'h0;
+				Ry16_latched <= 16'h0;
+			end
+			else
+				if(ps_mul_en & ps_mul_cls!=2'b00)
+				begin
+					Rx16_latched <= xb_dtx;	//latch only when multiplier enabled and also its not a saturate instruction which only requires MR
+					Ry16_latched <= xb_dty;
+				end
 		end
 
 		wire[RF_DATASIZE:0] U_Rx, S_Rx, U_Ry, S_Ry;	//17 bit wires for converting to signed
@@ -99,7 +120,7 @@ module multiplier
 		wire[(RF_DATASIZE*5/2)-1:0] sat_out;
 		wire satEn;
 		
-		assign satEn=(mul_cls==00);
+		assign satEn = (mul_cls==2'b00) & mul_en;
 
 		mul_sat sat1(satEn, mr40_data, mul_mrUbS, mul_IbF, sat_out);	
 		defparam sat1.SIZE=RF_DATASIZE;
@@ -198,9 +219,13 @@ module multiplier
 	//ANDing mul_otreg with mul_en ensures that mul_otreg signal goes low when multiplier is disabled and avoids unnecessary MR updates (which happens if last instruction is MR accumulate instruction)
 		
 		//MR write logic
-		always@(posedge clk)
-			mr40_data<=mr_in_data;
-
+		always@(posedge clk or negedge reset)
+		begin
+			if(~reset)
+				mr40_data<=40'h0;		//reset mr so that at reset, mul_cls=00 -> mv flag doesn't go to x
+			else
+				mr40_data<=mr_in_data;
+		end
 
 
 
@@ -241,19 +266,3 @@ module multiplier
 
 endmodule
 
-
-
-
-	/*
-	*			Control signal breakdown
-		*						
-		*		mul_otreg = 0 (Rn), 1 (MR)
-		*		
-				mul_dtsts = 0000 (UUI),	0010 (UUF), 0011(UUFR), 0100 (SUI), 0110 (SUF), 0111 (SUFR), 1000 (USI), 1010 (USF), 1011 (USFR), 1100 (SSI), 1110 (SSF), 1111 (SSFR)
-		*
-		*		mul_cls = 00 (SAT), 01 (Product), 10 (Accumulate ADD), 11 (Accumulate SUB)
-		*
-				{s1,s0} = 00 (SSI), 01 (SSF), 10 (UU), 11 (SU|US)
-		*		
-		*
-		*/
