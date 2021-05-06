@@ -36,7 +36,7 @@ reg[15:0] ps_astat;						//ASTAT work left -> compare
 reg[15:0] ps_pcstck[1:0];
 reg[2:0] ps_stcky;
 reg ps_pshstck_dly,ps_popstck_dly;
-reg ps_rd_dt;
+reg[15:0] ps_rd_dt;
 
 //Used for compute decoding
 reg cpt_en;//
@@ -108,9 +108,6 @@ always @ (posedge clk or negedge rst) begin
 		ps_faddr <= ps_faddr + 16'b1;
 		ps_daddr <= ps_faddr;
 		ps_pc <= ps_daddr;
-		if(ps_faddr==16'd14) begin                      		//Replace with idle logic
-			ps_pm_cslt<=1'b0;
-		end
 	end
 
 	//RF write address muxing
@@ -190,7 +187,7 @@ always @(*) begin
 	else if(ps_rd_add== 5'b00011)
 		ps_rd_dt= ps_pc;
 	else if(ps_rd_add== 5'b00100)
-		ps_rd_dt= ps_pcstck[ps_pcstck_pntr];
+		ps_rd_dt= ps_pcstck[ps_pcstck_pntr-1'b1];
 	else if(ps_rd_add== 5'b00101)
 		ps_rd_dt= {15'b0,ps_pcstck_pntr};
 	else if(ps_rd_add== 5'b11011)
@@ -202,9 +199,13 @@ always @(*) begin
 	else 
 		ps_rd_dt= 16'b0;
 
-	//Bypass
+	//Bypass (Consider if there are changes in pcstkp and stcky bypass after including jump instructions)
 	if(ps_wrt_add==ps_rd_add)
 		ps_bc_dt= bc_dt;
+	else if( (ps_rd_add==5'b00101) & (ps_pshstck_dly | ps_popstck_dly) )
+		ps_bc_dt= {15'b0,ps_pshstck_dly};
+	else if( (ps_rd_add==5'b11110) & (ps_pshstck_dly | ps_popstck_dly) )
+		ps_bc_dt= {13'b0, (ps_stcky[1] & ps_pshstck_dly) ,ps_pshstck_dly, ps_popstck_dly};
 	else
 		ps_bc_dt= ps_rd_dt;
 
@@ -215,7 +216,7 @@ always@(posedge clk or negedge rst) begin					//For the time being, a write usin
 
 	if(!rst) begin
 
-		ps_stcky<=3'b0;							//ps_stcky[0] -> empty flag, ps_stcky[1] -> full flag, ps_stcky[2] -> pc sctack overflow
+		ps_stcky<=3'b001;							//ps_stcky[0] -> empty flag, ps_stcky[1] -> full flag, ps_stcky[2] -> pc sctack overflow
 		ps_pcstck_pntr<= 1'b0;
 		ps_pshstck_dly<= 1'b0;
 		ps_popstck_dly<= 1'b0;
