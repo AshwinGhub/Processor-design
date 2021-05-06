@@ -37,6 +37,7 @@ reg[15:0] ps_pcstck[1:0];
 reg[2:0] ps_stcky;
 reg ps_pshstck_dly,ps_popstck_dly;
 reg[15:0] ps_rd_dt;
+reg ps_cmpt_dly;
 
 //Used for compute decoding
 reg cpt_en;//
@@ -206,6 +207,8 @@ always @(*) begin
 		ps_bc_dt= {15'b0,ps_pshstck_dly};
 	else if( (ps_rd_add==5'b11110) & (ps_pshstck_dly | ps_popstck_dly) )
 		ps_bc_dt= {13'b0, (ps_stcky[1] & ps_pshstck_dly) ,ps_pshstck_dly, ps_popstck_dly};
+	else if( (ps_rd_add== 5'b11100) & ps_cmpt_dly )
+		ps_bc_dt=  { /*ps_astat[15:10] */ 6'b0 , shf_ps_ss, shf_ps_sz, shf_ps_sv, mul_ps_mv, mul_ps_mn, alu_ps_as, alu_ps_ac, alu_ps_an, alu_ps_av, alu_ps_az };
 	else
 		ps_bc_dt= ps_rd_dt;
 
@@ -216,7 +219,7 @@ always@(posedge clk or negedge rst) begin					//For the time being, a write usin
 
 	if(!rst) begin
 
-		ps_stcky<=3'b001;							//ps_stcky[0] -> empty flag, ps_stcky[1] -> full flag, ps_stcky[2] -> pc sctack overflow
+		ps_stcky<=3'b001;						//ps_stcky[0] -> empty flag, ps_stcky[1] -> full flag, ps_stcky[2] -> pc sctack overflow
 		ps_pcstck_pntr<= 1'b0;
 		ps_pshstck_dly<= 1'b0;
 		ps_popstck_dly<= 1'b0;
@@ -249,6 +252,7 @@ always@(posedge clk or negedge rst) begin					//A write to pc stck doesnt affect
 		       	ps_pcstck[i]<= 2'b00;
 		end
 		ps_mode1<= 1'b0;
+		ps_cmpt_dly<=1'b0;
 
 	end begin
 		
@@ -262,12 +266,14 @@ always@(posedge clk or negedge rst) begin					//A write to pc stck doesnt affect
 			ps_mode1<= bc_dt[0];
 		end
 
-		//AStat writing
+		//Astat writing
 		if( (ps_wrt_add==5'b11100) & ps_wrt_en ) begin
 			ps_astat<= bc_dt;
 		end else begin
-			ps_astat<= { ps_astat[15:10], shf_ps_ss, shf_ps_sz, shf_ps_sv, mul_ps_mv, mul_ps_mn, alu_ps_as, alu_ps_ac, alu_ps_an, alu_ps_av, alu_ps_az };
+			ps_astat<= { /*ps_astat[15:10] */ 6'b0 , shf_ps_ss, shf_ps_sz, shf_ps_sv, mul_ps_mv, mul_ps_mn, alu_ps_as, alu_ps_ac, alu_ps_an, alu_ps_av, alu_ps_az };     //Update 6'b0 with compare logic later on
 		end
+
+		ps_cmpt_dly<=cpt_en;
 
 	end
 
