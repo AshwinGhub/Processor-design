@@ -187,9 +187,12 @@ always @(*) begin
 		ps_rd_dt= ps_daddr;	
 	else if(ps_rd_add== 5'b00011)
 		ps_rd_dt= ps_pc;
-	else if(ps_rd_add== 5'b00100)
-		ps_rd_dt= ps_pcstck[ps_pcstck_pntr-1'b1];
-	else if(ps_rd_add== 5'b00101)
+	else if(ps_rd_add== 5'b00100) begin					//PCSTCK 
+		if(ps_pcstck_pntr)
+			ps_rd_dt= ps_pcstck[ps_pcstck_pntr-1'b1];
+		else
+			ps_rd_dt= ps_pcstck[ps_pcstck_pntr];
+	end else if(ps_rd_add== 5'b00101)
 		ps_rd_dt= {15'b0,ps_pcstck_pntr};
 	else if(ps_rd_add== 5'b11011)
 		ps_rd_dt= {15'b0,ps_mode1};
@@ -258,7 +261,15 @@ always@(posedge clk or negedge rst) begin					//A write to pc stck doesnt affect
 		
 		//PC stck writing
 		if( (ps_wrt_add==5'b00100) & ps_wrt_en ) begin			//Should include jump logic too later
-			ps_pcstck[ps_pcstck_pntr]<= bc_dt;
+			if(ps_pshstck_dly) begin
+				ps_pcstck[ps_pcstck_pntr]<= bc_dt;
+			end else begin
+				if(ps_pcstck_pntr) begin
+					ps_pcstck[ps_pcstck_pntr-1'b1]<= bc_dt;
+				end else begin
+					ps_pcstck[ps_pcstck_pntr]<= bc_dt;
+				end
+			end
 		end
 		
 		//ps_mode1 writing
