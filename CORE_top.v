@@ -39,7 +39,7 @@ module   core_top	#(parameter PMA_SIZE, PMD_SIZE, DMA_SIZE, DMD_SIZE, RF_DATASIZ
 
 		cu_top #(.RF_DATASIZE(RF_DATASIZE), .ADDRESS_WIDTH(ADDRESS_WIDTH), .SIGNAL_WIDTH(SIGNAL_WIDTH))
 			cu_obj	(
-					clk, reset
+					clk, reset,
 				
 					//Multiplier control signals input from PS
 					ps_mul_en, ps_mul_otreg,
