@@ -1,7 +1,7 @@
-//2nd may
+// 7th may 12:46 AM reset port and logic added to pm mem
 module memory #(parameter PMA_SIZE, PMD_SIZE, DMA_SIZE, DMD_SIZE, PM_LOCATE, DM_LOCATE)
 			(
-				input wire clk,
+				input wire clk, reset,
 				input wire ps_pm_cslt, ps_dm_cslt,
 				input wire[PMA_SIZE-1:0] ps_pm_add,
 				//input wire[PMD_SIZE-1:0] pmDataIn, (future scope)
@@ -22,7 +22,10 @@ module memory #(parameter PMA_SIZE, PMD_SIZE, DMA_SIZE, DMD_SIZE, PM_LOCATE, DM_
 			$readmemb(PM_LOCATE,pmInsts);
 		end
 
-		always@(posedge clk)
+		always@(posedge clk or negedge reset)
+		if(~reset)
+			pm_ps_op<=0;
+		else
 		begin
 			if(ps_pm_cslt)
 			begin
