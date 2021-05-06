@@ -1,7 +1,7 @@
-//3rd May
+//6th May 7:36 PM reset added
 module cu_top 	#(parameter RF_DATASIZE, ADDRESS_WIDTH, SIGNAL_WIDTH)
 		(
-			input wire clk,
+			input wire clk, reset
 				
 			//Multiplier control signals input from PS
 			input wire ps_mul_en, ps_mul_otreg,
@@ -71,7 +71,7 @@ module cu_top 	#(parameter RF_DATASIZE, ADDRESS_WIDTH, SIGNAL_WIDTH)
 				ps_mul_en, ps_mul_otreg,
 				ps_mul_dtsts,
 				ps_mul_cls,
-				clk,
+				clk, reset
 				mul_ps_mv,
 				mul_ps_mn
 			);	

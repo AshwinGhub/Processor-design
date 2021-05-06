@@ -1,3 +1,4 @@
+//6th May 7:36 PM reset added
 module multiplier
 			#(parameter RF_DATASIZE)
 			(	
@@ -11,7 +12,7 @@ module multiplier
 				input wire[1:0] ps_mul_cls,
 				
 				//universal signals
-				input wire clk,
+				input wire clk, reset
 
 				//flags
 				output reg mul_ps_mv, 
