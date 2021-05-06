@@ -240,9 +240,9 @@ def clear():
     else:
         _=system("clear")
 a=input("Enter name of file containing instructions:")
-g=open("Instructions/"+a,"rt")
+g=open("instructions/"+a,"rt")
 #b=input("Enter name of OpCode Destination file:")
-f=open("../memory_files/pm_file.txt","wt")
+f=open("../memory_txt_files/pm_file.txt","wt")
 l=[]
 rewrite=False
 instr_list=[]
@@ -302,11 +302,11 @@ while(i<len(l)):
                 instr_list.append(instr)
                 print(instr,end='')
                 i=i+1
-print("\nOpcodes saved in ../memory_files/pm_file.txt")
+print("\nOpcodes saved in ../memory_txt_files/pm_file.txt")
 f.close()
 g.close()
 if(rewrite==True):
-    g=open("Instructions/"+a,"wt")
+    g=open("instructions/"+a,"wt")
     for i in range(len(l)):
         g.write(l[i])
         g.write('\n')
