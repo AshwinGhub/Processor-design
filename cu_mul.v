@@ -266,3 +266,91 @@ module multiplier
 
 endmodule
 
+
+
+
+	/*
+	*			Control signal breakdown
+		*						
+		*		mul_otreg = 0 (Rn), 1 (MR)
+		*		
+				mul_dtsts = 0000 (UUI),	0010 (UUF), 0011(UUFR), 0100 (SUI), 0110 (SUF), 0111 (SUFR), 1000 (USI), 1010 (USF), 1011 (USFR), 1100 (SSI), 1110 (SSF), 1111 (SSFR)
+		*
+		*		mul_cls = 00 (SAT), 01 (Product), 10 (Accumulate ADD), 11 (Accumulate SUB)
+		*
+				{s1,s0} = 00 (SSI), 01 (SSF), 10 (UU), 11 (SU|US)
+		*		
+		*
+		*/
+
+
+
+
+	//==============================================================
+	//
+	//			Testbench for mul
+	//
+	//==============================================================
+	/*
+	
+	module test_cu_mul();
+	
+	reg reset, clk;
+	wire [15:0] mul_out;
+
+	reg ps_mul_en, ps_mul_otreg;
+	reg [3:0] ps_mul_dtsts;
+	reg [1:0] ps_mul_cls;
+				
+	wire flag1, flag2;
+
+	multiplier #(.RF_DATASIZE(16)) m_tobj
+			(	16'habcd, 16'hcdef, 
+				mul_out,
+
+				//control signals below
+				ps_mul_en, ps_mul_otreg,
+				ps_mul_dtsts,
+				ps_mul_cls,
+				
+				//universal signals
+				clk, reset,
+
+				//flags
+				mul_ps_mv, 
+				mul_ps_mn
+			);
+	
+	initial
+	begin
+		reset=1;
+		#1 reset=0;
+		#2 reset=1;
+	end
+
+	initial
+	begin
+		clk=0;
+		#10
+		clk=1;
+		forever begin
+			#5 clk=~clk;
+		end
+	end
+
+	always@(negedge reset)
+		if(~reset)
+			ps_mul_en<=1'b0;		//PS supplies enable=0 on reset. This is required condition!
+
+	always@(posedge clk)
+	//if(~reset)
+		begin
+			#5
+			ps_mul_en<=1'b1;
+			ps_mul_otreg<=1'b1;
+			ps_mul_dtsts<=4'b1;
+			ps_mul_cls<=2'b01;
+		end
+
+	endmodule 
+	*/
