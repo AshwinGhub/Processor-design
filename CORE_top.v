@@ -1,4 +1,4 @@
-//6th May 7:36 PM reset added to cu_obj
+// 7th may 12:46AM reset port added to mem_top
 module   core_top	#(parameter PMA_SIZE, PMD_SIZE, DMA_SIZE, DMD_SIZE, RF_DATASIZE, ADDRESS_WIDTH, SIGNAL_WIDTH, PM_LOCATE, DM_LOCATE)
 			(
 				input wire clk,
@@ -87,7 +87,7 @@ module   core_top	#(parameter PMA_SIZE, PMD_SIZE, DMA_SIZE, DMD_SIZE, RF_DATASIZ
 
 		memory #(.PMA_SIZE(PMA_SIZE), .PMD_SIZE(PMD_SIZE), .DMA_SIZE(DMA_SIZE), .DMD_SIZE(DMD_SIZE), .PM_LOCATE(PM_LOCATE), .DM_LOCATE(DM_LOCATE))
 			mem_obj	(
-					clk,
+					clk, reset,
 					ps_pm_cslt, ps_dm_cslt,
 					ps_pm_add,
 					//pmDataIn,
