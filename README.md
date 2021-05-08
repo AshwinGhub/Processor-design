@@ -9,3 +9,6 @@ Units
 4. DAG
 5. Program Sequencer
 6. Memory
+
+
+You may find sample test instructions in the SAMPLE INSTRUCTIONS folder here
