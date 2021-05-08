@@ -203,9 +203,12 @@ always @(*) begin
 		ps_rd_dt= 16'b0;
 
 	//Bypass (Consider if there are changes in pcstkp and stcky bypass after including jump instructions)
-	if(ps_wrt_add==ps_rd_add)
-		ps_bc_dt= bc_dt;
-	else if( (ps_rd_add==5'b00101) & (ps_pshstck_dly | ps_popstck_dly) )
+	if(ps_wrt_add==ps_rd_add) begin
+		if(ps_rd_add== 5'b11011)
+			ps_bc_dt= {15'b0,bc_dt[0]};
+		else
+			ps_bc_dt= bc_dt;
+	end else if( (ps_rd_add==5'b00101) & (ps_pshstck_dly | ps_popstck_dly) )
 		ps_bc_dt= {15'b0,ps_pshstck_dly};
 	else if( (ps_rd_add==5'b11110) & (ps_pshstck_dly | ps_popstck_dly) )
 		ps_bc_dt= {13'b0, (ps_stcky[1] & ps_pshstck_dly) ,ps_pshstck_dly, ps_popstck_dly};
