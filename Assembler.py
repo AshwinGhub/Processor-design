@@ -1,3 +1,4 @@
+# 6th may 2:05 AM
 from os import system,name
 import re
 import time
@@ -240,9 +241,9 @@ def clear():
     else:
         _=system("clear")
 a=input("Enter name of file containing instructions:")
-g=open("instructions/"+a,"rt")
+g=open("instructions/"+a,"rt")                              # changed
 #b=input("Enter name of OpCode Destination file:")
-f=open("../memory_txt_files/pm_file.txt","wt")
+f=open("../memory_txt_files/pm_file.txt","wt")              # changed
 l=[]
 rewrite=False
 instr_list=[]
@@ -302,11 +303,12 @@ while(i<len(l)):
                 instr_list.append(instr)
                 print(instr,end='')
                 i=i+1
-print("\nOpcodes saved in ../memory_txt_files/pm_file.txt")
+#print("\nOpcodes saved in {}".format(b))
+print("\nOpcodes saved in ../memory_txt_files/pm_file.txt")     # changed
 f.close()
 g.close()
 if(rewrite==True):
-    g=open("instructions/"+a,"wt")
+    g=open("instructions/"+a,"wt")                              # changed
     for i in range(len(l)):
         g.write(l[i])
         g.write('\n')

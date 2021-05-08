@@ -1,7 +1,9 @@
+// 7th may 12:46AM reset port added to mem_top
 module   core_top	#(parameter PMA_SIZE, PMD_SIZE, DMA_SIZE, DMD_SIZE, RF_DATASIZE, ADDRESS_WIDTH, SIGNAL_WIDTH, PM_LOCATE, DM_LOCATE)
 			(
 				input wire clk,
-				input wire reset
+				input wire reset,
+				input wire interrupt
 			);
 
 		
@@ -38,7 +40,7 @@ module   core_top	#(parameter PMA_SIZE, PMD_SIZE, DMA_SIZE, DMD_SIZE, RF_DATASIZ
 
 		cu_top #(.RF_DATASIZE(RF_DATASIZE), .ADDRESS_WIDTH(ADDRESS_WIDTH), .SIGNAL_WIDTH(SIGNAL_WIDTH))
 			cu_obj	(
-					clk,
+					clk, reset,
 				
 					//Multiplier control signals input from PS
 					ps_mul_en, ps_mul_otreg,
@@ -86,7 +88,7 @@ module   core_top	#(parameter PMA_SIZE, PMD_SIZE, DMA_SIZE, DMD_SIZE, RF_DATASIZ
 
 		memory #(.PMA_SIZE(PMA_SIZE), .PMD_SIZE(PMD_SIZE), .DMA_SIZE(DMA_SIZE), .DMD_SIZE(DMD_SIZE), .PM_LOCATE(PM_LOCATE), .DM_LOCATE(DM_LOCATE))
 			mem_obj	(
-					clk,
+					clk, reset,
 					ps_pm_cslt, ps_dm_cslt,
 					ps_pm_add,
 					//pmDataIn,
@@ -128,7 +130,7 @@ module   core_top	#(parameter PMA_SIZE, PMD_SIZE, DMA_SIZE, DMD_SIZE, RF_DATASIZ
 		
 		PS_top ps_obj
 				(
-					clk, reset,
+					clk, reset,interrupt,
 					
 					//flags
 					//shf_ss
