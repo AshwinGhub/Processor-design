@@ -2,7 +2,7 @@
 
 # -------------------------------------------------------------------------------------------------------------------------------------
 
-PM_LOCATE="../memory_txt_files/pm_file.txt"                         # Provide path to PM file and instructions here
+PM_LOCATE="../memory_files/pm_file"                         # Provide path to PM file and instructions here
 INST_LOCATE="../test_instructions/"
 
 #-------------------------------------------------------------------------------------------------------------------------------------
