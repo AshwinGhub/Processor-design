@@ -1,8 +1,8 @@
 //2nd may
-module PS_top (clk,rst,shf_ps_ss,shf_ps_sz,shf_ps_sv,mul_ps_mv,mul_ps_mn,alu_ps_as,alu_ps_ac,alu_ps_an,alu_ps_av,alu_ps_az,pm_ps_op,bc_dt,ps_pm_cslt,ps_pm_wrb,ps_pm_add,ps_alu_en,ps_mul_en,ps_shf_en,ps_alu_log,ps_mul_otreg,ps_alu_hc,ps_mul_cls,ps_shf_cls,ps_alu_sc,ps_mul_dtsts,ps_xb_raddy,ps_xb_w_cuEn,ps_xb_wadd,ps_xb_raddx,ps_xb_w_bcEn,ps_dg_wrt_en,ps_dg_rd_add,ps_dg_wrt_add,ps_bc_immdt,ps_dm_cslt,ps_dm_wrb,ps_dg_en,ps_dg_dgsclt,ps_dg_mdfy,ps_dg_iadd,ps_dg_madd,ps_bc_drr_slct,ps_bc_di_slct,ps_bc_dt,dg_ps_add);
+module PS_top (clk,rst,interrupt,shf_ps_ss,shf_ps_sz,shf_ps_sv,mul_ps_mv,mul_ps_mn,alu_ps_as,alu_ps_ac,alu_ps_an,alu_ps_av,alu_ps_az,pm_ps_op,bc_dt,ps_pm_cslt,ps_pm_wrb,ps_pm_add,ps_alu_en,ps_mul_en,ps_shf_en,ps_alu_log,ps_mul_otreg,ps_alu_hc,ps_mul_cls,ps_shf_cls,ps_alu_sc,ps_mul_dtsts,ps_xb_raddy,ps_xb_w_cuEn,ps_xb_wadd,ps_xb_raddx,ps_xb_w_bcEn,ps_dg_wrt_en,ps_dg_rd_add,ps_dg_wrt_add,ps_bc_immdt,ps_dm_cslt,ps_dm_wrb,ps_dg_en,ps_dg_dgsclt,ps_dg_mdfy,ps_dg_iadd,ps_dg_madd,ps_bc_drr_slct,ps_bc_di_slct,ps_bc_dt,dg_ps_add);
 
 
-input clk,rst;//
+input clk,rst,interrupt;//
 input shf_ps_ss,shf_ps_sz,shf_ps_sv,mul_ps_mv,mul_ps_mn,alu_ps_as,alu_ps_ac,alu_ps_an,alu_ps_av,alu_ps_az; 
 input[31:0] pm_ps_op;//
 input[15:0] bc_dt;//
@@ -100,15 +100,15 @@ bc_slct_cntrl bsc(clk,ps_pshstck,ps_popstck,ps_imminst,ps_dminst,ps_urgtrnsinst,
 always @ (posedge clk or negedge rst) begin 
 	
 	if(!rst) begin
-		ps_pm_wrb<=1'b0;
-		ps_pm_cslt<=1'b1;
 		ps_faddr <=16'b0;
 		ps_daddr <= ps_faddr;
 		ps_pc <= ps_daddr;
 	end else begin
-		ps_faddr <= ps_faddr + 16'b1;
-		ps_daddr <= ps_faddr;
-		ps_pc <= ps_daddr;
+		if(!ps_idle) begin
+			ps_faddr <= ps_faddr + 16'b1;
+			ps_daddr <= ps_faddr;
+			ps_pc <= ps_daddr;
+		end
 	end
 
 	//RF write address muxing
@@ -131,10 +131,10 @@ always @(*) begin
 	opc_cnd= pm_ps_op[4:0];
 	cnd_en= pm_ps_op[31];
 	astat_bts= { shf_ps_sz, shf_ps_sv, mul_ps_mv, mul_ps_mn, alu_ps_ac, alu_ps_an, alu_ps_av, alu_ps_az };   		//ASTAT bits given to condition checking module
-	cnd_tru= ( cnd_stat | !pm_ps_op[31] );
+	cnd_tru= ( cnd_stat | !pm_ps_op[31] ) & !ps_idle;
 
 	//Instruction Identification
-	if(!pm_ps_op[30]) begin
+	if(!pm_ps_op[30] & !ps_idle) begin
 		ps_pshstck= (pm_ps_op[29:24]==6'b000010);                       //Push PCstck inst
 		ps_popstck= (pm_ps_op[29:24]==6'b000011);			//Pop PCstack inst
 		ps_imminst= (pm_ps_op[29:26]==4'b0011);				//Immediate Inst
@@ -151,16 +151,15 @@ always @(*) begin
 	//Compute decoding
 	cpt_en= pm_ps_op[30] & cnd_tru;
 	bt_5t25= pm_ps_op[25:5];
-	
-	//Idle
-	ps_idle= (pm_ps_op[31:23]==9'd1);        				//Must be used in other logics later on
 
 	//DM
 	ps_dm_cslt= ps_dminst;
 	ps_dm_wrb= pm_ps_op[6];
 
 	//PM
-	ps_pm_add=ps_faddr;
+	ps_pm_add= ps_faddr;
+	ps_pm_cslt= !ps_idle;
+	ps_pm_wrb=1'b0;
 
 	//DAG decoding
 	ps_dg_en= pm_ps_op[29] & cnd_tru;
@@ -246,6 +245,7 @@ always@(posedge clk or negedge rst) begin					//For the time being, a write usin
 
 end
 
+//Internal Registers - ASTAT, MODE1, PCSTK
 always@(posedge clk or negedge rst) begin					//A write to pc stck doesnt affect pc stck pntr and the latter is neither pushed or popped in the process
 
 	if(!rst) begin
@@ -255,7 +255,6 @@ always@(posedge clk or negedge rst) begin					//A write to pc stck doesnt affect
 		       	ps_pcstck[i]<= 2'b00;
 		end
 		ps_mode1<= 1'b0;
-		ps_cmpt_dly<=1'b0;
 
 	end begin
 		
@@ -284,7 +283,23 @@ always@(posedge clk or negedge rst) begin					//A write to pc stck doesnt affect
 			ps_astat<= { /*ps_astat[15:10] */ 6'b0 , shf_ps_ss, shf_ps_sz, shf_ps_sv, mul_ps_mv, mul_ps_mn, alu_ps_as, alu_ps_ac, alu_ps_an, alu_ps_av, alu_ps_az };     //Update 6'b0 with compare logic later on
 		end
 
+	end
+
+end
+
+always@(posedge clk or negedge rst) begin
+
+	if(!rst) begin
+
+		ps_cmpt_dly<=1'b0;
+		ps_idle<=1'b0;
+
+	end else begin
+
 		ps_cmpt_dly<=cpt_en;
+	
+		//Idle
+		ps_idle<= ( (pm_ps_op[31:23]==9'd1) & !ps_idle ) | ( !interrupt & ps_idle );
 
 	end
 

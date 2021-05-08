@@ -2,7 +2,8 @@
 module   core_top	#(parameter PMA_SIZE, PMD_SIZE, DMA_SIZE, DMD_SIZE, RF_DATASIZE, ADDRESS_WIDTH, SIGNAL_WIDTH, PM_LOCATE, DM_LOCATE)
 			(
 				input wire clk,
-				input wire reset
+				input wire reset,
+				input wire interrupt
 			);
 
 		
@@ -129,7 +130,7 @@ module   core_top	#(parameter PMA_SIZE, PMD_SIZE, DMA_SIZE, DMD_SIZE, RF_DATASIZ
 		
 		PS_top ps_obj
 				(
-					clk, reset,
+					clk, reset,interrupt,
 					
 					//flags
 					//shf_ss
