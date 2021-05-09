@@ -89,8 +89,6 @@ module multiplier
 		assign S_p = S_x * S_y;
 			
 		wire s1,s0;	//product mux select lines
-		//assign s1 = ~mul_ryUbS;					//USI - s1=0, s0=0
-		//assign s0 = mul_rxUbS & (mul_IbF | ~mul_ryUbS);
 		assign s1 = ~mul_rxUbS | ~mul_ryUbS;
 		assign s0 = (mul_rxUbS & (~mul_ryUbS |  mul_IbF)) | (~mul_rxUbS & mul_ryUbS);
 
