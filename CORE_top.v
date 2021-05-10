@@ -133,11 +133,9 @@ module   core_top	#(parameter PMA_SIZE, PMD_SIZE, DMA_SIZE, DMD_SIZE, RF_DATASIZ
 					clk, reset,interrupt,
 					
 					//flags
-					//shf_ss
-					1'b0, shf_ps_sz , shf_ps_sv,
+					shf_ps_sz , shf_ps_sv,
 					mul_ps_mv, mul_ps_mn,
-					//alu_as
-					1'b0, alu_ps_ac , alu_ps_an , alu_ps_av , alu_ps_az,
+					alu_ps_ac , alu_ps_an , alu_ps_av , alu_ps_az,
 
 
 					//pm_ps
