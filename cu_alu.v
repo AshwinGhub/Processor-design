@@ -22,7 +22,7 @@
 
 
 
-module alu_final #(parameter DATA_WIDTH)
+module alu #(parameter DATA_WIDTH)
 	(clk, reset, xb_dtx, xb_dty, ps_alu_en, ps_alu_log, ps_alu_hc, ps_alu_sc, alu_xb_dt, ps_alu_sat, alu_ps_az, alu_ps_an, alu_ps_ac, alu_ps_av);
 
 input clk, reset, xb_dtx, xb_dty ,ps_alu_en, ps_alu_log, ps_alu_sat, ps_alu_hc, ps_alu_sc;      
