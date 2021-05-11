@@ -6,7 +6,7 @@ module cu_top 	#(parameter RF_DATASIZE, ADDRESS_WIDTH, SIGNAL_WIDTH)
 			//Multiplier control signals input from PS
 			input wire ps_mul_en, ps_mul_otreg,
 			input wire[3:0] ps_mul_dtsts,
-			input wire[1:0] ps_mul_cls,
+			input wire[1:0] ps_mul_cls, ps_mul_sc,
 
 			//Multiplier flags output back to PS
 			output wire mul_ps_mv, 
