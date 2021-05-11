@@ -3,6 +3,7 @@
 //***************************************************************
 
 //Control Signals :clk
+//                :reset
 //	          :ps_alu_en
 //                :ps_alu_log
 //                :ps_alu_hc     (bits 21-20) 
@@ -21,11 +22,12 @@
 
 
 
-module alu #(parameter DATA_WIDTH)
-	(clk, xb_dtx, xb_dty, ps_alu_en, ps_alu_log, ps_alu_hc, ps_alu_sc, alu_xb_dt, ps_alu_sat, alu_ps_az, alu_ps_an, alu_ps_ac, alu_ps_av);
+module alu_final #(parameter DATA_WIDTH)
+	(clk, reset, xb_dtx, xb_dty, ps_alu_en, ps_alu_log, ps_alu_hc, ps_alu_sc, alu_xb_dt, ps_alu_sat, alu_ps_az, alu_ps_an, alu_ps_ac, alu_ps_av);
 
-input clk, xb_dtx, xb_dty ,ps_alu_en, ps_alu_log, ps_alu_sat, ps_alu_hc, ps_alu_sc;      
-wire clk;                                                                                        
+input clk, reset, xb_dtx, xb_dty ,ps_alu_en, ps_alu_log, ps_alu_sat, ps_alu_hc, ps_alu_sc;      
+wire clk;
+wire reset;                                                                                        
 wire [(DATA_WIDTH-1):0]xb_dtx;
 wire [(DATA_WIDTH-1):0]xb_dty;
 wire ps_alu_en, ps_alu_log;
@@ -46,10 +48,20 @@ reg [1:0]alu_hc;
 reg [2:0]alu_sc;
 
 
-always@(posedge clk)
-begin 
-          alu_en<= ps_alu_en;
+always@(posedge clk or negedge reset)
+begin
+      if(~reset)
+        begin
+            alu_en=1'b0;
+            alu_log<=1'b0;
+            alu_hc<=2'b00;
+            alu_sc<=3'b000;
+         end 
+
+else
+          alu_en<= ps_alu_en; 
 end 
+
 
 always@(posedge clk)
 begin
@@ -64,12 +76,21 @@ end
 
 
 
-always@(posedge clk)
+always@(posedge clk or negedge reset)
 begin
+        if(~reset)
+            begin
+                x<=16'h0000;
+                y<=16'h0000;
+             end 
+
+      else
+           begin
 		x<= ps_alu_en? xb_dtx:x;
 		y<= (ps_alu_en&~ps_alu_hc[1])? xb_dty:y;
 
-end
+            end
+end 
 
 
 always@(*)
@@ -89,9 +110,7 @@ begin
 				                   
 				                      value=x&y;
                                                       alu_xb_dt= value;
-                                                      alu_ps_an= (alu_xb_dt[DATA_WIDTH-1]==1);
-                                                      alu_ps_ac =0;
-                                                      alu_ps_av=0;
+                                                      
 			                           end
 
 			                3'b001:	//Rx OR Ry
@@ -99,9 +118,7 @@ begin
 				                     
 				                      value=x|y;
                                                       alu_xb_dt= value;
-                                                      alu_ps_an= (alu_xb_dt[DATA_WIDTH-1]==1);
-                                                      alu_ps_ac =0;
-                                                      alu_ps_av=0;
+                                                      
 			                          end
 
 			                3'b010:	//Rx XOR Ry
@@ -109,9 +126,7 @@ begin
                                                      
 				                      value=x^y;
                                                       alu_xb_dt= value;
-                                                      alu_ps_an= (alu_xb_dt[DATA_WIDTH-1]==1);
-			                              alu_ps_ac =0;
-                                                      alu_ps_av=0;
+                                                      
                                                  end
                                      endcase 
                                    end 
@@ -125,9 +140,7 @@ begin
                                                       
                                                       value= &x;
                                                       alu_xb_dt= value;
-                                                      alu_ps_an= (alu_xb_dt[DATA_WIDTH-1]==1);
-                                                      alu_ps_ac =0;
-                                                      alu_ps_av=0;
+                                                      
                                                    end 
 
                                           3'b001:  // REG_OR RX
@@ -135,9 +148,7 @@ begin
                                                      
                                                       value= |x;
                                                       alu_xb_dt= value;
-                                                      alu_ps_an= (alu_xb_dt[DATA_WIDTH-1]==1);
-                                                      alu_ps_ac =0;
-                                                      alu_ps_av=0;
+                                                      
                                                    end 
                                           endcase 
  
@@ -151,9 +162,7 @@ begin
 			                               begin				                           
 				                          value=~x;
                                                           alu_xb_dt= value;
-                                                          alu_ps_an= (alu_xb_dt[DATA_WIDTH-1]==1);
-                                                          alu_ps_ac =0;
-                                                          alu_ps_av=0;
+                                                          
 			                               end
                                           endcase 
 			                end 
@@ -172,36 +181,28 @@ begin
                                                    begin
 						   value=x+ (y^{16{alu_sc[0]}}) + alu_sc[0];
 						   alu_xb_dt=value;
-                                                   alu_ps_an= (alu_xb_dt[DATA_WIDTH-1]==1);
-                                                   alu_ps_ac= (value[DATA_WIDTH]==1);
-                                                   alu_ps_av=(value[DATA_WIDTH-2]^value[DATA_WIDTH-1]==1);
+                                                   
 			                           end
 
 			                  3'b001:	              //x-y
 			                           begin
 				                   value=x+ (y^{16{alu_sc[0]}}) + alu_sc[0];
 						   alu_xb_dt=value;
-                                                   alu_ps_an= (alu_xb_dt[DATA_WIDTH-1]==1);
-                                                   alu_ps_ac= (value[DATA_WIDTH]==1);
-                                                   alu_ps_av=(value[DATA_WIDTH-2]^value[DATA_WIDTH-1]==1);
+                                                   
 			                           end
 			
 			                  3'b010: 	             //x+y+CI 
 			                           begin 
 				                   value=x+ (y^{16{alu_sc[0]}}) + alu_sc[0]+ alu_ps_ac ;
 						   alu_xb_dt=value;
-                                                   alu_ps_an= (alu_xb_dt[DATA_WIDTH-1]==1);
-                                                   alu_ps_ac= (value[DATA_WIDTH]==1);
-                                                   alu_ps_av=(value[DATA_WIDTH-2]^value[DATA_WIDTH-1]==1);
+                                                   
 			                           end
 
 			                 3'b011: 	            //x-y+CI-1
 			                           begin
 				                   value=x+ (y^{16{alu_sc[0]}}) + alu_sc[0]+ alu_ps_ac - alu_sc[0] ;
 						   alu_xb_dt=value;
-                                                   alu_ps_an= (alu_xb_dt[DATA_WIDTH-1]==1);
-                                                   alu_ps_ac= (value[DATA_WIDTH]==1);
-                                                   alu_ps_av=(value[DATA_WIDTH-2]^value[DATA_WIDTH-1]==1);
+                                                   
 			                           end
 
 			                3'b101:	   begin 
@@ -211,12 +212,10 @@ begin
 				                   else
 					             alu_ps_az=0;
 
-                                                   alu_ps_ac =0;
-                                                   alu_ps_av =0;
                                                    if(x<y)
                                                       alu_ps_an = 1'b1;
                                                    else
-                                                       alu_ps_an = 1'b0;
+                                                      alu_ps_an = 1'b0;
 
                                                    end 
 
@@ -232,34 +231,26 @@ begin
 				                begin
 					           if(value[DATA_WIDTH-1]==1) begin
 						         alu_xb_dt=x;
-                                                         alu_ps_an= (alu_xb_dt[DATA_WIDTH-1]==1);
-                                                         alu_ps_ac =0; 
-                                                         alu_ps_av=0;
+                                                         
                                                          end 
 					           else
                                                          begin
 						        alu_xb_dt=y;
-                                                        alu_ps_an= (alu_xb_dt[DATA_WIDTH-1]==1);
-                                                        alu_ps_ac=0;
-                                                        alu_ps_av=0;
-                                                          end 
+                                                        
+                                                         end 
 				                end
 			                   end
 
                                    3'b011: begin                               //max(rx,ry)                                            
 				           value=x+(y^{16{alu_sc[0]}})+ alu_sc[0];	
 				                begin
-					             if(value[DATA_WIDTH-1]==1) begin
+					             if(value[DATA_WIDTH-1]==1) 
 						         alu_xb_dt=y;
-                                                         alu_ps_an= (alu_xb_dt[DATA_WIDTH-1]==1);
-                                                         alu_ps_ac=0;
-                                                         alu_ps_av=0;           end 
+                                                                     
 					             else
-                                                          begin 
+                                                          
 						         alu_xb_dt=x;
-                                                         alu_ps_an= (alu_xb_dt[DATA_WIDTH-1]==1);
-                                                         alu_ps_ac=0;
-                                                         alu_ps_av=0; end 
+                                                         
 				                end
 			                   end
                                  endcase 
@@ -273,9 +264,7 @@ begin
                                   3'b001:  begin                                // Rn= -Rx 
 				           value=(x^{16{alu_sc[0]}})+ alu_sc[0];
 					   alu_xb_dt=value;
-                                           alu_ps_an= (alu_xb_dt[DATA_WIDTH-1]==1);
-                                           alu_ps_ac= (value[DATA_WIDTH]==1);
-                                           alu_ps_av=(value[DATA_WIDTH-2]^value[DATA_WIDTH-1]==1);
+                                           
 			                   end
                               endcase 
                             end 
@@ -291,17 +280,13 @@ begin
 				                   begin
 					              value=(x^{16{alu_sc[0]}})+ alu_sc[0];
 						      alu_xb_dt=value;
-                                                      alu_ps_an= (alu_xb_dt[DATA_WIDTH-1]==1);
-                                                      alu_ps_ac=0;
-                                                      alu_ps_av=(value[DATA_WIDTH-2]^value[DATA_WIDTH-1]==1);
+                                                      
 					           end
 				           else
 				                   begin
 					             value=x;
 						     alu_xb_dt=value;
-                                                     alu_ps_an= (alu_xb_dt[DATA_WIDTH-1]==1);
-                                                     alu_ps_ac=0;
-                                                     alu_ps_av=(value[DATA_WIDTH-2]^value[DATA_WIDTH-1]==1);
+                                                     
 				                   end
 			                   end
                                  endcase 
@@ -316,16 +301,16 @@ end
 
 always@(*)
 begin
-
-	begin
-		                                                     //Zero Flag
+		 begin                                                              // Flag Updation
 			
 		       alu_ps_az= (alu_xb_dt==16'h0000);
-	end
+                       alu_ps_an= (alu_xb_dt[DATA_WIDTH-1]==1);
+                       alu_ps_ac= (value[DATA_WIDTH]==1);
+                       alu_ps_av=(value[DATA_WIDTH]^value[DATA_WIDTH-1]==1);
 
-
+       
 	
-
+                  end 
 
                                                                    //Saturation 
         begin
@@ -335,9 +320,9 @@ begin
                                                begin
 
  				                       if(value[DATA_WIDTH-1]==1)
-					                        alu_xb_dt=32'h7fff;
+					                        alu_xb_dt= 16'h7fff;
 				                       else
-					                        alu_xb_dt=32'h8000;
+					                        alu_xb_dt= 16'h8000;
 
                                                 end 
                                    
@@ -351,9 +336,10 @@ endmodule
 		
 
 	
-/*
-module testalbench #(parameter DATA_WIDTH=16)();
+
+/*module afinalbench #(parameter DATA_WIDTH=16)();
 reg  clk;
+reg reset;
 reg  [DATA_WIDTH-1:0] xb_dtx;
 reg  [DATA_WIDTH-1:0] xb_dty;
 reg ps_alu_en ;
@@ -376,7 +362,7 @@ wire [2:0]alu_sc;
 wire signed [DATA_WIDTH-1:0]alu_xb_dt;
 
 
-test_alu ta(clk, xb_dtx, xb_dty, ps_alu_en, ps_alu_log, ps_alu_hc, ps_alu_sc, alu_xb_dt, ps_alu_sat, alu_ps_az, alu_ps_an, alu_ps_ac, alu_ps_av);
+alu_final aft_bench(clk, reset, xb_dtx, xb_dty, ps_alu_en, ps_alu_log, ps_alu_hc, ps_alu_sc, alu_xb_dt, ps_alu_sat, alu_ps_az, alu_ps_an, alu_ps_ac, alu_ps_av);
 
 
 
@@ -386,6 +372,14 @@ forever begin
 #5 clk=~clk;
 end
 end 
+
+
+initial begin
+reset=0;
+#5 reset=~reset;
+end 
+
+
 
 initial
 begin
@@ -429,7 +423,7 @@ end
 initial
 begin
         #21
-	ps_alu_hc=2'b10;
+	ps_alu_hc=2'b00;
 
                 forever begin
                         
@@ -447,7 +441,7 @@ end
 initial
 begin
           #21
-	ps_alu_sc=3'b001;
+	ps_alu_sc=3'b101;
                 forever begin
                         
                    #10 ps_alu_sc = 3'b001;
@@ -465,7 +459,7 @@ end
 initial
 begin
 	 #21
-      xb_dtx=16'ha001;
+      xb_dtx=16'h8000;
                forever begin 
             #10 xb_dtx= 16'hb102;
             #10 xb_dtx= 16'h0005;
@@ -496,5 +490,5 @@ begin
 end
 
 
-endmodule 
-*/
+endmodule */
+
