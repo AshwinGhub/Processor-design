@@ -1,4 +1,4 @@
-//comment
+
 
 module shifter #(parameter DATASIZE = 16)(clk, rst, ps_shf_en, ps_shf_cls, xb_dtx, xb_dty, shf_xb_dt, shf_ps_sv, shf_ps_sz);
 
