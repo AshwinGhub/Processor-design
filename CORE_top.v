@@ -10,7 +10,7 @@ module   core_top	#(parameter PMA_SIZE, PMD_SIZE, DMA_SIZE, DMD_SIZE, RF_DATASIZ
 		//Multiplier control signals input from PS
 		wire ps_mul_en, ps_mul_otreg;
 		wire[3:0] ps_mul_dtsts;
-		wire[1:0] ps_mul_cls;
+		wire[1:0] ps_mul_cls, ps_mul_sc;
 
 		//Multiplier flags output back to PS
 		wire mul_ps_mv, mul_ps_mn;
@@ -45,7 +45,7 @@ module   core_top	#(parameter PMA_SIZE, PMD_SIZE, DMA_SIZE, DMD_SIZE, RF_DATASIZ
 					//Multiplier control signals input from PS
 					ps_mul_en, ps_mul_otreg,
 					ps_mul_dtsts,
-					ps_mul_cls,
+					ps_mul_cls, ps_mul_sc,
 
 					//Multiplier flags output back to PS
 					mul_ps_mv,

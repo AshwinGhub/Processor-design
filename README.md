@@ -22,4 +22,4 @@ Main Units in the design
 3. Register file and Crossbar
 4. DAG
 5. Program Sequencer
-6. Memory
+6. Memory - PM and DM
