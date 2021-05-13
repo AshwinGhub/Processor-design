@@ -79,7 +79,7 @@ module cu_top 	#(parameter RF_DATASIZE, ADDRESS_WIDTH, SIGNAL_WIDTH)
 			
 	shifter #(.DATASIZE(RF_DATASIZE)) shf_obj
 			(
-				clk, 
+				clk, reset,
 				ps_shf_en, ps_shf_cls, 
 				xb_dtx, xb_dty, 
 				shf_xb_dt, shf_ps_sv, shf_ps_sz
