@@ -9,21 +9,20 @@ module multiplier
 				//control signals below
 				input wire ps_mul_en, ps_mul_otreg,
 				input wire[3:0] ps_mul_dtsts,
-				input wire[1:0] ps_mul_cls,
+				input wire[1:0] ps_mul_cls, ps_mul_sc,
 				
 				//universal signals
 				input wire clk, reset,
 
 				//flags
-				output reg mul_ps_mv, 
-				output wire mul_ps_mn
+				output wire mul_ps_mv, mul_ps_mn
 			);
 		
 	//latching the control signals for execute cycle usage
 	//=======================================================================================
 		reg mul_en, mul_otreg;
 		reg mul_rndPrdt, mul_IbF, mul_rxUbS, mul_ryUbS;		//mul_dtsts[3:0]
-		reg[1:0] mul_cls;
+		reg[1:0] mul_cls, mul_sc;
 		always@(posedge clk or negedge reset)
 		begin 
 			if(~reset)
@@ -35,6 +34,7 @@ module multiplier
 				mul_IbF <= 1'b0;
 				mul_rndPrdt <= 1'b0;
 				mul_cls <= 2'b00;
+				mul_sc <= 2'b00;
 			end
 			else
 				mul_en <= ps_mul_en;
@@ -49,16 +49,20 @@ module multiplier
 				mul_IbF <= ps_mul_dtsts[1];
 				mul_rndPrdt <= ps_mul_dtsts[0];
 				mul_cls <= ps_mul_cls;
+				mul_sc <= ps_mul_sc;
 			end
 		end
 	//=======================================================================================
+	
+	
 	
 		wire mul_mrUbS;
 		assign mul_mrUbS=mul_rxUbS;	//Used for SAT MR instruction. The rxUbS data status bit is shared for both Rx data status and MR data status.
 
 		reg[RF_DATASIZE-1:0] Rx16_latched, Ry16_latched;
 		
-		//latch Register File inputs multiplier entry
+	//latch Rx and Ry at entry of multiplier to use data only in execute
+	//=======================================================================================
 		always@(posedge clk or negedge reset)
 		begin
 			if(~reset)
@@ -67,13 +71,20 @@ module multiplier
 				Ry16_latched <= 16'h0;
 			end
 			else
-				if(ps_mul_en & ps_mul_cls!=2'b00)
-				begin
-					Rx16_latched <= xb_dtx;	//latch only when multiplier enabled and also its not a saturate instruction which only requires MR
+				if( ps_mul_en & ps_mul_cls!=2'b00 )
 					Ry16_latched <= xb_dty;
-				end
 		end
 
+		always@(posedge clk)
+		begin
+			if( ps_mul_en & ~(ps_mul_cls==2'b00 & (~ps_mul_otreg|(&ps_mul_sc))) )
+				Rx16_latched <= xb_dtx;
+		end
+	//=======================================================================================
+	
+
+		
+	
 		wire[RF_DATASIZE:0] U_Rx, S_Rx, U_Ry, S_Ry;	//17 bit wires for converting to signed
 
 		assign U_Rx={1'b0,Rx16_latched};
@@ -94,8 +105,9 @@ module multiplier
 
 		reg[2*RF_DATASIZE-1:0] mul32_product_data;	//32 bit multiplier product wire
 		reg[(RF_DATASIZE*5/2)-1:0] mul40_out_data;	//40 bit multiplier output
-		
-		//multiplier product logic for SS, UU, SU cases in Fractional and Integer modes
+	
+	//multiplier product logic for SS, UU, SU cases in Fractional and Integer mode
+	//=========================================================================================
 		always@(*)
 		begin
 			case( {s1,s0} )
@@ -109,16 +121,20 @@ module multiplier
 				2'b11:	mul32_product_data=S_p[2*RF_DATASIZE:1];		// SUI, SUF, USI, USF (discard 33rd and 0th bit)	[32:1]
 			endcase
 		end
-		
-		reg[(RF_DATASIZE*5/2)-1:0] mr40_data;
-		wire[(RF_DATASIZE*5/2)-1:0] mr_in_data;
+	//=========================================================================================
+	
+
+
+		reg [(RF_DATASIZE*5/2)-1:0] mr40_data;
+		wire [(RF_DATASIZE*5/2)-1:0] mr_in_data;
+		reg [RF_DATASIZE-1:0] mr_slice;	//16 bit MRx value. Used for Rn=MRx
 
 		//assign mr_byp_data = (ps_mul_mrBypass) ? mr_in_data : mr40_data;
 
 		wire[(RF_DATASIZE*5/2)-1:0] sat_out;
 		wire satEn;
 		
-		assign satEn = (mul_cls==2'b00) & mul_en;
+		assign satEn = (mul_cls==2'b00) & mul_en & (mul_sc==2'b11);
 
 		mul_sat sat1(satEn, mr40_data, mul_mrUbS, mul_IbF, sat_out);	
 		defparam sat1.SIZE=RF_DATASIZE;
@@ -129,80 +145,32 @@ module multiplier
 		mul_rnd rnd1(mul32_product_data, mul_rndPrdt, rnd32_out);
 		defparam rnd1.SIZE=RF_DATASIZE;
 		
-				
 		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		/*
-//---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-		//multiplier operation selector
-		always@(*)
-		begin
-			
-				if(~mul_cls[1])
-				begin
-
-					//saturate	mul_cls=00
-					if(~mul_cls[0])
-						mul40_out_data<=sat_out;
-
-					//product	mul_cls=01
-					else
-						if(mul_IbF)
-							//mul40_out_data<={ {(RF_DATASIZE/2){1'b0}},rnd32_out };	//{8 zeros, 32bit product} for unsigned result
-							mul40_out_data<={ { (RF_DATASIZE/2) {(mul_rxUbS|mul_ryUbS) & rnd32_out[2*RF_DATASIZE-1]} },rnd32_out };		//sign extend 32 bit product to 40 for signed	
-						else
-							//mul40_out_data<={ {(RF_DATASIZE*3/2){1'b0}},rnd32_out[2*RF_DATASIZE-1:RF_DATASIZE] }; //{24 zeros, 16bit product[31:16] }
-							//mul40_out_data<={ {(RF_DATASIZE*3/2){1'b0}},rnd32_out[RF_DATASIZE-1:0] }; //{24 zeros, 16bit product[15:0]} for unsigned result
-							mul40_out_data<={ { (RF_DATASIZE*3/2) {(mul_rxUbS|mul_ryUbS) & rnd32_out[RF_DATASIZE-1]} },rnd32_out[RF_DATASIZE-1:0] };   //sign extend 16LSBs to 40 for signed
-				end
-				
-				//accumulate	mul_cls=1X
-				else
-					if(mul_IbF)
-						mul40_out_data <= mr40_data + mul_cls[0] + ( { {(RF_DATASIZE/2) {(mul_rxUbS|mul_ryUbS) & rnd32_out[2*RF_DATASIZE-1]} },rnd32_out } ^ { (RF_DATASIZE*5/2){mul_cls[0]} } );	//40bit sign extended subtEn is xor ed
-					else
-						//mul40_out_data <= mr_byp_data + mul_cls[0] + ( { {(RF_DATASIZE*3/2){1'b0}},rnd32_out[31:16] } ^ { (RF_DATASIZE*5/2){mul_cls[0]} } );
-						mul40_out_data <= mr40_data + mul_cls[0] + ( { {(RF_DATASIZE*3/2) {(mul_rxUbS|mul_ryUbS) & rnd32_out[RF_DATASIZE-1]} },rnd32_out[RF_DATASIZE-1:0] } ^ { (RF_DATASIZE*5/2){mul_cls[0]} } );
-			
-		end
-		
-		wire mul_mrWen;		//Write enable signal for enabling MR write
-		assign mul_mrWen = mul_otreg & mul_en;	//ANDing mul_otreg with mul_en ensures that mul_otreg signal goes low when multiplier is disabled and avoids unnecessary MR updates (which happens if last instruction is MR accumulate instruction)
-
-		//multiplexer at input of mr to decide whether data is to be written into MR
-		assign mr_in_data = (mul_mrWen) ? mul40_out_data : mr40_data; 
-
-		//mr writing logic
-		always@(posedge clk)
-		begin
-			mr40_data<=mr_in_data;
-		end
-//------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-*/
-		
-		
-		
-		
-		
-
-
-		
-	        //multiplier operation classification
+	//multiplier operation classification
+	//=======================================================================
 		always@(*)
 		begin
 			casex(mul_cls)
 				
-				2'b00:	//saturate
-					mul40_out_data = sat_out;
+				2'b00:	//saturate and MR<->Rn transfers
+					casex(mul_sc)			//mul40_out_data and mr_slice are 2 different muxes with same select line
+						2'b00:			//MR0 (no sign extension as per sharc)
+							begin	
+								mul40_out_data <= { {RF_DATASIZE*3/2{1'h0}}, Rx16_latched };
+								mr_slice <= mr40_data[RF_DATASIZE-1:0];	
+							end
+						2'b01:			//MR1 (sign extended)
+							begin
+								mul40_out_data = { {RF_DATASIZE/2{Rx16_latched[RF_DATASIZE-1]}}, Rx16_latched, {RF_DATASIZE{1'h0}} };	
+								mr_slice <= mr40_data[RF_DATASIZE*2-1:RF_DATASIZE];
+							end
+						2'b10:	
+							begin		//MR2 (sign extend)
+								mul40_out_data = { Rx16_latched[RF_DATASIZE/2-1:0], {RF_DATASIZE*2{1'h0}} };
+								mr_slice <= {{RF_DATASIZE/2{mr40_data[RF_DATASIZE*5/2-1]}}, mr40_data[RF_DATASIZE*5/2-1 : RF_DATASIZE*2]};
+							end				
+						2'b11:	mul40_out_data = sat_out;	//SAT MR
+					endcase
 
 				2'b01:	//product
 					mul40_out_data = { { RF_DATASIZE/2 {(mul_rxUbS|mul_ryUbS) & rnd32_out[2*RF_DATASIZE-1]} }, rnd32_out };		//sign extend 32 bit product to 40 bits.
@@ -211,12 +179,22 @@ module multiplier
 					mul40_out_data = mr40_data + mul_cls[0] + ( { { RF_DATASIZE/2 {(mul_rxUbS|mul_ryUbS) & rnd32_out[2*RF_DATASIZE-1]} }, rnd32_out } ^ { RF_DATASIZE*5/2 {mul_cls[0]} } ) ;	//sign extend product to 40 bits and then find 2's complement and add to mr
 			endcase
 		end
+	//======================================================================
 		
+		
+	
 		//multiplexer at input of mr to decide whether data is to be written into MR
-		assign mr_in_data = (mul_otreg & mul_en) ? mul40_out_data : mr40_data;	
-	//ANDing mul_otreg with mul_en ensures that mul_otreg signal goes low when multiplier is disabled and avoids unnecessary MR updates (which happens if last instruction is MR accumulate instruction)
+		assign mr_in_data = (mul_otreg & mul_en) ? mul40_out_data : mr40_data;		
 		
-		//MR write logic
+		//ANDing mul_otreg with mul_en ensures that mul_otreg signal goes low when multiplier 
+		//is disabled and avoids unnecessary MR updates 
+		//(which happens if last instruction is MR accumulate instruction)
+		
+
+
+
+	//MR write logic
+	//=======================================================================
 		always@(posedge clk or negedge reset)
 		begin
 			if(~reset)
@@ -224,43 +202,54 @@ module multiplier
 			else
 				mr40_data<=mr_in_data;
 		end
+	//=======================================================================
 
 
+		
+		//16 bit data extraction from mul40_out_data for passing to output mux
+		assign mul_out = mul_IbF ? mul40_out_data[(2*RF_DATASIZE-1):RF_DATASIZE] : mul40_out_data[RF_DATASIZE-1:0];
+		
+		
 
-		
-		
-		
-		
-		
-		
-		//16 bit data extraction from mul40_out_data for passing to Rn
-		assign mul_xb_dt = mul_IbF ? mul40_out_data[(2*RF_DATASIZE-1):RF_DATASIZE] : mul40_out_data[RF_DATASIZE-1:0];
-		
-		//mul40_out_data[31:16] : mul40_out_data[15:0]
+	//Output to Rn
+	//=================================================================================
+		assign mul_xb_dt = (mul_cls==2'b00 & mul_sc!=2'b11) ? mr_slice : mul_out;
+	//=================================================================================
+	
 
+		wire mul_mn;
+		reg mul_mv;
 		
-		//overflow flag updation		- This works only for
+		//overflow flag internal
 		always@(*)
 		begin
 			case( {mul_rxUbS|mul_ryUbS , mul_IbF} )		
 			
-					2'b00:	//UI
-						mul_ps_mv = ~(mul40_out_data[(RF_DATASIZE*5/2)-1:RF_DATASIZE]=={24{1'h0}}); 			//DATA_IN[39:16]== 24 zeros
+					2'b00:	//UI	[39:16]== 24 zeros
+						mul_mv = ~(mul40_out_data[(RF_DATASIZE*5/2)-1:RF_DATASIZE]=={24{1'h0}}); 
 				
-					2'b01:	//UF
-						mul_ps_mv = ~(mul40_out_data[(RF_DATASIZE*5/2)-1:RF_DATASIZE*2]==8'h00); 			//data_in[39:32]==8'h00
+					2'b01:	//UF	[39:32]==8'h00
+						mul_mv = ~(mul40_out_data[(RF_DATASIZE*5/2)-1:RF_DATASIZE*2]==8'h00);
 				
-					2'b10:	//SI
-						mul_ps_mv = ~(mul40_out_data[(RF_DATASIZE*5/2)-1:RF_DATASIZE-1]=={25{1'h1}} | mul40_out_data[(RF_DATASIZE*5/2)-1:RF_DATASIZE-1]=={25{1'h0}});	//data_in[39:15]== 25 ones or 25 zeros
-
-					2'b11:	//SF
-						mul_ps_mv = ~(mul40_out_data[(RF_DATASIZE*5/2)-1:RF_DATASIZE*2-1]=={9{1'h1}} | mul40_out_data[(RF_DATASIZE*5/2)-1:RF_DATASIZE*2-1]=={9{1'h0}});			//data_in[39:31]== 9 ones or 9 zeros
+					2'b10:	//SI 	[39:15]== 25 ones or 25 zeros
+						mul_mv = ~(mul40_out_data[(RF_DATASIZE*5/2)-1:RF_DATASIZE-1]=={25{1'h1}} | mul40_out_data[(RF_DATASIZE*5/2)-1:RF_DATASIZE-1]=={25{1'h0}});	
+					2'b11:	//SF	[39:31]== 9 ones or 9 zeros
+						mul_mv = ~(mul40_out_data[(RF_DATASIZE*5/2)-1:RF_DATASIZE*2-1]=={9{1'h1}} | mul40_out_data[(RF_DATASIZE*5/2)-1:RF_DATASIZE*2-1]=={9{1'h0}});
 			endcase
 		end
 		
 		
-		//sign flag MN updation
-		assign mul_ps_mn = (mul_rxUbS|mul_ryUbS) & mul40_out_data[(RF_DATASIZE*5/2)-1];
+		//sign flag internal
+		assign mul_mn = (mul_rxUbS|mul_ryUbS) & mul40_out_data[(RF_DATASIZE*5/2)-1];
+
+
+
+	//Flag updation before giving to out port
+	//====================================================================================
+		assign mul_ps_mv = mul_mv & ~(mul_cls==2'b00 & mul_sc!=2'b11);
+		assign mul_ps_mn = mul_mn & ~(mul_cls==2'b00 & mul_sc!=2'b11);
+	//====================================================================================
+	
 
 endmodule
 
