@@ -204,7 +204,8 @@ module multiplier
 		end
 	//=======================================================================
 
-
+		
+		wire [RF_DATASIZE-1:0] mul_out;
 		
 		//16 bit data extraction from mul40_out_data for passing to output mux
 		assign mul_out = mul_IbF ? mul40_out_data[(2*RF_DATASIZE-1):RF_DATASIZE] : mul40_out_data[RF_DATASIZE-1:0];
