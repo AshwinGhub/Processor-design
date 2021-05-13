@@ -1,4 +1,12 @@
-# 6th may 2:05 AM
+# 9th may 12:35 AM
+
+# -------------------------------------------------------------------------------------------------------------------------------------
+
+PM_LOCATE="../memory_files/pm_file"                         # Provide path to PM file and instructions here
+INST_LOCATE="../test_instructions/"
+
+#-------------------------------------------------------------------------------------------------------------------------------------
+
 from os import system,name
 import re
 import time
@@ -134,7 +142,7 @@ def compute(com):
         Comp_code = "01010"+sign
     elif(re.match("MR[ ]?=[ ]?R[0-9]+[ ]?[*][ ]?R[0-9]+[ ]?",com)):
         Comp_code = "01011"+sign
-        print("1")
+        #print("1")
     elif(re.match("R[0-9]+[ ]?=[ ]?MR[ ]?[+][ ]?R[0-9]+[ ]?[*][ ]?R[0-9]+[ ]?",com)):
         Comp_code = "01100"+sign
     elif(re.match("MR[ ]?=[ ]?MR[ ]?[+][ ]?R[0-9]+[ ]?[*][ ]?R[0-9]+[ ]?",com)):
@@ -240,10 +248,10 @@ def clear():
         _=system('cls')
     else:
         _=system("clear")
-a=input("Enter name of file containing instructions:")
-g=open("instructions/"+a,"rt")                              # changed
+a=input("Enter name of file containing instructions : ")
+g=open(INST_LOCATE+a,"rt")                               # changed
 #b=input("Enter name of OpCode Destination file:")
-f=open("../memory_txt_files/pm_file.txt","wt")              # changed
+f=open(PM_LOCATE,"wt")                                      # changed
 l=[]
 rewrite=False
 instr_list=[]
@@ -251,7 +259,7 @@ for i in g:
     l.append(i.strip("\n"))
 i=0
 while(i<len(l)):
-    time.sleep(1)
+    time.sleep(.1)
     instr=l[i]
     i=i+1
     if(instr!=" "):
@@ -283,7 +291,7 @@ while(i<len(l)):
                 print(instr,end=" ")
                 print("contains error. Please re-enter")
                 print("You can re-enter in {} seconds".format(z))
-                time.sleep(1)
+                time.sleep(.1)
                 clear()
             display(instr_list)
             print("Faulty instruction : {}".format(instr))
@@ -303,12 +311,11 @@ while(i<len(l)):
                 instr_list.append(instr)
                 print(instr,end='')
                 i=i+1
-#print("\nOpcodes saved in {}".format(b))
-print("\nOpcodes saved in ../memory_txt_files/pm_file.txt")     # changed
+print("\nOpcodes saved in "+ PM_LOCATE)     # changed
 f.close()
 g.close()
 if(rewrite==True):
-    g=open("instructions/"+a,"wt")                              # changed
+    g=open(INST_LOCATE+a,"wt")              # changed
     for i in range(len(l)):
         g.write(l[i])
         g.write('\n')

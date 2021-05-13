@@ -1,9 +1,9 @@
 //2nd may
-module PS_top (clk,rst,interrupt,shf_ps_ss,shf_ps_sz,shf_ps_sv,mul_ps_mv,mul_ps_mn,alu_ps_as,alu_ps_ac,alu_ps_an,alu_ps_av,alu_ps_az,pm_ps_op,bc_dt,ps_pm_cslt,ps_pm_wrb,ps_pm_add,ps_alu_en,ps_mul_en,ps_shf_en,ps_alu_log,ps_mul_otreg,ps_alu_hc,ps_mul_cls,ps_shf_cls,ps_alu_sc,ps_mul_dtsts,ps_xb_raddy,ps_xb_w_cuEn,ps_xb_wadd,ps_xb_raddx,ps_xb_w_bcEn,ps_dg_wrt_en,ps_dg_rd_add,ps_dg_wrt_add,ps_bc_immdt,ps_dm_cslt,ps_dm_wrb,ps_dg_en,ps_dg_dgsclt,ps_dg_mdfy,ps_dg_iadd,ps_dg_madd,ps_bc_drr_slct,ps_bc_di_slct,ps_bc_dt,dg_ps_add);
+module PS_top (clk,rst,interrupt,shf_ps_sz,shf_ps_sv,mul_ps_mv,mul_ps_mn,alu_ps_ac,alu_ps_an,alu_ps_av,alu_ps_az,pm_ps_op,bc_dt,ps_pm_cslt,ps_pm_wrb,ps_pm_add,ps_alu_en,ps_mul_en,ps_shf_en,ps_alu_log,ps_mul_otreg,ps_alu_hc,ps_mul_cls,ps_shf_cls,ps_alu_sc,ps_mul_dtsts,ps_xb_raddy,ps_xb_w_cuEn,ps_xb_wadd,ps_xb_raddx,ps_xb_w_bcEn,ps_dg_wrt_en,ps_dg_rd_add,ps_dg_wrt_add,ps_bc_immdt,ps_dm_cslt,ps_dm_wrb,ps_dg_en,ps_dg_dgsclt,ps_dg_mdfy,ps_dg_iadd,ps_dg_madd,ps_bc_drr_slct,ps_bc_di_slct,ps_bc_dt,dg_ps_add);
 
 
 input clk,rst,interrupt;//
-input shf_ps_ss,shf_ps_sz,shf_ps_sv,mul_ps_mv,mul_ps_mn,alu_ps_as,alu_ps_ac,alu_ps_an,alu_ps_av,alu_ps_az; 
+input shf_ps_sz,shf_ps_sv,mul_ps_mv,mul_ps_mn,alu_ps_ac,alu_ps_an,alu_ps_av,alu_ps_az; 
 input[31:0] pm_ps_op;//
 input[15:0] bc_dt;//
 input[15:0] dg_ps_add;                           //Add pm address bus mux logic
@@ -203,14 +203,17 @@ always @(*) begin
 		ps_rd_dt= 16'b0;
 
 	//Bypass (Consider if there are changes in pcstkp and stcky bypass after including jump instructions)
-	if(ps_wrt_add==ps_rd_add)
-		ps_bc_dt= bc_dt;
-	else if( (ps_rd_add==5'b00101) & (ps_pshstck_dly | ps_popstck_dly) )
+	if(ps_wrt_add==ps_rd_add) begin
+		if(ps_rd_add== 5'b11011)
+			ps_bc_dt= {15'b0,bc_dt[0]};
+		else
+			ps_bc_dt= bc_dt;
+	end else if( (ps_rd_add==5'b00101) & (ps_pshstck_dly | ps_popstck_dly) )
 		ps_bc_dt= {15'b0,ps_pshstck_dly};
 	else if( (ps_rd_add==5'b11110) & (ps_pshstck_dly | ps_popstck_dly) )
 		ps_bc_dt= {13'b0, (ps_stcky[1] & ps_pshstck_dly) ,ps_pshstck_dly, ps_popstck_dly};
 	else if( (ps_rd_add== 5'b11100) & ps_cmpt_dly )
-		ps_bc_dt=  { /*ps_astat[15:10] */ 6'b0 , shf_ps_ss, shf_ps_sz, shf_ps_sv, mul_ps_mv, mul_ps_mn, alu_ps_as, alu_ps_ac, alu_ps_an, alu_ps_av, alu_ps_az };
+		ps_bc_dt=  { /*ps_astat[15:8] */ 8'b0 , shf_ps_sz, shf_ps_sv, mul_ps_mv, mul_ps_mn, alu_ps_ac, alu_ps_an, alu_ps_av, alu_ps_az };
 	else
 		ps_bc_dt= ps_rd_dt;
 
@@ -280,7 +283,7 @@ always@(posedge clk or negedge rst) begin					//A write to pc stck doesnt affect
 		if( (ps_wrt_add==5'b11100) & ps_wrt_en ) begin
 			ps_astat<= bc_dt;
 		end else begin
-			ps_astat<= { /*ps_astat[15:10] */ 6'b0 , shf_ps_ss, shf_ps_sz, shf_ps_sv, mul_ps_mv, mul_ps_mn, alu_ps_as, alu_ps_ac, alu_ps_an, alu_ps_av, alu_ps_az };     //Update 6'b0 with compare logic later on
+			ps_astat<= { /*ps_astat[15:8] */ 8'b0 , shf_ps_sz, shf_ps_sv, mul_ps_mv, mul_ps_mn, alu_ps_ac, alu_ps_an, alu_ps_av, alu_ps_az };     //Update 6'b0 with compare logic later on
 		end
 
 	end
