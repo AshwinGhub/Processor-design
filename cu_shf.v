@@ -1,10 +1,10 @@
 
 
-module shifter #(parameter DATASIZE = 16)(clk, rst, ps_shf_en, ps_shf_cls, xb_dtx, xb_dty, shf_xb_dt, shf_ps_sv, shf_ps_sz);
+module shifter #(parameter DATASIZE = 16)(clk, reset, ps_shf_en, ps_shf_cls, xb_dtx, xb_dty, shf_xb_dt, shf_ps_sv, shf_ps_sz);
 
 
 
-input wire rst, clk;
+input wire reset, clk;
 input wire ps_shf_en;
 input wire [1:0]ps_shf_cls;
 input wire [DATASIZE-1:0]xb_dtx;
@@ -13,7 +13,7 @@ output reg [DATASIZE-1:0]shf_xb_dt;
 output reg shf_ps_sv, shf_ps_sz;
 
 reg [DATASIZE-1:0]ip1, ip2; 
-reg [1:0]shf_classif;
+reg [1:0]shf_cls;
 reg shf_en;
 
 wire [DATASIZE-1:0]ip2_2c;
@@ -32,7 +32,7 @@ reg [DATASIZE-1:0]rot1, rot2;
 always@*
 begin
 	
-	case(shf_classif)
+	case(shf_cls)
 		2'b00:	begin
 			
 			if(ip2[DATASIZE-1])				//Rn = ip2_2c Rx BY Ry	//negative ry will right shift; positive Ry will left shift.
@@ -103,7 +103,7 @@ begin
 				
 				shf_xb_dt=leftz;	
 
-					//zero flag
+				//zero flag
 				if(ip1[DATASIZE-1])
 					shf_ps_sz=1'b1;
 				else 
@@ -132,7 +132,7 @@ begin
 				
 				shf_xb_dt=lefto;
 
-					//zero flag
+				//zero flag
 				if(!ip1[DATASIZE-1])
 					shf_ps_sz=1'b1;
 				else 
@@ -149,14 +149,14 @@ begin
 	
 end
 
-always@(posedge clk or negedge rst)
+always@(posedge clk or negedge reset)
 begin
-	if(~rst)
+	if(~reset)
 	begin
 		shf_en<=1'b0;
-		shf_classif<=2'b0;
-		ip1<=16'h0;
-		ip2<=16'h0;
+		shf_cls<=2'b0;
+		ip1<=16'h1;
+		ip2<=16'h1;
 	end
 	else
 	begin
@@ -164,7 +164,7 @@ begin
 
 		if(ps_shf_en) 
 		begin
-			shf_classif<=ps_shf_cls;
+			shf_cls<=ps_shf_cls;
 			
 			ip1<=xb_dtx;
 			if(!ps_shf_cls[1])	ip2<=xb_dty;
@@ -174,18 +174,18 @@ end
 
 endmodule
 
+
 /*
+module test_shifter#(parameter DATASIZE = 16)();
 
-module test_shifter_b#(parameter DATASIZE = 16)();
 
-
-reg rst, clk, ps_shf_en;
+reg reset, clk, ps_shf_en;
 reg [1:0]ps_shf_cls;
 reg [DATASIZE-1:0]xb_dtx, xb_dty;
 wire[DATASIZE-1:0]shf_xb_dt;
 wire shf_ps_sv, shf_ps_sz;
 
-shifter_b b_obj(clk, rst, ps_shf_en, ps_shf_cls, xb_dtx, xb_dty, shf_xb_dt, shf_ps_sv, shf_ps_sz);
+shifter shf_obj(clk, reset, ps_shf_en, ps_shf_cls, xb_dtx, xb_dty, shf_xb_dt, shf_ps_sv, shf_ps_sz);
 
 initial
 begin
@@ -198,8 +198,8 @@ end
 
 initial
 begin
-	rst=0;
-	#2 rst = 1;
+	reset=0;
+	#2 reset = 1;
 
 end
 initial
