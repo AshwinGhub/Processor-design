@@ -155,9 +155,8 @@ begin
 	begin
 		shf_en<=1'b0;
 		shf_cls<=2'b0;
-		ip1<=16'h0001;
-		ip2<=16'h0001;
-
+		ip1<=16'h1;
+		ip2<=16'h1;
 	end
 	else
 	begin
@@ -187,7 +186,7 @@ wire[DATASIZE-1:0]shf_xb_dt;
 wire shf_ps_sv, shf_ps_sz;
 
 
-shifter_b b_obj(clk, reset, ps_shf_en, ps_shf_cls, xb_dtx, xb_dty, shf_xb_dt, shf_ps_sv, shf_ps_sz);
+shifter shf_obj(clk, reset, ps_shf_en, ps_shf_cls, xb_dtx, xb_dty, shf_xb_dt, shf_ps_sv, shf_ps_sz);
 
 
 initial
