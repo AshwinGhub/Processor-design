@@ -155,8 +155,8 @@ begin
 	begin
 		shf_en<=1'b0;
 		shf_cls<=2'b0;
-		ip1<=16'h0001;
-		ip2<=16'h0001;
+		ip1<=16'h1;
+		ip2<=16'h1;
 	end
 	else
 	begin
