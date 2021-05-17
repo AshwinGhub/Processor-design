@@ -1,4 +1,4 @@
-//6th May 7:36 PM reset added
+//updated design with MR<->Rn
 module multiplier
 			#(parameter RF_DATASIZE)
 			(	
