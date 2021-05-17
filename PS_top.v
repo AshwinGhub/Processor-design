@@ -1,5 +1,5 @@
 //2nd may
-module PS_top (clk,rst,interrupt,shf_ps_sz,shf_ps_sv,mul_ps_mv,mul_ps_mn,alu_ps_ac,alu_ps_an,alu_ps_av,alu_ps_az,pm_ps_op,bc_dt,ps_pm_cslt,ps_pm_wrb,ps_pm_add,ps_alu_en,ps_mul_en,ps_shf_en,ps_alu_log,ps_mul_otreg,ps_alu_hc,ps_mul_cls,ps_shf_cls,ps_alu_sc,ps_mul_dtsts,ps_xb_raddy,ps_xb_w_cuEn,ps_xb_wadd,ps_xb_raddx,ps_xb_w_bcEn,ps_dg_wrt_en,ps_dg_rd_add,ps_dg_wrt_add,ps_bc_immdt,ps_dm_cslt,ps_dm_wrb,ps_dg_en,ps_dg_dgsclt,ps_dg_mdfy,ps_dg_iadd,ps_dg_madd,ps_bc_drr_slct,ps_bc_di_slct,ps_bc_dt,dg_ps_add);
+module PS_top (clk,rst,interrupt,shf_ps_sz,shf_ps_sv,mul_ps_mv,mul_ps_mn,alu_ps_ac,alu_ps_an,alu_ps_av,alu_ps_az,pm_ps_op,bc_dt,ps_pm_cslt,ps_pm_wrb,ps_pm_add,ps_alu_en,ps_mul_en,ps_shf_en,ps_alu_log,ps_mul_otreg,ps_alu_hc,ps_mul_cls,ps_mul_sc,ps_shf_cls,ps_alu_sc,ps_mul_dtsts,ps_xb_raddy,ps_xb_w_cuEn,ps_xb_wadd,ps_xb_raddx,ps_xb_w_bcEn,ps_dg_wrt_en,ps_dg_rd_add,ps_dg_wrt_add,ps_bc_immdt,ps_dm_cslt,ps_dm_wrb,ps_dg_en,ps_dg_dgsclt,ps_dg_mdfy,ps_dg_iadd,ps_dg_madd,ps_bc_drr_slct,ps_bc_di_slct,ps_bc_dt,dg_ps_add);
 
 
 input clk,rst,interrupt;//
@@ -10,7 +10,7 @@ input[15:0] dg_ps_add;                           //Add pm address bus mux logic
 output ps_pm_cslt,ps_pm_wrb;//
 output [15:0] ps_pm_add;//
 output ps_alu_en, ps_mul_en, ps_shf_en, ps_alu_log, ps_mul_otreg;//
-output[1:0] ps_alu_hc, ps_mul_cls, ps_shf_cls;//
+output[1:0] ps_alu_hc, ps_mul_cls, ps_mul_sc, ps_shf_cls;//
 output[2:0] ps_alu_sc;//
 output[3:0] ps_mul_dtsts, ps_xb_raddy;//                           
 output[2:0] ps_xb_w_cuEn;//
@@ -44,7 +44,7 @@ reg cpt_en;//
 reg [20:0] bt_5t25;//
 
 wire ps_alu_en, ps_mul_en, ps_shf_en, ps_alu_log, ps_mul_otreg;//
-wire[1:0] ps_alu_hc, ps_mul_cls, ps_shf_cls;//
+wire[1:0] ps_alu_hc, ps_mul_cls, ps_mul_sc, ps_shf_cls;//
 wire[2:0] ps_alu_sc;//
 wire[3:0] ps_mul_dtsts, ps_xb_rd_a0, ps_xb_raddy;//
 wire[2:0] ps_xb_w_cuEn;//
@@ -85,7 +85,7 @@ reg[2:0] ps_dg_iadd,ps_dg_madd;//
 
 
 //Compute Decoing hardware
-cmpt_inst_dcdr cpt(clk,rst,cpt_en,bt_5t25, ps_alu_en,ps_mul_en, ps_shf_en, ps_alu_log, ps_mul_otreg, ps_alu_hc, ps_mul_cls, ps_shf_cls, ps_alu_sc, ps_xb_w_cuEn,ps_mul_dtsts, ps_xb_rd_a0, ps_xb_raddy, ps_xb_wrt_a);
+cmpt_inst_dcdr cpt(clk,rst,cpt_en,bt_5t25, ps_alu_en,ps_mul_en, ps_shf_en, ps_alu_log, ps_mul_otreg, ps_alu_hc, ps_mul_cls, ps_mul_sc, ps_shf_cls, ps_alu_sc, ps_xb_w_cuEn,ps_mul_dtsts, ps_xb_rd_a0, ps_xb_raddy, ps_xb_wrt_a);
 
 //Condition decoding hardware
 cnd_dcdr cnd(cnd_en,opc_cnd,cnd_stat,astat_bts);
