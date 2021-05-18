@@ -129,12 +129,11 @@ module multiplier
 		wire [(RF_DATASIZE*5/2)-1:0] mr_in_data;
 		reg [RF_DATASIZE-1:0] mr_slice;	//16 bit MRx value. Used for Rn=MRx
 
-		//assign mr_byp_data = (ps_mul_mrBypass) ? mr_in_data : mr40_data;
-
 		wire[(RF_DATASIZE*5/2)-1:0] sat_out;
 		wire satEn;
 		
-		assign satEn = (mul_cls==2'b00) & mul_en & (mul_sc==2'b11);
+		assign satEn = (mul_cls==2'b00) & (mul_sc==2'b11);
+		//satEn stays high after mul is disabled if last instruction is sat MR
 
 		mul_sat sat1(satEn, mr40_data, mul_mrUbS, mul_IbF, sat_out);	
 		defparam sat1.SIZE=RF_DATASIZE;
@@ -184,7 +183,7 @@ module multiplier
 		
 	
 		//multiplexer at input of mr to decide whether data is to be written into MR
-		assign mr_in_data = (mul_otreg & mul_en) ? mul40_out_data : mr40_data;		
+		assign mr_in_data = (mul_otreg & mul_en) ? mul40_out_data : mr40_data;
 		
 		//ANDing mul_otreg with mul_en ensures that mul_otreg signal goes low when multiplier 
 		//is disabled and avoids unnecessary MR updates 
@@ -204,7 +203,7 @@ module multiplier
 		end
 	//=======================================================================
 
-		
+	
 		wire [RF_DATASIZE-1:0] mul_out;
 		
 		//16 bit data extraction from mul40_out_data for passing to output mux
