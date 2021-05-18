@@ -109,7 +109,7 @@ def compute(com):
         Comp_code = "000001001"
     elif(re.match("R[0-9]+[ ]?=[ ]?MAX[ ]?[(][ ]?R[0-9]+[ ]?,[ ]?R[0-9]+[ ]?[)][ ]?",com)):
         Comp_code = "000001011"
-    elif(re.match("R[0-9]+[ ]?=[ ]?-R[0-9]+[ ]?",com)):
+    elif(re.match("R[0-9]+[ ]?=[ ]?-[ ]?R[0-9]+[ ]?",com)):
         Comp_code = "000010001"
     elif(re.match("R[0-9]+[ ]?=[ ]?ABS[ ]?R[0-9]+[ ]?",com)):
         Comp_code = "000011001"
@@ -125,15 +125,32 @@ def compute(com):
         Comp_code = "000110001"
     elif(re.match("R[0-9]+[ ]?=[ ]?NOT[ ]?R[0-9]+[ ]?",com)):
         Comp_code = "000111000"
+    elif(re.match("R[0-9]+[ ]?=[ ]?MR[0,1,2][ ]?",com)):
+        Comp_code = "01000"+sign
+        if("MR0" in com):
+            R[2]="0000"
+        elif("MR1" in com):
+            R[2]="0001"
+        else:
+            R[2]="0010"
     elif(re.match("R[0-9]+[ ]?=[ ]?SAT MR",com)):
         Comp_code = "01000"+sign
+        R[2]="0011"
+    elif(re.match("MR[0,1,2][ ]?=[ ]?R[0-9]+[ ]?",com)):
+        Comp_code = "01001"+sign
+        if("MR0" in com):
+            R[2]="0000"
+        elif("MR1" in com):
+            R[2]="0001"
+        else:
+            R[2]="0010"
     elif(re.match("MR[ ]?=[ ]?SAT MR",com)):
         Comp_code = "01001"+sign
+        R[2]="0011"
     elif(re.match("R[0-9]+[ ]?=[ ]?R[0-9]+[ ]?[*][ ]?R[0-9]+[ ]?",com)):
         Comp_code = "01010"+sign
     elif(re.match("MR[ ]?=[ ]?R[0-9]+[ ]?[*][ ]?R[0-9]+[ ]?",com)):
         Comp_code = "01011"+sign
-        print("1")
     elif(re.match("R[0-9]+[ ]?=[ ]?MR[ ]?[+][ ]?R[0-9]+[ ]?[*][ ]?R[0-9]+[ ]?",com)):
         Comp_code = "01100"+sign
     elif(re.match("MR[ ]?=[ ]?MR[ ]?[+][ ]?R[0-9]+[ ]?[*][ ]?R[0-9]+[ ]?",com)):
@@ -159,20 +176,30 @@ def compute(com):
     else:
         for i in range(len(reg)):
             R[i+1]=register(reg[i])[4:]
+    if(Comp_code=="01000"+sign):
+        R[1]="0000"
+    if(Comp_code=="01001"+sign):
+        R[0]="0000"
     Comp_code = Comp_code+R[0]+R[1]+R[2]
     if("EROR" in Comp_code):
         return "EROR"
     else:
         return Comp_code
+ur1="^[ ]?[A,C,D,F,I,L,M,P,S,U][A,C,M,O,R,S,T,U][A,D,I,K,N,R,S,T]?[A,D,E,L,S,T,Y]?[C,K,L,R,T,1,2]?[N,P,1,2]?[T]?[R]?[ ]?$"
+d="^[ ]?DM[ ]?[(][ ]?I[0-7][ ]?,[ ]?M[0-7][ ]?[)][ ]?$"
 def Assembler(x):
     OpCode = "00000000000000000000000000000000"
     x=x.upper()
+    while(x[-1]==" " or x[-1]=="\t"):
+        x=x[0:-1]
     if(x=="NOP"):
         OpCode = "00000000000000000000000000000000"
     elif(x=="IDLE"):
         OpCode = OpCode[:8]+"1"+OpCode[9:]
     elif(x=="RTS"):
         OpCode = OpCode[0:7]+"1"+OpCode[8:]
+    elif(x=="FINISH"):
+        OpCode = OpCode[0:9]+"1"+OpCode[10:]
     elif(re.match("^PUSH[ ]+PCSTK[ ]?$",x.split("=")[0])):
         OpCode = OpCode[:6]+"10"+register(x.split("=")[-1])+OpCode[16:]
     elif(re.match("^[ ]?POP[ ]+PCSTK[ ]?",x.split("=")[-1])):
@@ -181,7 +208,7 @@ def Assembler(x):
             OpCode="ERROR"
         else:
             OpCode = OpCode[:6]+"11"+register(x.split("=")[0])+OpCode[16:]
-    elif(re.match("^[ ]?[0-9,A-F]?[0-9,A-F]?[0-9,A-F]?[0-9,A-F]?$",x.split("=")[-1])):
+    elif(re.match("^[ ]?[0-9,A-F]?[0-9,A-F]?[0-9,A-F]?[0-9,A-F]?[ ]?$",x.split("=")[-1])):
         temp=x.split("=")[0]
         if(("FADDR" in temp) or ("DADDR" in temp) or (re.match("^[ ]?PC[ ]?$",temp)) or ("STKY" in temp) or ("PCSTKP" in temp)):
             OpCode="ERROR"
@@ -203,7 +230,7 @@ def Assembler(x):
             x=x[3:]
         if(re.match("[R,I,M][0-9]+[ ]?=[ ]?[R,I,M][0-9]+[ ]?$",x)):
             OpCode=OpCode[0]+"0000100"+register(re.findall("[R,I,M,L,B][0-9]+",x)[0])+register(re.findall("[R,I,M,L,B][0-9]+",x)[1])+"000"+conditions(condition)
-        elif((re.match("^[A,C,D,F,I,L,M,P,S,U][A,C,M,O,R,S,T,U][A,D,I,K,N,R,S,T]?[A,D,E,L,S,T,Y]?[C,K,L,R,T,1,2]?[N,P,1,2]?[T]?[R]?[ ]?$",x.split("=")[0]) or re.match("^[ ]?[A,C,D,F,I,L,M,P,S,U][A,C,M,O,R,S,T,U][A,D,I,K,N,R,S,T]?[A,D,E,L,S,T,Y]?[C,K,L,R,T,1,2]?[N,P,1,2]?[T]?[R]?[ ]?$",x.split("=")[-1])) and (not re.match("^MR[ ]?$",x.split("=")[0]))):
+        elif((re.match(ur1,x.split("=")[0]) or re.match(ur1,x.split("=")[-1])) and (not re.match("^MR[0,1,2]?[ ]?$",x.split("=")[0]))and (not re.match("^MR[0,1,2]?[ ]?$",x.split("=")[-1])) and (not re.match(d,x.split("=")[0])) and (not re.match(d,x.split("=")[-1]))):
             temp=x.split("=")[0]
             if(("FADDR" in temp) or ("DADDR" in temp) or (re.match("^[ ]?PC[ ]?$",temp)) or ("STKY" in temp) or ("PCSTKP" in temp)):
                 OpCode="ERROR"
@@ -238,9 +265,9 @@ def clear():
     else:
         _=system("clear")
 a=input("Enter name of file containing instructions:")
-g=open("instructions/"+a,"rt")
-#b=input("Enter name of OpCode Destination file:")
-f=open("../memory_txt_files/pm_file.txt","wt")
+g=open(a,"rt")
+b=input("Enter name of OpCode Destination file:")
+f=open(b,"wt")
 l=[]
 rewrite=False
 instr_list=[]
@@ -248,7 +275,7 @@ for i in g:
     l.append(i.strip("\n"))
 i=0
 while(i<len(l)):
-    time.sleep(.5)
+    time.sleep(1)
     instr=l[i]
     i=i+1
     if(instr!=" "):
@@ -283,10 +310,12 @@ while(i<len(l)):
                 time.sleep(1)
                 clear()
             display(instr_list)
+            print("Faulty instruction : {}".format(instr))
             instr = input()
+            clear()
+            display(instr_list)
             i=i-1
             l[i]=instr
-            instr_list.append(instr)
             rewrite=True
         else:
             f.write(OpCode)
@@ -298,11 +327,11 @@ while(i<len(l)):
                 instr_list.append(instr)
                 print(instr,end='')
                 i=i+1
-print("\nOpcodes saved in ../memory_txt_files/pm_file.txt")
+print("\nOpcodes saved in {}".format(b))
 f.close()
 g.close()
 if(rewrite==True):
-    g=open("instructions/"+a,"wt")
+    g=open(a,"wt")
     for i in range(len(l)):
         g.write(l[i])
         g.write('\n')
