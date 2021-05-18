@@ -1,7 +1,7 @@
-//2nd may
+// 9th may 3:25 AM dm file address
 module memory #(parameter PMA_SIZE, PMD_SIZE, DMA_SIZE, DMD_SIZE, PM_LOCATE, DM_LOCATE)
 			(
-				input wire clk,
+				input wire clk, reset,
 				input wire ps_pm_cslt, ps_dm_cslt,
 				input wire[PMA_SIZE-1:0] ps_pm_add,
 				//input wire[PMD_SIZE-1:0] pmDataIn, (future scope)
@@ -13,17 +13,19 @@ module memory #(parameter PMA_SIZE, PMD_SIZE, DMA_SIZE, DMD_SIZE, PM_LOCATE, DM_
 			);
 
 
-	//------------------------------------------------------------------------------------------------------------------------------------
-	//					PM reading
-	//------------------------------------------------------------------------------------------------------------------------------------
+//------------------------------------------------------------------------------------------------------------------------------------
+//					PM reading
+//------------------------------------------------------------------------------------------------------------------------------------
 		reg [PMD_SIZE-1:0] pmInsts [(2**PMA_SIZE)-1:0];	
 		initial
 		begin
-			//$readmemb("C:/Users/Ashwin Pradeep/Desktop/Project Final Year/GIT repo/memory_txt_files/pm_file.txt",pmInsts);
 			$readmemb(PM_LOCATE,pmInsts);
 		end
 
-		always@(posedge clk)
+		always@(posedge clk or negedge reset)
+		if(~reset)
+			pm_ps_op<=0;
+		else
 		begin
 			if(ps_pm_cslt)
 			begin
@@ -38,11 +40,12 @@ module memory #(parameter PMA_SIZE, PMD_SIZE, DMA_SIZE, DMD_SIZE, PM_LOCATE, DM_
 		
 
 
-	//------------------------------------------------------------------------------------------------------------------------
-	//				DM reading and writing
-	//------------------------------------------------------------------------------------------------------------------------
+//------------------------------------------------------------------------------------------------------------------------
+//				DM reading and writing
+//------------------------------------------------------------------------------------------------------------------------
 		
 		reg [DMD_SIZE-1:0] dmData [(2**DMA_SIZE)-1:0];
+		reg [DMD_SIZE-1:0] dm [2*(2**DMA_SIZE)-1:0];	//with address
 
 		integer file, i;
 		reg dm_cslt;
@@ -51,14 +54,27 @@ module memory #(parameter PMA_SIZE, PMD_SIZE, DMA_SIZE, DMD_SIZE, PM_LOCATE, DM_
 		wire [DMD_SIZE-1:0] dmBypData;
 
 
+	//----------------------------------------------------------------------------------------
 		//Initially open and close to clear the DM file
 		initial
 		begin
-			//file=$fopen("C:/Users/Ashwin Pradeep/Desktop/Project Final Year/GIT repo/memory_txt_files/dm_file.txt","w");			
 			file=$fopen(DM_LOCATE,"w");
 			$fclose(file);
 		end
+	
+	//Comment above initial block if you want to access DM data present in data memory before startup.
+	//----------------------------------------------------------------------------------------
 
+
+		//initially load DM data from DM file (required when DM contains data to be read before startup)
+		initial
+		begin
+			$readmemh(DM_LOCATE,dm);
+			for(i=0; i<(2*(2**DMA_SIZE)); i=i+2)
+			begin
+				dmData[i/2]=dm[i+1];
+			end
+		end
 		
 		//DM bypass
 		assign dmBypData = (dm_add==dg_dm_add) ? bc_dt : dmData[dg_dm_add];
@@ -71,8 +87,6 @@ module memory #(parameter PMA_SIZE, PMD_SIZE, DMA_SIZE, DMD_SIZE, PM_LOCATE, DM_
 			begin
 				if(~ps_dm_wrb)
 				begin
-					//$readmemh("C:/Users/Ashwin Pradeep/Desktop/Project Final Year/GIT repo/memory_txt_files/dm_file.txt",dmData);
-					$readmemh(DM_LOCATE,dmData);
 					dm_bc_dt<=dmBypData;
 				end
 			end
@@ -87,18 +101,17 @@ module memory #(parameter PMA_SIZE, PMD_SIZE, DMA_SIZE, DMD_SIZE, PM_LOCATE, DM_
 		end
 
 		//DM writing
-		always@(posedge clk)
+		always@(posedge clk )
 		begin
 			if(dm_cslt)
 			begin
 				if(dm_wrb)
 				begin
-					dmData[dm_add]=bc_dt;
-					//file=$fopen("C:/Users/Ashwin Pradeep/Desktop/Project Final Year/GIT repo/memory_txt_files/dm_file.txt");
+					dmData[dm_add][DMD_SIZE-1:0] = bc_dt ;
 					file=$fopen(DM_LOCATE);
-					for(i=0; i<((2**DMA_SIZE)-1); i=i+1)
+					for(i=0; i<(2**DMA_SIZE); i=i+1)
 					begin
-						$fdisplayh(file,dmData[i[DMA_SIZE-1:0]]);
+						$fdisplayh(file, i[DMA_SIZE-1:0], "\t", dmData[i]);
 					end
 					$fclose(file);
 				end

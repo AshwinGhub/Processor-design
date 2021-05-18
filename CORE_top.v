@@ -1,14 +1,16 @@
+// 7th may 12:46AM reset port added to mem_top
 module   core_top	#(parameter PMA_SIZE, PMD_SIZE, DMA_SIZE, DMD_SIZE, RF_DATASIZE, ADDRESS_WIDTH, SIGNAL_WIDTH, PM_LOCATE, DM_LOCATE)
 			(
 				input wire clk,
-				input wire reset
+				input wire reset,
+				input wire interrupt
 			);
 
 		
 		//Multiplier control signals input from PS
 		wire ps_mul_en, ps_mul_otreg;
 		wire[3:0] ps_mul_dtsts;
-		wire[1:0] ps_mul_cls;
+		wire[1:0] ps_mul_cls, ps_mul_sc;
 
 		//Multiplier flags output back to PS
 		wire mul_ps_mv, mul_ps_mn;
@@ -38,12 +40,12 @@ module   core_top	#(parameter PMA_SIZE, PMD_SIZE, DMA_SIZE, DMD_SIZE, RF_DATASIZ
 
 		cu_top #(.RF_DATASIZE(RF_DATASIZE), .ADDRESS_WIDTH(ADDRESS_WIDTH), .SIGNAL_WIDTH(SIGNAL_WIDTH))
 			cu_obj	(
-					clk,
+					clk, reset,
 				
 					//Multiplier control signals input from PS
 					ps_mul_en, ps_mul_otreg,
 					ps_mul_dtsts,
-					ps_mul_cls,
+					ps_mul_cls, ps_mul_sc,
 
 					//Multiplier flags output back to PS
 					mul_ps_mv,
@@ -86,7 +88,7 @@ module   core_top	#(parameter PMA_SIZE, PMD_SIZE, DMA_SIZE, DMD_SIZE, RF_DATASIZ
 
 		memory #(.PMA_SIZE(PMA_SIZE), .PMD_SIZE(PMD_SIZE), .DMA_SIZE(DMA_SIZE), .DMD_SIZE(DMD_SIZE), .PM_LOCATE(PM_LOCATE), .DM_LOCATE(DM_LOCATE))
 			mem_obj	(
-					clk,
+					clk, reset,
 					ps_pm_cslt, ps_dm_cslt,
 					ps_pm_add,
 					//pmDataIn,
@@ -128,14 +130,12 @@ module   core_top	#(parameter PMA_SIZE, PMD_SIZE, DMA_SIZE, DMD_SIZE, RF_DATASIZ
 		
 		PS_top ps_obj
 				(
-					clk, reset,
+					clk, reset,interrupt,
 					
 					//flags
-					//shf_ss,shf_sz,shf_sv,
-					1'b0,     1'b0, 1'b0,
+					shf_ps_sz , shf_ps_sv,
 					mul_ps_mv, mul_ps_mn,
-					//alu_as,alu_ac,alu_an,alu_av,alu_az,
-					1'b0,     1'b0,   1'b0, 1'b0, 1'b0,
+					alu_ps_ac , alu_ps_an , alu_ps_av , alu_ps_az,
 
 
 					//pm_ps
@@ -148,7 +148,7 @@ module   core_top	#(parameter PMA_SIZE, PMD_SIZE, DMA_SIZE, DMD_SIZE, RF_DATASIZ
 					ps_pm_cslt, ps_pm_wrb, ps_pm_add, 
 
 					//ps_cu	
-					ps_alu_en, ps_mul_en, ps_shf_en, ps_alu_log, ps_mul_otreg, ps_alu_hc, ps_mul_cls, ps_shf_cls, ps_alu_sc, ps_mul_dtsts, 
+					ps_alu_en, ps_mul_en, ps_shf_en, ps_alu_log, ps_mul_otreg, ps_alu_hc, ps_mul_cls, ps_mul_sc, ps_shf_cls, ps_alu_sc, ps_mul_dtsts, 
 
 
 					ps_xb_raddy, 

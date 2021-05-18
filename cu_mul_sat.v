@@ -14,20 +14,20 @@ module mul_sat
 			case( {UbS,IbF} )		//ps_mul_mrUbS
 			
 				2'b00:	//UI
-					out = (data_in[(SIZE*5/2)-1:SIZE]=={24{1'h0}}) ? data_in : 40'h00_0000_FFFF;		//DATA_IN[39:16]== 24 zeros
+					out = (data_in[(SIZE*5/2)-1:SIZE]=={ (SIZE*5/2 - SIZE){1'h0} }) ? data_in : 40'h00_0000_FFFF;		//DATA_IN[39:16]== 24 zeros
 				
 				2'b01:	//UF
-					out = (data_in[(SIZE*5/2)-1:SIZE*2]==8'h00) ? data_in : 40'h00_FFFF_FFFF;		//data_in[39:32]==8'h00
+					out = (data_in[(SIZE*5/2)-1:SIZE*2]=={(SIZE/2){1'h0}}) ? data_in : 40'h00_FFFF_FFFF;		//data_in[39:32]==8'h00
 				
 				2'b10:	//SI
-					if(data_in[(SIZE*5/2)-1:SIZE-1]=={25{1'h1}} | data_in[(SIZE*5/2)-1:SIZE-1]=={25{1'h0}})				//data_in[39:15]== 25 ones or 25 zeros
+					if(data_in[(SIZE*5/2)-1:SIZE-1]=={ (SIZE*5/2 - SIZE + 1){1'h1}} | data_in[(SIZE*5/2)-1:SIZE-1]=={ (SIZE*5/2 - SIZE + 1){1'h0}})				//data_in[39:15]== 25 ones or 25 zeros
 						out=data_in;
 					else
 						out = data_in[(SIZE*5/2)-1] ? 40'hFF_FFFF_8000 : 40'h00_0000_7FFF;
 			
 			
 				2'b11:	//SF
-					if(data_in[(SIZE*5/2)-1:SIZE*2-1]=={9{1'h1}} | data_in[(SIZE*5/2)-1:SIZE*2-1]=={9{1'h0}})			//data_in[39:31]== 9 ones or 9 zeros
+					if(data_in[(SIZE*5/2)-1:SIZE*2-1]=={ (SIZE*5/2 - 2*SIZE +1){1'h1}} | data_in[(SIZE*5/2)-1:SIZE*2-1]=={ (SIZE*5/2 - 2*SIZE + 1){1'h0}})			//data_in[39:31]== 9 ones or 9 zeros
 						out=data_in;
 					else
 						out = data_in[(SIZE*5/2)-1] ? 40'hFF_8000_0000 : 40'h00_7FFF_FFFF;			//data_in[39] MSB

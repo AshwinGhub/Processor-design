@@ -1,12 +1,12 @@
-//3rd May
+//6th May 7:36 PM reset added
 module cu_top 	#(parameter RF_DATASIZE, ADDRESS_WIDTH, SIGNAL_WIDTH)
 		(
-			input wire clk,
+			input wire clk, reset,
 				
 			//Multiplier control signals input from PS
 			input wire ps_mul_en, ps_mul_otreg,
 			input wire[3:0] ps_mul_dtsts,
-			input wire[1:0] ps_mul_cls,
+			input wire[1:0] ps_mul_cls, ps_mul_sc,
 
 			//Multiplier flags output back to PS
 			output wire mul_ps_mv, 
@@ -71,7 +71,7 @@ module cu_top 	#(parameter RF_DATASIZE, ADDRESS_WIDTH, SIGNAL_WIDTH)
 				ps_mul_en, ps_mul_otreg,
 				ps_mul_dtsts,
 				ps_mul_cls,
-				clk,
+				clk, reset,
 				mul_ps_mv,
 				mul_ps_mn
 			);	
@@ -79,7 +79,7 @@ module cu_top 	#(parameter RF_DATASIZE, ADDRESS_WIDTH, SIGNAL_WIDTH)
 			
 	shifter #(.DATASIZE(RF_DATASIZE)) shf_obj
 			(
-				clk, 
+				clk, reset,
 				ps_shf_en, ps_shf_cls, 
 				xb_dtx, xb_dty, 
 				shf_xb_dt, shf_ps_sv, shf_ps_sz
@@ -87,7 +87,7 @@ module cu_top 	#(parameter RF_DATASIZE, ADDRESS_WIDTH, SIGNAL_WIDTH)
 
 	alu #(.DATA_WIDTH(RF_DATASIZE)) alu_obj
 			(
-				clk, 
+				clk, reset,
 				xb_dtx, xb_dty, 
 				ps_alu_en, ps_alu_log, ps_alu_hc, ps_alu_sc, 
 				alu_xb_dt, 

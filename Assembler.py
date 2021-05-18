@@ -1,9 +1,11 @@
+# 18th may
 # -------------------------------------------------------------------------------------------------------------------------------------
 
 PM_LOCATE="../memory_files/pm_file.txt"                         # Provide path to PM file and instructions here
 INST_LOCATE="../test_instructions/"
 
 #-------------------------------------------------------------------------------------------------------------------------------------
+
 from os import system,name
 import re
 import time
@@ -100,6 +102,8 @@ def signed(x):
 def compute(com):
     Comp_code=""
     R=["0000","0000","0000"]
+    while(com[-1]==" "):
+        com=com[0:-1]
     sign=signed(com.split(" ")[-1])
     if(re.match("R[0-9]+[ ]?=[ ]?R[0-9]+[ ]?[+][ ]?R[0-9]+[ ]?[+][ ]?CI[ ]?",com)):
         Comp_code = "000000010"
@@ -271,9 +275,9 @@ def clear():
     else:
         _=system("clear")
 a=input("Enter name of file containing instructions:")
-g=open(INST_LOCATE+a,"rt")				#Changed
+g=open(INST_LOCATE+a,"rt")                                  #Changed
 #b=input("Enter name of OpCode Destination file:")
-f=open(PM_LOCATE,"wt")					#Changed
+f=open(PM_LOCATE,"wt")                                      #Changed
 l=[]
 rewrite=False
 instr_list=[]
@@ -281,7 +285,7 @@ for i in g:
     l.append(i.strip("\n"))
 i=0
 while(i<len(l)):
-    time.sleep(1)
+    time.sleep(.1)
     instr=l[i]
     i=i+1
     if(instr!=" "):
@@ -333,11 +337,11 @@ while(i<len(l)):
                 instr_list.append(instr)
                 print(instr,end='')
                 i=i+1
-print("\nOpcodes saved in {}".format(PM_LOCATE))
+print("\nOpcodes saved in "+ PM_LOCATE)                     #Changed
 f.close()
 g.close()
 if(rewrite==True):
-    g=open(INST_LOCATE+a,"wt")
+    g=open(INST_LOCATE+a,"wt")                              #Changed
     for i in range(len(l)):
         g.write(l[i])
         g.write('\n')

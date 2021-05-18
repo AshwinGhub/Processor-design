@@ -1,3 +1,4 @@
+//6th May 7:36 PM reset added
 module multiplier
 			#(parameter RF_DATASIZE)
 			(	
@@ -11,21 +12,32 @@ module multiplier
 				input wire[1:0] ps_mul_cls,
 				
 				//universal signals
-				input wire clk,
+				input wire clk, reset,
 
 				//flags
 				output reg mul_ps_mv, 
 				output wire mul_ps_mn
 			);
 		
-	//matching the port signal names given by ps team with the names used in my design
+	//latching the control signals for execute cycle usage
 	//=======================================================================================
 		reg mul_en, mul_otreg;
 		reg mul_rndPrdt, mul_IbF, mul_rxUbS, mul_ryUbS;		//mul_dtsts[3:0]
 		reg[1:0] mul_cls;
-		always@(posedge clk)
+		always@(posedge clk or negedge reset)
 		begin 
-			mul_en <= ps_mul_en;
+			if(~reset)
+			begin
+				mul_en <= 1'b0;
+				mul_otreg <= 1'b0;
+				mul_ryUbS <= 1'b0;
+				mul_rxUbS <= 1'b0;
+				mul_IbF <= 1'b0;
+				mul_rndPrdt <= 1'b0;
+				mul_cls <= 2'b00;
+			end
+			else
+				mul_en <= ps_mul_en;
 		end	
 		always@(posedge clk)
 		begin
@@ -47,10 +59,19 @@ module multiplier
 		reg[RF_DATASIZE-1:0] Rx16_latched, Ry16_latched;
 		
 		//latch Register File inputs multiplier entry
-		always@(posedge clk)
+		always@(posedge clk or negedge reset)
 		begin
-			Rx16_latched <= (ps_mul_en & ps_mul_cls!=2'b00) ? xb_dtx : Rx16_latched;	//latch only when multiplier enabled and also its not a saturate instruction which only requires MR
-			Ry16_latched <= (ps_mul_en & ps_mul_cls!=2'b00) ? xb_dty : Ry16_latched;
+			if(~reset)
+			begin
+				Rx16_latched <= 16'h0;
+				Ry16_latched <= 16'h0;
+			end
+			else
+				if(ps_mul_en & ps_mul_cls!=2'b00)
+				begin
+					Rx16_latched <= xb_dtx;	//latch only when multiplier enabled and also its not a saturate instruction which only requires MR
+					Ry16_latched <= xb_dty;
+				end
 		end
 
 		wire[RF_DATASIZE:0] U_Rx, S_Rx, U_Ry, S_Ry;	//17 bit wires for converting to signed
@@ -68,8 +89,6 @@ module multiplier
 		assign S_p = S_x * S_y;
 			
 		wire s1,s0;	//product mux select lines
-		//assign s1 = ~mul_ryUbS;					//USI - s1=0, s0=0
-		//assign s0 = mul_rxUbS & (mul_IbF | ~mul_ryUbS);
 		assign s1 = ~mul_rxUbS | ~mul_ryUbS;
 		assign s0 = (mul_rxUbS & (~mul_ryUbS |  mul_IbF)) | (~mul_rxUbS & mul_ryUbS);
 
@@ -99,7 +118,7 @@ module multiplier
 		wire[(RF_DATASIZE*5/2)-1:0] sat_out;
 		wire satEn;
 		
-		assign satEn=(mul_cls==00);
+		assign satEn = (mul_cls==2'b00) & mul_en;
 
 		mul_sat sat1(satEn, mr40_data, mul_mrUbS, mul_IbF, sat_out);	
 		defparam sat1.SIZE=RF_DATASIZE;
@@ -198,9 +217,13 @@ module multiplier
 	//ANDing mul_otreg with mul_en ensures that mul_otreg signal goes low when multiplier is disabled and avoids unnecessary MR updates (which happens if last instruction is MR accumulate instruction)
 		
 		//MR write logic
-		always@(posedge clk)
-			mr40_data<=mr_in_data;
-
+		always@(posedge clk or negedge reset)
+		begin
+			if(~reset)
+				mr40_data<=40'h0;		//reset mr so that at reset, mul_cls=00 -> mv flag doesn't go to x
+			else
+				mr40_data<=mr_in_data;
+		end
 
 
 
@@ -257,3 +280,75 @@ endmodule
 		*		
 		*
 		*/
+
+
+
+
+	//==============================================================
+	//
+	//			Testbench for mul
+	//
+	//==============================================================
+	/*
+	
+	module test_cu_mul();
+	
+	reg reset, clk;
+	wire [15:0] mul_out;
+
+	reg ps_mul_en, ps_mul_otreg;
+	reg [3:0] ps_mul_dtsts;
+	reg [1:0] ps_mul_cls;
+				
+	wire flag1, flag2;
+
+	multiplier #(.RF_DATASIZE(16)) m_tobj
+			(	16'habcd, 16'hcdef, 
+				mul_out,
+
+				//control signals below
+				ps_mul_en, ps_mul_otreg,
+				ps_mul_dtsts,
+				ps_mul_cls,
+				
+				//universal signals
+				clk, reset,
+
+				//flags
+				mul_ps_mv, 
+				mul_ps_mn
+			);
+	
+	initial
+	begin
+		reset=1;
+		#1 reset=0;
+		#2 reset=1;
+	end
+
+	initial
+	begin
+		clk=0;
+		#10
+		clk=1;
+		forever begin
+			#5 clk=~clk;
+		end
+	end
+
+	always@(negedge reset)
+		if(~reset)
+			ps_mul_en<=1'b0;		//PS supplies enable=0 on reset. This is required condition!
+
+	always@(posedge clk)
+	//if(~reset)
+		begin
+			#5
+			ps_mul_en<=1'b1;
+			ps_mul_otreg<=1'b1;
+			ps_mul_dtsts<=4'b1;
+			ps_mul_cls<=2'b01;
+		end
+
+	endmodule 
+	*/
