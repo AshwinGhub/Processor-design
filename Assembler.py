@@ -1,3 +1,9 @@
+# -------------------------------------------------------------------------------------------------------------------------------------
+
+PM_LOCATE="../memory_files/pm_file.txt"                         # Provide path to PM file and instructions here
+INST_LOCATE="../test_instructions/"
+
+#-------------------------------------------------------------------------------------------------------------------------------------
 from os import system,name
 import re
 import time
@@ -265,9 +271,9 @@ def clear():
     else:
         _=system("clear")
 a=input("Enter name of file containing instructions:")
-g=open(a,"rt")
-b=input("Enter name of OpCode Destination file:")
-f=open(b,"wt")
+g=open(INST_LOCATE+a,"rt")				#Changed
+#b=input("Enter name of OpCode Destination file:")
+f=open(PM_LOCATE,"wt")					#Changed
 l=[]
 rewrite=False
 instr_list=[]
@@ -327,11 +333,11 @@ while(i<len(l)):
                 instr_list.append(instr)
                 print(instr,end='')
                 i=i+1
-print("\nOpcodes saved in {}".format(b))
+print("\nOpcodes saved in {}".format(PM_LOCATE))
 f.close()
 g.close()
 if(rewrite==True):
-    g=open(a,"wt")
+    g=open(INST_LOCATE+a,"wt")
     for i in range(len(l)):
         g.write(l[i])
         g.write('\n')
