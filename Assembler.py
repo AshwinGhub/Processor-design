@@ -1,8 +1,8 @@
-# 14nth may 12:35 AM
+# 18th may
 
 # -------------------------------------------------------------------------------------------------------------------------------------
 
-PM_LOCATE="../memory_files/pm_file"                         # Provide path to PM file and instructions here
+PM_LOCATE="../memory_files/pm_file.txt"                         # Provide path to PM file and instructions here
 INST_LOCATE="../test_instructions/"
 
 #-------------------------------------------------------------------------------------------------------------------------------------
@@ -103,6 +103,8 @@ def signed(x):
 def compute(com):
     Comp_code=""
     R=["0000","0000","0000"]
+    while(com[-1]==" "):
+        com=com[0:-1]
     sign=signed(com.split(" ")[-1])
     if(re.match("R[0-9]+[ ]?=[ ]?R[0-9]+[ ]?[+][ ]?R[0-9]+[ ]?[+][ ]?CI[ ]?",com)):
         Comp_code = "000000010"
@@ -118,7 +120,7 @@ def compute(com):
         Comp_code = "000001001"
     elif(re.match("R[0-9]+[ ]?=[ ]?MAX[ ]?[(][ ]?R[0-9]+[ ]?,[ ]?R[0-9]+[ ]?[)][ ]?",com)):
         Comp_code = "000001011"
-    elif(re.match("R[0-9]+[ ]?=[ ]?-R[0-9]+[ ]?",com)):
+    elif(re.match("R[0-9]+[ ]?=[ ]?-[ ]?R[0-9]+[ ]?",com)):
         Comp_code = "000010001"
     elif(re.match("R[0-9]+[ ]?=[ ]?ABS[ ]?R[0-9]+[ ]?",com)):
         Comp_code = "000011001"
@@ -160,7 +162,6 @@ def compute(com):
         Comp_code = "01010"+sign
     elif(re.match("MR[ ]?=[ ]?R[0-9]+[ ]?[*][ ]?R[0-9]+[ ]?",com)):
         Comp_code = "01011"+sign
-        #print("1")
     elif(re.match("R[0-9]+[ ]?=[ ]?MR[ ]?[+][ ]?R[0-9]+[ ]?[*][ ]?R[0-9]+[ ]?",com)):
         Comp_code = "01100"+sign
     elif(re.match("MR[ ]?=[ ]?MR[ ]?[+][ ]?R[0-9]+[ ]?[*][ ]?R[0-9]+[ ]?",com)):
