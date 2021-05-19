@@ -102,8 +102,6 @@ def signed(x):
 def compute(com):
     Comp_code=""
     R=["0000","0000","0000"]
-    while(com[-1]==" "):
-        com=com[0:-1]
     sign=signed(com.split(" ")[-1])
     if(re.match("R[0-9]+[ ]?=[ ]?R[0-9]+[ ]?[+][ ]?R[0-9]+[ ]?[+][ ]?CI[ ]?",com)):
         Comp_code = "000000010"
@@ -288,7 +286,9 @@ while(i<len(l)):
     time.sleep(.1)
     instr=l[i]
     i=i+1
-    if(instr!=" "):
+    if(instr!=" " or instr!="\n" or instr!="\t" or instr!=""):
+        if(instr==".memcheck"):
+            break
         print(instr)
         instr_list.append(instr)
         if("#" in instr):
@@ -307,7 +307,8 @@ while(i<len(l)):
                 continue
         else:
             inst = instr
-        OpCode=Assembler(inst)
+        if(len(instr)>0):
+            OpCode=Assembler(inst)
         if("ERROR" in OpCode):
             clear()
             instr_list.pop()
