@@ -287,7 +287,7 @@ while(i<len(l)):
     instr=l[i]
     i=i+1
     if(instr!=" " or instr!="\n" or instr!="\t" or instr!=""):
-        if(instr==".memcheck"):
+        if(instr.lower()==".memcheck"):
             break
         print(instr)
         instr_list.append(instr)
