@@ -103,7 +103,7 @@ begin
 				
 				shf_xb_dt=leftz;	
 
-					//zero flag
+				//zero flag
 				if(ip1[DATASIZE-1])
 					shf_ps_sz=1'b1;
 				else 
@@ -132,7 +132,7 @@ begin
 				
 				shf_xb_dt=lefto;
 
-					//zero flag
+				//zero flag
 				if(!ip1[DATASIZE-1])
 					shf_ps_sz=1'b1;
 				else 
@@ -155,8 +155,8 @@ begin
 	begin
 		shf_en<=1'b0;
 		shf_cls<=2'b0;
-		ip1<=16'h0;
-		ip2<=16'h0;
+		ip1<=16'h1;
+		ip2<=16'h1;
 	end
 	else
 	begin
@@ -174,9 +174,9 @@ end
 
 endmodule
 
-/*
 
-module test_shifter_b#(parameter DATASIZE = 16)();
+/*
+module test_shifter#(parameter DATASIZE = 16)();
 
 
 reg reset, clk, ps_shf_en;
@@ -185,7 +185,9 @@ reg [DATASIZE-1:0]xb_dtx, xb_dty;
 wire[DATASIZE-1:0]shf_xb_dt;
 wire shf_ps_sv, shf_ps_sz;
 
-shifter_b b_obj(clk, reset, ps_shf_en, ps_shf_cls, xb_dtx, xb_dty, shf_xb_dt, shf_ps_sv, shf_ps_sz);
+
+shifter shf_obj(clk, reset, ps_shf_en, ps_shf_cls, xb_dtx, xb_dty, shf_xb_dt, shf_ps_sv, shf_ps_sz);
+
 
 initial
 begin
