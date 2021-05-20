@@ -89,7 +89,7 @@ always @(*) begin
 	wrt_en[1]= ps_mul_en & !bt_5t25[16];
 	wrt_en[2]= ps_shf_en;
 	
-	if( ps_alu_en | (ps_mul_en & (|bt_5t25[18:17])) | ps_shf_en ) begin
+	if( ps_alu_en | (ps_mul_en & ( (|bt_5t25[18:17]) | ( (bt_5t25[16]==1'b1) & (bt_5t25[1:0]!=2'b11) ) )) | ps_shf_en ) begin
 
 		ps_xb_rd_a0= bt_5t25[7:4];          //Input 1 read Address 
 		
