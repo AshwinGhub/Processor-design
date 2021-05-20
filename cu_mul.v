@@ -263,7 +263,9 @@ endmodule
 		*		
 				mul_dtsts = 0000 (UUI),	0010 (UUF), 0011(UUFR), 0100 (SUI), 0110 (SUF), 0111 (SUFR), 1000 (USI), 1010 (USF), 1011 (USFR), 1100 (SSI), 1110 (SSF), 1111 (SSFR)
 		*
-		*		mul_cls = 00 (SAT), 01 (Product), 10 (Accumulate ADD), 11 (Accumulate SUB)
+		*		mul_cls = 00 (refer mul_sc signal), 01 (Product), 10 (Accumulate ADD), 11 (Accumulate SUB)
+		*
+				mul_sc = 00 (MR0), 01 (MR1), 10 (MR2), 11 (SAT MR)
 		*
 				{s1,s0} = 00 (SSI), 01 (SSF), 10 (UU), 11 (SU|US)
 		*		
