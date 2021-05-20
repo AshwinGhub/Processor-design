@@ -31,13 +31,15 @@ integer i;
 
 //Internal Sginals
 reg cnd_tru, ps_idle,ps_pcstck_pntr,ps_mode1;//
-reg [15:0] ps_faddr,ps_daddr,ps_pc;//
+reg[15:0] ps_faddr,ps_daddr,ps_pc;//
+reg[15:0] dg_ps_add_dly;
 reg[15:0] ps_astat;						//ASTAT work left -> compare
 reg[15:0] ps_pcstck[1:0];
 reg[2:0] ps_stcky;
 reg ps_pshstck_dly,ps_popstck_dly;
 reg[15:0] ps_rd_dt;
 reg ps_cmpt_dly;
+reg ps_jmp,ps_jmp_dly;
 
 //Used for compute decoding
 reg cpt_en;//
@@ -103,12 +105,25 @@ always @ (posedge clk or negedge rst) begin
 		ps_faddr <=16'b0;
 		ps_daddr <= ps_faddr;
 		ps_pc <= ps_daddr;
+		ps_jmp <= 1'b0;
+		ps_jmp_dly <= 1'b0;
 	end else begin
-		if(!ps_idle) begin
+
+		ps_jmp<=pm_ps_op[28] & cnd_tru;
+		ps_jmp_dly<=ps_jmp;
+		dg_ps_add_dly<=dg_ps_add;
+
+		if(ps_jmp) begin
+			ps_faddr<=dg_ps_add_dly;
+		end else if(!ps_idle) begin
 			ps_faddr <= ps_faddr + 16'b1;
+		end
+
+		if(!ps_idle) begin
 			ps_daddr <= ps_faddr;
 			ps_pc <= ps_daddr;
 		end
+	
 	end
 
 	//RF write address muxing
@@ -131,10 +146,10 @@ always @(*) begin
 	opc_cnd= pm_ps_op[4:0];
 	cnd_en= pm_ps_op[31];
 	astat_bts= { shf_ps_sz, shf_ps_sv, mul_ps_mv, mul_ps_mn, alu_ps_ac, alu_ps_an, alu_ps_av, alu_ps_az };   		//ASTAT bits given to condition checking module
-	cnd_tru= ( cnd_stat | !pm_ps_op[31] ) & !ps_idle;
+	cnd_tru= ( cnd_stat | !pm_ps_op[31] ) & !ps_idle & !ps_jmp & !ps_jmp_dly;
 
 	//Instruction Identification
-	if(!pm_ps_op[30] & !ps_idle) begin
+	if(!pm_ps_op[30] & !ps_idle & !ps_jmp & !ps_jmp_dly) begin
 		ps_pshstck= (pm_ps_op[29:24]==6'b000010);                       //Push PCstck inst
 		ps_popstck= (pm_ps_op[29:24]==6'b000011);			//Pop PCstack inst
 		ps_imminst= (pm_ps_op[29:26]==4'b0011);				//Immediate Inst
@@ -302,7 +317,7 @@ always@(posedge clk or negedge rst) begin
 		ps_cmpt_dly<=cpt_en;
 	
 		//Idle
-		ps_idle<= ( (pm_ps_op[31:23]==9'd1) & !ps_idle ) | ( !interrupt & ps_idle );
+		ps_idle<= ( ( (pm_ps_op[31:23]==9'd1) & !ps_idle ) | ( !interrupt & ps_idle ) ) & !ps_jmp & !ps_jmp_dly;
 
 	end
 
