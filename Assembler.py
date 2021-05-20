@@ -256,7 +256,7 @@ def Assembler(x):
             OpCode=OpCode[0]+"01000"+OpCode[6:19]+register(re.findall("I[0-7]",x)[0])[5:]+register(re.findall("M[0-7]",x)[0])[5:]+"00"+conditions(condition)
         elif(re.match("JUMP[ ]?[(][ ]?M[1,8,9][0-5]*[ ]?,[ ]?I[1,8,9][0-5]*[ ]?[)][ ]?$",x)):
             OpCode=OpCode[0]+"01100"+OpCode[6:19]+register(re.findall("I[1,8,9][0-5]*",x)[0])[5:]+register(re.findall("M[1,8,9][0-5]*",x)[0])[5:]+"00"+conditions(condition)
-        elif(re.match("JUMPR[ ]?[(][ ]?M[1,8,9][0-5]*[ ]?,[ ]?I[1,8,9][0-5]*[ ]?[)][ ]?$",x)):
+        elif(re.match("CALL[ ]?[(][ ]?M[1,8,9][0-5]*[ ]?,[ ]?I[1,8,9][0-5]*[ ]?[)][ ]?$",x)):
             OpCode=OpCode[0]+"01101"+OpCode[6:19]+register(re.findall("I[1,8,9][0-5]*",x)[0])[5:]+register(re.findall("M[1,8,9][0-5]*",x)[0])[5:]+"00"+conditions(condition)
         else:
             OpCode=OpCode[0]+"10000"+compute(x)+conditions(condition)
