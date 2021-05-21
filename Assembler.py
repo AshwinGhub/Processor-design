@@ -310,7 +310,7 @@ while(i<len(l)):
         if(len(instr)>0):
             OpCode=Assembler(inst)
         else:
-            OpCode=""
+            continue
         if("ERROR" in OpCode):
             clear()
             instr_list.pop()
