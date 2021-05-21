@@ -309,6 +309,8 @@ while(i<len(l)):
             inst = instr
         if(len(instr)>0):
             OpCode=Assembler(inst)
+        else:
+            OpCode=""
         if("ERROR" in OpCode):
             clear()
             instr_list.pop()
