@@ -286,8 +286,8 @@ while(i<len(l)):
     time.sleep(.1)
     instr=l[i]
     i=i+1
-    if(instr!=" " or instr!="\n" or instr!="\t" or instr!=""):
-        if(instr.lower()==".memcheck"):
+    if(instr!=" " and instr!="\n" and instr!="\t" and instr!=""):
+        if(re.match(".memcheck[ ]?",instr.lower())):
             break
         print(instr)
         instr_list.append(instr)
@@ -307,7 +307,7 @@ while(i<len(l)):
                 continue
         else:
             inst = instr
-        if(len(instr)>0):
+        if(len(instr)>2):
             OpCode=Assembler(inst)
         else:
             continue
