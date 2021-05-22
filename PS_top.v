@@ -40,6 +40,7 @@ reg ps_pshstck_dly,ps_popstck_dly;
 reg[15:0] ps_rd_dt;
 reg ps_cmpt_dly;
 reg ps_jmp,ps_jmp_dly;
+reg ps_call;
 
 //Used for compute decoding
 reg cpt_en;//
@@ -105,10 +106,12 @@ always @ (posedge clk or negedge rst) begin
 		ps_faddr <=16'b0;
 		ps_daddr <= ps_faddr;
 		ps_pc <= ps_daddr;
+		ps_call <= 1'b0;
 		ps_jmp <= 1'b0;
 		ps_jmp_dly <= 1'b0;
 	end else begin
 
+		ps_call<=pm_ps_op[28] & pm_ps_op[26] & cnd_tru;
 		ps_jmp<=pm_ps_op[28] & cnd_tru;
 		ps_jmp_dly<=ps_jmp;
 		dg_ps_add_dly<=dg_ps_add;
@@ -251,13 +254,13 @@ always@(posedge clk or negedge rst) begin					//For the time being, a write usin
 
 		if(ps_popstck_dly & !ps_stcky[0]) begin	
 			ps_pcstck_pntr<=ps_pcstck_pntr-1'b1;
-		end else if(ps_pshstck_dly & !ps_stcky[1]) begin
+		end else if( (ps_pshstck_dly | ps_call) & !ps_stcky[1]) begin
 			ps_pcstck_pntr<=ps_pcstck_pntr+1'b1;
 		end
 
-		ps_stcky[0]<= (ps_stcky[1] & ps_popstck_dly) | (ps_stcky[0] & !ps_pshstck_dly);
-		ps_stcky[1]<= (ps_stcky[0] & ps_pshstck_dly) | (ps_stcky[1] & !ps_popstck_dly);
-		ps_stcky[2]<= ps_stcky[1] & ps_pshstck_dly;
+		ps_stcky[0]<= (ps_stcky[1] & ps_popstck_dly) | (ps_stcky[0] & !(ps_pshstck_dly | ps_call));
+		ps_stcky[1]<= (ps_stcky[0] & (ps_pshstck_dly | ps_call)) | (ps_stcky[1] & !ps_popstck_dly);
+		ps_stcky[2]<= ps_stcky[1] & (ps_pshstck_dly | ps_call);
 
 	end
 
@@ -277,8 +280,10 @@ always@(posedge clk or negedge rst) begin					//A write to pc stck doesnt affect
 	end begin
 		
 		//PC stck writing
-		if( (ps_wrt_add==5'b00100) & ps_wrt_en ) begin			//Should include jump logic too later
-			if(ps_pshstck_dly) begin
+		if( ( (ps_wrt_add==5'b00100) & ps_wrt_en ) | ps_call) begin			//Should include jump logic too later
+			if(ps_call) begin
+				ps_pcstck[ps_pcstck_pntr]<= ps_daddr;	
+			end else if(ps_pshstck_dly) begin
 				ps_pcstck[ps_pcstck_pntr]<= bc_dt;
 			end else begin
 				if(ps_pcstck_pntr) begin
