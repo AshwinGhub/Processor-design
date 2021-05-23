@@ -1,0 +1,19 @@
+# uui acc add saturation + mr0 write (py verified)
+r3=9000
+r1=7000
+r2=f002
+mr=r3*r1 uui	# 00 3f00 0000
+mr=mr+r3*r2 uui	# 00 c601 2000
+r4=sat mr ui	# 00 0000 (ffff)
+mr=sat mr ui	# 00 0000 ffff
+mr0=r2		# 00 0000 f002
+r6=mr+r4*r1 uui	# 00 7000 (8002)
+i0=0
+m0=1
+dm(i0,m0)=r4	# dm(0)=ffff
+dm(i0,m0)=r6	# dm(1)=8002
+finish
+
+.memcheck
+0000	ffff
+0001	8002

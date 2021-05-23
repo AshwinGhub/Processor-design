@@ -256,7 +256,7 @@ def Assembler(x):
             OpCode=OpCode[0]+"01000"+OpCode[6:19]+register(re.findall("I[0-7]",x)[0])[5:]+register(re.findall("M[0-7]",x)[0])[5:]+"00"+conditions(condition)
         elif(re.match("JUMP[ ]?[(][ ]?M[1,8,9][0-5]*[ ]?,[ ]?I[1,8,9][0-5]*[ ]?[)][ ]?$",x)):
             OpCode=OpCode[0]+"01100"+OpCode[6:19]+register(re.findall("I[1,8,9][0-5]*",x)[0])[5:]+register(re.findall("M[1,8,9][0-5]*",x)[0])[5:]+"00"+conditions(condition)
-        elif(re.match("JUMPR[ ]?[(][ ]?M[1,8,9][0-5]*[ ]?,[ ]?I[1,8,9][0-5]*[ ]?[)][ ]?$",x)):
+        elif(re.match("CALL[ ]?[(][ ]?M[1,8,9][0-5]*[ ]?,[ ]?I[1,8,9][0-5]*[ ]?[)][ ]?$",x)):
             OpCode=OpCode[0]+"01101"+OpCode[6:19]+register(re.findall("I[1,8,9][0-5]*",x)[0])[5:]+register(re.findall("M[1,8,9][0-5]*",x)[0])[5:]+"00"+conditions(condition)
         else:
             OpCode=OpCode[0]+"10000"+compute(x)+conditions(condition)
@@ -286,8 +286,8 @@ while(i<len(l)):
     time.sleep(.1)
     instr=l[i]
     i=i+1
-    if(instr!=" " or instr!="\n" or instr!="\t" or instr!=""):
-        if(instr==".memcheck"):
+    if(instr!=" " and instr!="\n" and instr!="\t" and instr!=""):
+        if(re.match(".memcheck[ ]?",instr.lower())):
             break
         print(instr)
         instr_list.append(instr)
@@ -307,8 +307,10 @@ while(i<len(l)):
                 continue
         else:
             inst = instr
-        if(len(instr)>0):
+        if(len(instr)>2):
             OpCode=Assembler(inst)
+        else:
+            continue
         if("ERROR" in OpCode):
             clear()
             instr_list.pop()

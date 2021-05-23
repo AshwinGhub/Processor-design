@@ -1,0 +1,20 @@
+# uuf product + mr slicing (py verified)
+r0=9000
+r1=0001
+r2=f002
+mr=r0*r1 uuf	# 00 0000 9000
+r3=sat mr uf	# 00 (0000) 9000
+mr=r0*r2 uuf	# 00 8701 2000
+r4=sat mr uf	# 00 (8701) 2000
+r5=mr0
+i0=0
+m0=1
+dm(i0,m0)=r3	# 0000
+dm(i0,m0)=r4	# 8701
+dm(i0,m0)=r5	# 2000
+finish
+
+.memcheck
+0000	0000
+0001	8701
+0002	2000
