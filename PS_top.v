@@ -40,7 +40,7 @@ reg ps_pshstck_dly,ps_popstck_dly;
 reg[15:0] ps_rd_dt;
 reg ps_cmpt_dly;
 reg ps_jmp,ps_jmp_dly;
-reg ps_call;
+reg ps_call,ps_rtrn,ps_rtrn_dly;
 
 //Used for compute decoding
 reg cpt_en;//
@@ -107,17 +107,26 @@ always @ (posedge clk or negedge rst) begin
 		ps_daddr <= ps_faddr;
 		ps_pc <= ps_daddr;
 		ps_call <= 1'b0;
+		ps_rtrn <= 1'b0;
+		ps_rtrn_dly <= 1'b0;
 		ps_jmp <= 1'b0;
 		ps_jmp_dly <= 1'b0;
 	end else begin
 
 		ps_call<=pm_ps_op[28] & pm_ps_op[26] & cnd_tru;
+		ps_rtrn<=(pm_ps_op[31:24]==8'b1);
+		ps_rtrn_dly<= ps_rtrn;
 		ps_jmp<=pm_ps_op[28] & cnd_tru;
 		ps_jmp_dly<=ps_jmp;
 		dg_ps_add_dly<=dg_ps_add;
 
 		if(ps_jmp) begin
 			ps_faddr<=dg_ps_add_dly;
+		end else if(ps_rtrn) begin
+			if(ps_pcstck_pntr)
+				ps_faddr<= ps_pcstck[ps_pcstck_pntr-1'b1];
+			else
+				ps_faddr<= ps_pcstck[ps_pcstck_pntr];
 		end else if(!ps_idle) begin
 			ps_faddr <= ps_faddr + 16'b1;
 		end
@@ -149,10 +158,10 @@ always @(*) begin
 	opc_cnd= pm_ps_op[4:0];
 	cnd_en= pm_ps_op[31];
 	astat_bts= { shf_ps_sz, shf_ps_sv, mul_ps_mv, mul_ps_mn, alu_ps_ac, alu_ps_an, alu_ps_av, alu_ps_az };   		//ASTAT bits given to condition checking module
-	cnd_tru= ( cnd_stat | !pm_ps_op[31] ) & !ps_idle & !ps_jmp & !ps_jmp_dly;
+	cnd_tru= ( cnd_stat | !pm_ps_op[31] ) & !ps_idle & !ps_jmp & !ps_jmp_dly & !ps_rtrn & !ps_rtrn_dly;
 
 	//Instruction Identification
-	if(!pm_ps_op[30] & !ps_idle & !ps_jmp & !ps_jmp_dly) begin
+	if(!pm_ps_op[30] & !ps_idle & !ps_jmp & !ps_jmp_dly & !ps_rtrn & !ps_rtrn_dly) begin
 		ps_pshstck= (pm_ps_op[29:24]==6'b000010);                       //Push PCstck inst
 		ps_popstck= (pm_ps_op[29:24]==6'b000011);			//Pop PCstack inst
 		ps_imminst= (pm_ps_op[29:26]==4'b0011);				//Immediate Inst
@@ -322,7 +331,7 @@ always@(posedge clk or negedge rst) begin
 		ps_cmpt_dly<=cpt_en;
 	
 		//Idle
-		ps_idle<= ( ( (pm_ps_op[31:23]==9'd1) & !ps_idle ) | ( !interrupt & ps_idle ) ) & !ps_jmp & !ps_jmp_dly;
+		ps_idle<= ( ( (pm_ps_op[31:23]==9'd1) & !ps_idle ) | ( !interrupt & ps_idle ) ) & !ps_jmp & !ps_jmp_dly & !ps_rtrn & !ps_rtrn_dly;
 
 	end
 
