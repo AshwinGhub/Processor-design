@@ -350,4 +350,3 @@ if(rewrite==True):
         g.write('\n')
     g.close()
 time.sleep(2)
-

@@ -1,9 +1,0 @@
-i2 =0006
-m3 =0002
-r0 =00ab
-r1 = LEFTZ r0
-dm(i2,m3) =r1
-finish
-
-.memcheck
-0006 0008

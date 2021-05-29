@@ -27,4 +27,3 @@ print("TEST PASSED") if not len(set(slines)-set(dlines)) else None
 [print("Address {}: {}".format(dl[:4], "fail")) if dl not in dlines else None for dl in slines]
 
 time.sleep(5)
-
