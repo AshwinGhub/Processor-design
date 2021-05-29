@@ -1,0 +1,9 @@
+i1 =0004
+m1 =0003
+r1 =ffff
+r2 =leftz r1
+dm(i1,m1) =r2
+finish
+
+.memcheck
+0004 0000

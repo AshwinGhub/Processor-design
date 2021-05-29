@@ -45,7 +45,7 @@ end
 always@(*) begin
 	if(core_obj.mem_obj.pm_ps_op[31:22]==10'b1) begin
 		#50;
-		$system("python C:/modeltech64_10.5/examples/SAC/a_test_script.py");                          //Command to run a_test_script.py - Update its location if neccessary
+		$system("python C:/Users/arund/Desktop/TKM-Docs/Final-Year-Project/processor-design-new/a_test_script.py");     //Command to run a_test_script.py - Update its location if neccessary
 		#50;
 		$stop;
 	end
