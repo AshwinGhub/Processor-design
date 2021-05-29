@@ -1,0 +1,12 @@
+i1=0003
+m2=0002
+r0 =0001
+r1 =000f
+r2 =0cab
+r3 =ashift r1 by r2
+if sz r4=r0
+dm(i1,m2) = r4
+finish
+
+.memcheck
+0003 0001
