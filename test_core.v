@@ -3,7 +3,7 @@ module test_core();
 reg clk, reset,interrupt;
 reg[2:0] count,rand;
 
-core_top #(.PMA_SIZE(16), .PMD_SIZE(32), .DMA_SIZE(16), .DMD_SIZE(16), .RF_DATASIZE(16), .ADDRESS_WIDTH(4), .SIGNAL_WIDTH(3), .PM_LOCATE("C:/Users/Ashwin Pradeep/Desktop/Project Final Year/GIT repo/memory_files/pm_file"), .DM_LOCATE("C:/Users/Ashwin Pradeep/Desktop/Project Final Year/GIT repo/memory_files/dm_file"))
+core_top #(.PMA_SIZE(16), .PMD_SIZE(32), .DMA_SIZE(16), .DMD_SIZE(16), .RF_DATASIZE(16), .ADDRESS_WIDTH(4), .SIGNAL_WIDTH(3), .PM_LOCATE("C:/Users/Ashwin Pradeep/Desktop/Project Final Year/GIT repo/memory_files/pm_file.txt"), .DM_LOCATE("C:/Users/Ashwin Pradeep/Desktop/Project Final Year/GIT repo/memory_files/dm_file.txt"))
 	core_obj	(
 				clk,
 				reset,
@@ -39,6 +39,15 @@ always@(posedge clk or negedge reset) begin
 		if(core_obj.ps_obj.ps_idle) begin
 			count<=count-3'b1;
 		end
+	end
+end
+
+always@(*) begin
+	if(core_obj.mem_obj.pm_ps_op[31:22]==10'b1) begin
+		#50;
+		$system("python C:/modeltech64_10.5/examples/SAC/a_test_script.py");                          //Command to run a_test_script.py - Update its location if neccessary
+		#50;
+		$stop;
 	end
 end
 

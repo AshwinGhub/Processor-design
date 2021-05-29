@@ -1,0 +1,22 @@
+# suf product + mr slicing (py verified)
+r0=9000
+r1=0001
+r2=f002
+r3=r0*r1 suf	# ff (ffff) 9000
+mr=r0*r2 suf	# ff 96ff 2000
+r4=mr2
+r5=mr1
+r6=mr0
+i0=1
+m0=1
+dm(i0,m0)=r3	# dm(1)=ffff
+dm(i0,m0)=r4	# dm(2)=ffff
+dm(i0,m0)=r5	# 96ff
+dm(i0,m0)=r6	# 2000
+finish
+
+.memcheck
+0001	ffff
+0002	ffff
+0003	96ff
+0004	2000

@@ -1,0 +1,19 @@
+# uui acc sub saturation + mr slicing (py verified)
+r0=9000
+r1=7000
+r2=f002
+mr=r0*r1 uui	# 00 3f00 0000
+mr=mr-r0*r2 uui	# ff b7fe e000
+if ms r3=mr1		# false
+if not ms r3=mr0	# e000
+r4=beef
+if mv r4=sat mr ui	# false because previous instruction resets flag
+i0=0
+m0=1
+dm(i0,m0)=r4	# dm(0)=beef
+dm(i0,m0)=r3	# dm(1)=e000
+finish
+
+.memcheck
+0000	beef
+0001	e000

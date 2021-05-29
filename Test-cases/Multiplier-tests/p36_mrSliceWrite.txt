@@ -1,0 +1,69 @@
+# MRx = Rn test case
+i0=a
+m0=1
+r0=beef
+mr0=r0		# 00 0000 beef
+r1=mr2
+r2=mr1
+r3=mr0
+mr1=r0		# ff beef 0000
+r4=mr2
+r5=mr1
+r6=mr0
+mr2=r0		# ef 0000 0000
+r7=mr2
+r8=mr1
+r9=mr0
+dm(i0,m0)=r1
+dm(i0,m0)=r2
+dm(i0,m0)=r3
+dm(i0,m0)=r4
+dm(i0,m0)=r5
+dm(i0,m0)=r6
+dm(i0,m0)=r7
+dm(i0,m0)=r8
+dm(i0,m0)=r9
+#
+r10=2020
+mr0=r10		# 00 0000 2020
+r11=mr2
+r12=mr1
+r13=mr0
+mr1=r10		# 00 2020 0000
+r14=mr2
+r15=mr1
+r0=mr0
+mr2=r10		# 20 0000 0000
+r1=mr2
+r2=mr1
+r3=mr0
+dm(i0,m0)=r11
+dm(i0,m0)=r12
+dm(i0,m0)=r13
+dm(i0,m0)=r14
+dm(i0,m0)=r15
+dm(i0,m0)=r0
+dm(i0,m0)=r1
+dm(i0,m0)=r2
+dm(i0,m0)=r3
+finish
+
+.memcheck
+000a	0000
+000b	0000
+000c	beef
+000d	ffff
+000e	beef
+000f	0000
+0010	ffef
+0011	0000
+0012	0000
+0013	0000
+0014	0000
+0015	2020
+0016	0000
+0017	2020
+0018	0000
+0019	0020
+001a	0000
+001b	0000

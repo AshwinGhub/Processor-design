@@ -1,0 +1,19 @@
+# sufr product rounding (py verified)
+r0=9000
+r1=0001
+r2=f00a
+r3=r0*r1 sufr	# ffffff9000 -> 00 (0000) 0000 (rounded)
+mr=r0*r2 sufr	# ff96fba000 -> ff 96fc 0000 (rounded)
+r4=sat mr sf	# ff (96fc) 0000 
+r5=mr2		# ffff
+i0=1
+m0=1
+dm(i0,m0)=r3	# dm(1)=0000
+dm(i0,m0)=r4	# dm(2)=96fc
+dm(i0,m0)=r5	# dm(3)=ffff
+finish
+
+.memcheck
+0001	0000
+0002	96fc
+0003	ffff
