@@ -1,4 +1,4 @@
-module cmpt_inst_dcdr(clk,rst,cpt_en,bt_5t25, ps_alu_en,ps_mul_en, ps_shf_en, ps_alu_log, ps_mul_otreg, ps_alu_hc, ps_mul_cls, ps_shf_cls, ps_alu_sc, ps_xb_w_cuEn,ps_mul_dtsts, ps_xb_rd_a0, ps_xb_raddy, ps_xb_wrt_a);
+module cmpt_inst_dcdr(clk,rst,cpt_en,bt_5t25, ps_alu_en,ps_mul_en, ps_shf_en, ps_alu_log, ps_mul_otreg, ps_alu_hc, ps_mul_cls, ps_mul_sc, ps_shf_cls, ps_alu_sc, ps_xb_w_cuEn,ps_mul_dtsts, ps_xb_rd_a0, ps_xb_raddy, ps_xb_wrt_a);
 
 parameter wrt=16;
 
@@ -6,12 +6,12 @@ input clk,rst,cpt_en;
 input[20:0] bt_5t25;
 
 output ps_alu_en, ps_mul_en, ps_shf_en, ps_alu_log, ps_mul_otreg;
-output[1:0] ps_alu_hc, ps_mul_cls, ps_shf_cls;
+output[1:0] ps_alu_hc, ps_mul_cls, ps_mul_sc, ps_shf_cls;
 output[2:0] ps_alu_sc, ps_xb_w_cuEn;
 output[3:0] ps_mul_dtsts, ps_xb_rd_a0, ps_xb_raddy, ps_xb_wrt_a;
 
 reg ps_alu_en, ps_mul_en, ps_shf_en, ps_alu_log, ps_mul_otreg;
-reg[1:0] ps_alu_hc, ps_mul_cls, ps_shf_cls;
+reg[1:0] ps_alu_hc, ps_mul_cls, ps_mul_sc, ps_shf_cls;
 reg[2:0] ps_alu_sc,wrt_en;
 reg[3:0] ps_mul_dtsts, ps_xb_rd_a0, ps_xb_raddy;
 
@@ -54,12 +54,14 @@ always @(*) begin
 		ps_mul_cls= bt_5t25[18:17];			  //Classification bits
 		ps_mul_otreg= bt_5t25[16];			  //Output reg selection bit - High for MRF, Low for Rn
 		ps_mul_dtsts = bt_5t25[15:12];			  //Data status
+		ps_mul_sc= bt_5t25[1:0];			  //Sub Classification bits
 
 	end else begin
 
 		ps_mul_cls= 2'b0;
 		ps_mul_otreg= 1'b0;
 		ps_mul_dtsts = 4'b0;
+		ps_mul_sc= 2'b0;
 
 	end
 
@@ -87,7 +89,7 @@ always @(*) begin
 	wrt_en[1]= ps_mul_en & !bt_5t25[16];
 	wrt_en[2]= ps_shf_en;
 	
-	if( ps_alu_en | (ps_mul_en & (|bt_5t25[18:17])) | ps_shf_en ) begin
+	if( ps_alu_en | (ps_mul_en & ( (|bt_5t25[18:17]) | ( (bt_5t25[16]==1'b1) & (bt_5t25[1:0]!=2'b11) ) )) | ps_shf_en ) begin
 
 		ps_xb_rd_a0= bt_5t25[7:4];          //Input 1 read Address 
 		

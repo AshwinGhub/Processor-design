@@ -1,9 +1,8 @@
-# 14nth may 12:35 AM
-
+# 24th may
 # -------------------------------------------------------------------------------------------------------------------------------------
 
-PM_LOCATE="C:/Users/arund/Desktop/TKM-Docs/Final-Year-Project/memory_files/pm_file"                         # Provide path to PM file and instructions here
-INST_LOCATE="C:/Users/arund/Desktop/TKM-Docs/Final-Year-Project/test_instructions/"
+PM_LOCATE="../memory_files/pm_file.txt"                         # Provide path to PM file and instructions here
+INST_LOCATE="../test_instructions/"
 
 #-------------------------------------------------------------------------------------------------------------------------------------
 
@@ -118,7 +117,7 @@ def compute(com):
         Comp_code = "000001001"
     elif(re.match("R[0-9]+[ ]?=[ ]?MAX[ ]?[(][ ]?R[0-9]+[ ]?,[ ]?R[0-9]+[ ]?[)][ ]?",com)):
         Comp_code = "000001011"
-    elif(re.match("R[0-9]+[ ]?=[ ]?-R[0-9]+[ ]?",com)):
+    elif(re.match("R[0-9]+[ ]?=[ ]?-[ ]?R[0-9]+[ ]?",com)):
         Comp_code = "000010001"
     elif(re.match("R[0-9]+[ ]?=[ ]?ABS[ ]?R[0-9]+[ ]?",com)):
         Comp_code = "000011001"
@@ -160,7 +159,6 @@ def compute(com):
         Comp_code = "01010"+sign
     elif(re.match("MR[ ]?=[ ]?R[0-9]+[ ]?[*][ ]?R[0-9]+[ ]?",com)):
         Comp_code = "01011"+sign
-       #print("1")
     elif(re.match("R[0-9]+[ ]?=[ ]?MR[ ]?[+][ ]?R[0-9]+[ ]?[*][ ]?R[0-9]+[ ]?",com)):
         Comp_code = "01100"+sign
     elif(re.match("MR[ ]?=[ ]?MR[ ]?[+][ ]?R[0-9]+[ ]?[*][ ]?R[0-9]+[ ]?",com)):
@@ -200,6 +198,8 @@ d="^[ ]?DM[ ]?[(][ ]?I[0-7][ ]?,[ ]?M[0-7][ ]?[)][ ]?$"
 def Assembler(x):
     OpCode = "00000000000000000000000000000000"
     x=x.upper()
+    while(x[-1]==" " or x[-1]=="\t"):
+        x=x[0:-1]
     if(x=="NOP"):
         OpCode = "00000000000000000000000000000000"
     elif(x=="IDLE"):
@@ -256,7 +256,7 @@ def Assembler(x):
             OpCode=OpCode[0]+"01000"+OpCode[6:19]+register(re.findall("I[0-7]",x)[0])[5:]+register(re.findall("M[0-7]",x)[0])[5:]+"00"+conditions(condition)
         elif(re.match("JUMP[ ]?[(][ ]?M[1,8,9][0-5]*[ ]?,[ ]?I[1,8,9][0-5]*[ ]?[)][ ]?$",x)):
             OpCode=OpCode[0]+"01100"+OpCode[6:19]+register(re.findall("I[1,8,9][0-5]*",x)[0])[5:]+register(re.findall("M[1,8,9][0-5]*",x)[0])[5:]+"00"+conditions(condition)
-        elif(re.match("JUMPR[ ]?[(][ ]?M[1,8,9][0-5]*[ ]?,[ ]?I[1,8,9][0-5]*[ ]?[)][ ]?$",x)):
+        elif(re.match("CALL[ ]?[(][ ]?M[1,8,9][0-5]*[ ]?,[ ]?I[1,8,9][0-5]*[ ]?[)][ ]?$",x)):
             OpCode=OpCode[0]+"01101"+OpCode[6:19]+register(re.findall("I[1,8,9][0-5]*",x)[0])[5:]+register(re.findall("M[1,8,9][0-5]*",x)[0])[5:]+"00"+conditions(condition)
         else:
             OpCode=OpCode[0]+"10000"+compute(x)+conditions(condition)
@@ -273,9 +273,9 @@ def clear():
     else:
         _=system("clear")
 a=input("Enter name of file containing instructions:")
-g=open(INST_LOCATE+a,"rt")
+g=open(INST_LOCATE+a,"rt")                                  #Changed
 #b=input("Enter name of OpCode Destination file:")
-f=open(PM_LOCATE,"wt")
+f=open(PM_LOCATE,"wt")                                      #Changed
 l=[]
 rewrite=False
 instr_list=[]
@@ -286,7 +286,9 @@ while(i<len(l)):
     time.sleep(.1)
     instr=l[i]
     i=i+1
-    if(instr!=" "):
+    if(instr!=" " and instr!="\n" and instr!="\t" and instr!=""):
+        if(re.match(".memcheck[ ]?",instr.lower())):
+            break
         print(instr)
         instr_list.append(instr)
         if("#" in instr):
@@ -305,7 +307,10 @@ while(i<len(l)):
                 continue
         else:
             inst = instr
-        OpCode=Assembler(inst)
+        if(len(instr)>2):
+            OpCode=Assembler(inst)
+        else:
+            continue
         if("ERROR" in OpCode):
             clear()
             instr_list.pop()
@@ -335,13 +340,14 @@ while(i<len(l)):
                 instr_list.append(instr)
                 print(instr,end='')
                 i=i+1
-print("\nOpcodes saved in "+ PM_LOCATE)
+print("\nOpcodes saved in "+ PM_LOCATE)                     #Changed
 f.close()
 g.close()
 if(rewrite==True):
-    g=open(INST_LOCATE+a,"wt")
+    g=open(INST_LOCATE+a,"wt")                              #Changed
     for i in range(len(l)):
         g.write(l[i])
         g.write('\n')
     g.close()
 time.sleep(2)
+

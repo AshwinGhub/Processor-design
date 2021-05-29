@@ -148,7 +148,7 @@ module   core_top	#(parameter PMA_SIZE, PMD_SIZE, DMA_SIZE, DMD_SIZE, RF_DATASIZ
 					ps_pm_cslt, ps_pm_wrb, ps_pm_add, 
 
 					//ps_cu	
-					ps_alu_en, ps_mul_en, ps_shf_en, ps_alu_log, ps_mul_otreg, ps_alu_hc, ps_mul_cls, ps_shf_cls, ps_alu_sc, ps_mul_dtsts, 
+					ps_alu_en, ps_mul_en, ps_shf_en, ps_alu_log, ps_mul_otreg, ps_alu_hc, ps_mul_cls, ps_mul_sc, ps_shf_cls, ps_alu_sc, ps_mul_dtsts, 
 
 
 					ps_xb_raddy, 

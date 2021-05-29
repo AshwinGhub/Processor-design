@@ -70,7 +70,7 @@ module cu_top 	#(parameter RF_DATASIZE, ADDRESS_WIDTH, SIGNAL_WIDTH)
 				xb_dtx, xb_dty, mul_xb_dt,
 				ps_mul_en, ps_mul_otreg,
 				ps_mul_dtsts,
-				ps_mul_cls,
+				ps_mul_cls, ps_mul_sc,
 				clk, reset,
 				mul_ps_mv,
 				mul_ps_mn
