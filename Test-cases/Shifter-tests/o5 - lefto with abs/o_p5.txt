@@ -1,0 +1,12 @@
+i1=0002
+m3=0001
+r0=fffe
+r1=abs r0
+r3=lefto r1
+dm(i1,m3)=r1
+dm(i1,m3)=r3
+finish
+
+.memcheck
+0002 0002
+0003 0001
