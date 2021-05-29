@@ -1,0 +1,11 @@
+i1 =0003
+m2 =0002
+r1 =0006
+r2 =0001
+r3 =leftz r1
+if sv r4 =r2
+dm(i1,m2) = r4
+finish
+
+.memcheck
+0003 xxxx
