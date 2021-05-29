@@ -1,0 +1,17 @@
+# uufr product saturation (py verified)
+R3=9000 
+R4=0001 
+R5=F002 
+MR=R3*R4 UUFR	# 00 0001 0000 rounded
+R6=SAT MR UF 	# 00 (0001) 0000
+MR=R3*R5 UUFR	# 00 8701 0000 rounded
+R7=SAT MR UF 	# 00 (8701) 0000
+I0=0 
+M0=1 
+DM(I0,M0)=R6	# 0001
+DM(I0,M0)=R7	# 8701
+FINISH 
+ 
+.MEMCHECK 
+0000 0001 
+0001 8701 

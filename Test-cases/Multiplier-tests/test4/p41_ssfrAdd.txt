@@ -1,0 +1,20 @@
+# ssfr acc add (py verified)
+R3=BEEF 
+R0=FAFA 
+MR=R3*R0 SSF	# 00 028d b6cb
+R4=MR1 	# 028d
+R5=FFFF 
+R6=MR+R4*R5 SSFR	# 00 028d b6cb + 00000000 (rounded)
+R7=MR0 	# b6cb
+I0=F000 
+M0=FFFF 
+DM(I0,M0)=R4	# dm(f000)=028d
+DM(I0,M0)=R7	# dm(efff)=b6cb
+DM(I0,M0)=R6	# dm(effe)=028d
+FINISH 
+ 
+ 
+.MEMCHECK 
+F000 028D 
+EFFF B6CC 
+EFFE 028D 
