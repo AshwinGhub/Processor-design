@@ -1,8 +1,8 @@
 # 24th may
 # -------------------------------------------------------------------------------------------------------------------------------------
 
-PM_LOCATE="../memory_files/pm_file.txt"                         # Provide path to PM file and instructions here
-INST_LOCATE="../test_instructions/"
+PM_LOCATE="C:/Users/arund/Desktop/TKM-Docs/Final-Year-Project/memory_files/pm_file"                         # Provide path to PM file and instructions here
+INST_LOCATE="C:/Users/arund/Desktop/TKM-Docs/Final-Year-Project/test_instructions/"
 
 #-------------------------------------------------------------------------------------------------------------------------------------
 
