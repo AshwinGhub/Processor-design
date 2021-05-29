@@ -1,0 +1,17 @@
+# ssi product saturation (py verified)
+R14=9000 
+R15=0001 
+R0=F002 
+MR=R14*R15 SSI	# ff ffff 9000
+R1=SAT MR SI 	# ff ffff (9000)
+MR=R14*R0 SSI	# 00 06ff 2000
+R2=SAT MR SI 	# 00 0000 (7fff)
+I0=1 
+M0=1 
+DM(I0,M0)=R1	# dm(1) = 9000
+DM(I0,M0)=R2	# dm(2) = 7fff
+FINISH 
+ 
+.MEMCHECK 
+0001 9000 
+0002 7FFF 

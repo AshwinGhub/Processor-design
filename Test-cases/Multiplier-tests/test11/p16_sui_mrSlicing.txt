@@ -1,0 +1,21 @@
+# sui product + mr slicing (py verified)
+R11=9000 
+R12=F002 
+MR=R11*R12 SUI	# ff 96ff 2000
+R14=MR2 	# ffff
+R15=MR1 	# 96ff
+R0=MR0 	# 2000
+R1=SAT MR SI 	# ff ffff (8000)
+I0=A001 
+M0=1 
+DM(I0,M0)=R14	# dm(1)=ffff
+DM(I0,M0)=R15	# dm(2)=96ff
+DM(I0,M0)=R0
+DM(I0,M0)=R1
+FINISH 
+ 
+.MEMCHECK 
+A001 FFFF 
+A002 96FF 
+A003 2000 
+A004 8000 

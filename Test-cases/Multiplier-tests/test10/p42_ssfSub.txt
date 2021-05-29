@@ -1,0 +1,16 @@
+# ssf multiplication sub (py verified)
+R9=BEEF 
+R6=FAFA 
+MR=R9*R6 SSF	# 00 028d b6cb
+R10=MR1 	# 028d
+R11=FFFF 
+R12=MR-R10*R11 SSF	# 00 028d bbe6
+I0=1 
+M0=1 
+DM(I0,M0)=R10	# dm(1)=028d
+DM(I0,M0)=R12	# dm(2)=028d
+FINISH 
+ 
+.MEMCHECK 
+0001 028D 
+0002 028D 

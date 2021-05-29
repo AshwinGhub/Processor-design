@@ -1,0 +1,27 @@
+# ssi acc sub saturation with conditional mn flag check (py verified)
+r0=9000
+r1=7000
+r2=f002
+r3=fffb
+mr=r0*r1 ssi		# ff cf00 0000
+r3=mr-r0*r2 ssi		# ff c800 (e000)
+if ms r2=r0*r3 ssi	# 00 0e00 (0000)
+if mv mr=sat mr si	# ff ffff 8000
+r4=mr2
+r5=mr1
+r6=mr0
+i0=0
+m0=1
+dm(i0,m0)=r3	# e000
+dm(i0,m0)=r2	# 0000
+dm(i0,m0)=r4	# ffff
+dm(i0,m0)=r5	# ffff
+dm(i0,m0)=r6	# 8000
+finish
+
+.memcheck
+0000	e000
+0001	0000
+0002	ffff
+0003	ffff
+0004	8000

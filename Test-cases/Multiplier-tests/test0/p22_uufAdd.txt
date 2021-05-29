@@ -1,0 +1,24 @@
+# uuf acc add saturation (py verified)
+r0=9000
+r1=7000
+r2=f002
+mr=r0*r1 uuf	# 00 3f00 0000
+mr=mr+r0*r2 uuf	# 00 c601 2000
+r4=sat mr uf	# 00 (c601) 2000
+r5=mr2		# 0000
+r6=mr1		# c601
+r7=mr0		# 2000
+i0=ffff
+m3=3
+m1=1
+dm(i0,m3)=r4	# c601
+dm(i0,m1)=r5	# 0000
+dm(i0,m1)=r6	# c601
+dm(i0,m1)=r7	# 2000
+finish
+
+.memcheck
+ffff	c601
+0002	0000
+0003	c601
+0004	2000

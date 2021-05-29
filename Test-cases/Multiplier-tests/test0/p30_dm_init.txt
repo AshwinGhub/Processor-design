@@ -1,0 +1,7 @@
+# memory must have initial data at locations 5 and 4
+I2=5
+M2=ffff
+r3=dm(i2,m2)
+r4=dm(i2,m2)
+r1=r3*r4 ssi
+dm(i2,m2)=r1

@@ -1,0 +1,23 @@
+# usf acc add (py verified)
+r0=9000
+r1=7000
+r2=f002
+mr=r0*r1 usf		# 00 3f00 0000
+r3=mr2
+r4=mr1
+r5=mr0
+mr=mr+r0*r2 usf		# 00 3601 2000
+r6=sat mr sf		# 00 (3601) 2000
+i0=0
+m0=1
+dm(i0,m0)=r6	# 3601
+dm(i0,m0)=r3	# 0000
+dm(i0,m0)=r4	# 3f00
+dm(i0,m0)=r5	# 0000
+finish
+
+.memcheck
+0000	3601
+0001	0000
+0002	3f00
+0003	0000

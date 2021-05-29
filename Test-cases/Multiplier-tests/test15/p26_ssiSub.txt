@@ -1,0 +1,23 @@
+# ssi acc sub saturation (py verified)
+R15=9000 
+R0=7000 
+R1=F002 
+MR=R15*R0 SSI	# ff cf00 0000
+MR=MR-R15*R1 SSI	# ff c800 e000
+R2=MR2 
+R3=MR1 
+R4=MR0 
+R5=SAT MR SI 	# ff ffff (8000)
+I0=0 
+M0=1 
+DM(I0,M0)=R5	# 8000
+DM(I0,M0)=R2
+DM(I0,M0)=R3
+DM(I0,M0)=R4
+FINISH 
+ 
+.MEMCHECK 
+0000 8000 
+0001 FFFF 
+0002 C800 
+0003 E000 

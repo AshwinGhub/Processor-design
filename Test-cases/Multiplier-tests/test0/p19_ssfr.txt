@@ -1,0 +1,16 @@
+# ssfr product rounding (py verified)
+r0=9000
+r1=0001
+r2=f002
+r3=r0*r1 ssfr	# ffffff2000 -> ff (ffff) 0000 (rounded)
+mr=r0*r2 ssfr	# 00dfe4000 -> 00 0dfe 0000 (rounded)
+r4=sat mr sf	# 00 (0dfe) 0000 
+i0=1
+m0=1
+dm(i0,m0)=r3	# ffff
+dm(i0,m0)=r4	# 0dfe
+finish
+
+.memcheck
+0001	ffff
+0002	0dfe

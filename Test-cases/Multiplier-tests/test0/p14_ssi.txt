@@ -1,0 +1,17 @@
+# ssi product saturation (py verified)
+r0=9000
+r1=0001
+r2=f002
+mr=r0*r1 ssi	# ff ffff 9000
+r3=sat mr si	# ff ffff (9000)
+mr=r0*r2 ssi	# 00 06ff 2000
+r4=sat mr si	# 00 0000 (7fff)
+i0=1
+m0=1
+dm(i0,m0)=r3	# dm(1) = 9000
+dm(i0,m0)=r4	# dm(2) = 7fff
+finish
+
+.memcheck
+0001	9000
+0002	7fff
