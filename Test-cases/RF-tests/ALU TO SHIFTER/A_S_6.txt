@@ -1,0 +1,15 @@
+nop
+nop
+nop
+R15=fffe
+R13=3421
+R14=R13-R15 UUI
+R11=ASHIFT R14 BY R15 
+I0=0001
+M0=0000
+DM(I0,M0)=R11 
+NOP
+FINISH
+
+.memcheck
+0001	0d08
