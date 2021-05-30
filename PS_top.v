@@ -1,4 +1,4 @@
-//2nd may
+//30 may
 module PS_top (clk,rst,interrupt,shf_ps_sz,shf_ps_sv,mul_ps_mv,mul_ps_mn,alu_ps_ac,alu_ps_an,alu_ps_av,alu_ps_az,pm_ps_op,bc_dt,ps_pm_cslt,ps_pm_wrb,ps_pm_add,ps_alu_en,ps_mul_en,ps_shf_en,ps_alu_log,ps_mul_otreg,ps_alu_hc,ps_mul_cls,ps_mul_sc,ps_shf_cls,ps_alu_sc,ps_mul_dtsts,ps_xb_raddy,ps_xb_w_cuEn,ps_xb_wadd,ps_xb_raddx,ps_xb_w_bcEn,ps_dg_wrt_en,ps_dg_rd_add,ps_dg_wrt_add,ps_bc_immdt,ps_dm_cslt,ps_dm_wrb,ps_dg_en,ps_dg_dgsclt,ps_dg_mdfy,ps_dg_iadd,ps_dg_madd,ps_bc_drr_slct,ps_bc_di_slct,ps_bc_dt,dg_ps_add);
 
 
@@ -26,15 +26,12 @@ output[1:0] ps_bc_drr_slct,ps_bc_di_slct;
 output[15:0] ps_bc_dt;
 
 
-integer i;
-
-
 //Internal Sginals
 reg cnd_tru, ps_idle,ps_pcstck_pntr,ps_mode1;
 reg[15:0] ps_faddr,ps_daddr,ps_pc;
 reg[15:0] dg_ps_add_dly;
 reg[15:0] ps_astat;						//ASTAT work left -> compare
-reg[15:0] ps_pcstck[1:0];
+reg[15:0] ps_pcstck;
 reg[2:0] ps_stcky;
 reg ps_pshstck_dly,ps_popstck_dly;
 reg[15:0] ps_rd_dt;
@@ -120,10 +117,7 @@ always @ (posedge clk or negedge rst) begin
 		if(ps_jmp) begin
 			ps_faddr<=dg_ps_add_dly;
 		end else if(ps_rtrn) begin
-			if(ps_pcstck_pntr)
-				ps_faddr<= ps_pcstck[ps_pcstck_pntr-1'b1];
-			else
-				ps_faddr<= ps_pcstck[ps_pcstck_pntr];
+			ps_faddr<= ps_pcstck;
 		end else if(!ps_idle) begin
 			ps_faddr <= ps_faddr + 16'b1;
 		end
@@ -216,12 +210,9 @@ always @(*) begin
 		ps_rd_dt= ps_daddr;	
 	else if(ps_rd_add== 5'b00011)
 		ps_rd_dt= ps_pc;
-	else if(ps_rd_add== 5'b00100) begin					//PCSTCK 
-		if(ps_pcstck_pntr)
-			ps_rd_dt= ps_pcstck[ps_pcstck_pntr-1'b1];
-		else
-			ps_rd_dt= ps_pcstck[ps_pcstck_pntr];
-	end else if(ps_rd_add== 5'b00101)
+	else if(ps_rd_add== 5'b00100)					//PCSTCK 
+		ps_rd_dt= ps_pcstck;
+	else if(ps_rd_add== 5'b00101)
 		ps_rd_dt= {15'b0,ps_pcstck_pntr};
 	else if(ps_rd_add== 5'b11011)
 		ps_rd_dt= {15'b0,ps_mode1};
@@ -233,7 +224,7 @@ always @(*) begin
 		ps_rd_dt= 16'b0;
 
 	//Bypass (Consider if there are changes in pcstkp and stcky bypass after including jump instructions)
-	if(ps_wrt_add==ps_rd_add) begin
+	if( (ps_wrt_add==ps_rd_add) & ps_wrt_en ) begin
 		if(ps_rd_add== 5'b11011)
 			ps_bc_dt= {15'b0,bc_dt[0]};
 		else
@@ -303,9 +294,7 @@ always@(posedge clk or negedge rst) begin
 
 		ps_astat<=16'h0;
 		ps_mode1<= 1'b0;
-		for (i=0; i<=1; i=i+1) begin
-			ps_pcstck[i]<= 16'b0;		
-		end
+		ps_pcstck<= 16'b0;		
      
 	end else begin
 
@@ -324,19 +313,12 @@ always@(posedge clk or negedge rst) begin
 		//PC stck writing
 		if( ( (ps_wrt_add==5'b00100) & ps_wrt_en ) | ps_call) begin
 			if(ps_call) begin
-				ps_pcstck[ps_pcstck_pntr]<= ps_daddr;	
-			end else if(ps_pshstck_dly) begin
-				ps_pcstck[ps_pcstck_pntr]<= bc_dt;
+				ps_pcstck<= ps_daddr;	
 			end else begin
-				if(ps_pcstck_pntr) begin
-					ps_pcstck[ps_pcstck_pntr-1'b1]<= bc_dt;
-				end else begin
-					ps_pcstck[ps_pcstck_pntr]<= bc_dt;
-				end
+				ps_pcstck<= bc_dt;
 			end
-		end
+		end		
 	end
-
 end
 
 endmodule
