@@ -80,7 +80,7 @@ always@(posedge clk or negedge reset)
 begin
         if(~reset)
             begin
-                x<=16'h0000;
+                x<=16'h0001;
                 y<=16'h0000;
              end 
 
