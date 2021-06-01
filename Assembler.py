@@ -276,6 +276,7 @@ a=input("Enter name of file containing instructions:")
 g=open(INST_LOCATE+a,"rt")                                  #Changed
 #b=input("Enter name of OpCode Destination file:")
 f=open(PM_LOCATE,"wt")                                      #Changed
+f.write(16*"1"+16*"0"+"\n")
 l=[]
 rewrite=False
 instr_list=[]
@@ -291,6 +292,12 @@ while(i<len(l)):
             break
         print(instr)
         instr_list.append(instr)
+        if(re.match(".CALL[ ]?[(][ ]?[0-9]+[ ]?[)][ ]?",instr.upper())):
+            f.write(16*"1"+format(int(re.findall("[0-9]+",instr)[0]),"016b")+"\n")
+            instr=l[i]
+            i=i+1
+            print(instr)
+            instr_list.append(instr)
         if("#" in instr):
             inst = re.split("#",instr)[0]
             if(re.match("^[ ]*#",instr)):
