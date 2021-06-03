@@ -132,8 +132,13 @@ begin
 					a=x;
 					if(alu_sc[2])		//comp
 					begin
-						b=(~y)+1'b1;
-						alu_xb_dt=(|sum)&~(b==16'h8000) ? sum^{{DATA_WIDTH-1{cout[DATA_WIDTH-1]^cout[DATA_WIDTH-2]}},(cout[DATA_WIDTH-1]^cout[DATA_WIDTH-2])} : sum;	//if sum is 0 then we make alu_xb_dt=sum
+						//b=(~y)+1'b1;
+						b=y;
+						if($signed(a)<$signed(b))
+							alu_xb_dt=16'hffff;
+						else
+							alu_xb_dt=(a==b)?16'h0:16'h1;
+						//alu_xb_dt=(|sum)&~(b==16'h8000) ? sum^{{DATA_WIDTH-1{cout[DATA_WIDTH-1]^cout[DATA_WIDTH-2]}},(cout[DATA_WIDTH-1]^cout[DATA_WIDTH-2])} : sum;	//if sum is 0 then we make alu_xb_dt=sum
 					end
 
 					else
