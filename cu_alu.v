@@ -132,7 +132,6 @@ begin
 					a=x;
 					if(alu_sc[2])		//comp
 					begin
-						//b=(~y)+1'b1;
 						b=y;
 						if($signed(a)<$signed(b))
 							alu_xb_dt=16'hffff;
