@@ -237,7 +237,7 @@ always @(*) begin
 		ps_bc_dt= {13'b0, (ps_stcky[1] & ps_pshstck_dly) ,ps_pshstck_dly, ps_popstck_dly};
 	else if( (ps_rd_add== 5'b11100) & ps_cmpt_dly ) begin
 		if(alu_ps_compd)
-			ps_bc_dt= {  !alu_ps_an & !alu_ps_av, ps_astat[15:9] , shf_ps_sz, shf_ps_sv, mul_ps_mv, mul_ps_mn, alu_ps_ac, alu_ps_an, alu_ps_av, alu_ps_az };
+			ps_bc_dt= {  !alu_ps_an & !alu_ps_az, ps_astat[15:9] , shf_ps_sz, shf_ps_sv, mul_ps_mv, mul_ps_mn, alu_ps_ac, alu_ps_an, alu_ps_av, alu_ps_az };
 		else
 			ps_bc_dt= {  ps_astat[15:8] , shf_ps_sz, shf_ps_sv, mul_ps_mv, mul_ps_mn, alu_ps_ac, alu_ps_an, alu_ps_av, alu_ps_az };
 	end else
@@ -308,7 +308,7 @@ always@(posedge clk or negedge rst) begin
 	       		ps_astat<= bc_dt;
 		end else begin
 			if(alu_ps_compd) begin
-				ps_astat[15:8]<= { !alu_ps_an & !alu_ps_av, ps_astat[15:9] };
+				ps_astat[15:8]<= { !alu_ps_an & !alu_ps_az, ps_astat[15:9] };
 			end
 			ps_astat[7:0]<= { shf_ps_sz, shf_ps_sv, mul_ps_mv, mul_ps_mn, alu_ps_ac, alu_ps_an, alu_ps_av, alu_ps_az };     //Update 6'b0 with compare logic later on	 
 		end
