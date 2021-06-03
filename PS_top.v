@@ -1,15 +1,16 @@
-//30 may
-module PS_top (clk,rst,interrupt,shf_ps_sz,shf_ps_sv,mul_ps_mv,mul_ps_mn,alu_ps_ac,alu_ps_an,alu_ps_av,alu_ps_az,pm_ps_op,bc_dt,ps_pm_cslt,ps_pm_wrb,ps_pm_add,ps_alu_en,ps_mul_en,ps_shf_en,ps_alu_log,ps_mul_otreg,ps_alu_hc,ps_mul_cls,ps_mul_sc,ps_shf_cls,ps_alu_sc,ps_mul_dtsts,ps_xb_raddy,ps_xb_w_cuEn,ps_xb_wadd,ps_xb_raddx,ps_xb_w_bcEn,ps_dg_wrt_en,ps_dg_rd_add,ps_dg_wrt_add,ps_bc_immdt,ps_dm_cslt,ps_dm_wrb,ps_dg_en,ps_dg_dgsclt,ps_dg_mdfy,ps_dg_iadd,ps_dg_madd,ps_bc_drr_slct,ps_bc_di_slct,ps_bc_dt,dg_ps_add);
+//3 June
+module PS_top (clk,rst,interrupt,shf_ps_sz,shf_ps_sv,mul_ps_mv,mul_ps_mn,alu_ps_ac,alu_ps_an,alu_ps_av,alu_ps_az,alu_ps_compd,pm_ps_op,bc_dt,ps_pm_cslt,ps_pm_wrb,ps_pm_add,ps_alu_en,ps_mul_en,ps_shf_en,ps_alu_log,ps_mul_otreg,ps_alu_ci,ps_alu_sat,ps_alu_hc,ps_mul_cls,ps_mul_sc,ps_shf_cls,ps_alu_sc,ps_mul_dtsts,ps_xb_raddy,ps_xb_w_cuEn,ps_xb_wadd,ps_xb_raddx,ps_xb_w_bcEn,ps_dg_wrt_en,ps_dg_rd_add,ps_dg_wrt_add,ps_bc_immdt,ps_dm_cslt,ps_dm_wrb,ps_dg_en,ps_dg_dgsclt,ps_dg_mdfy,ps_dg_iadd,ps_dg_madd,ps_bc_drr_slct,ps_bc_di_slct,ps_bc_dt,dg_ps_add);
 
 
 input clk,rst,interrupt;
-input shf_ps_sz,shf_ps_sv,mul_ps_mv,mul_ps_mn,alu_ps_ac,alu_ps_an,alu_ps_av,alu_ps_az; 
+input shf_ps_sz,shf_ps_sv,mul_ps_mv,mul_ps_mn,alu_ps_ac,alu_ps_an,alu_ps_av,alu_ps_az,alu_ps_compd; 
 input[31:0] pm_ps_op;
 input[15:0] bc_dt;
 input[15:0] dg_ps_add;
 output ps_pm_cslt,ps_pm_wrb;
 output [15:0] ps_pm_add;
 output ps_alu_en, ps_mul_en, ps_shf_en, ps_alu_log, ps_mul_otreg;
+output ps_alu_ci,ps_alu_sat;
 output[1:0] ps_alu_hc, ps_mul_cls, ps_mul_sc, ps_shf_cls;
 output[2:0] ps_alu_sc;
 output[3:0] ps_mul_dtsts, ps_xb_raddy;                       
@@ -41,7 +42,7 @@ reg ps_call,ps_rtrn,ps_rtrn_dly;
 
 //Used for compute decoding
 reg cpt_en;
-reg [20:0] bt_5t25;
+reg ps_alu_ci,ps_alu_sat;
 
 wire ps_alu_en, ps_mul_en, ps_shf_en, ps_alu_log, ps_mul_otreg;
 wire[1:0] ps_alu_hc, ps_mul_cls, ps_mul_sc, ps_shf_cls;
@@ -85,7 +86,7 @@ reg[2:0] ps_dg_iadd,ps_dg_madd;
 
 
 //Compute Decoing hardware
-cmpt_inst_dcdr cpt(clk,rst,cpt_en,bt_5t25, ps_alu_en,ps_mul_en, ps_shf_en, ps_alu_log, ps_mul_otreg, ps_alu_hc, ps_mul_cls, ps_mul_sc, ps_shf_cls, ps_alu_sc, ps_xb_w_cuEn,ps_mul_dtsts, ps_xb_rd_a0, ps_xb_raddy, ps_xb_wrt_a);
+cmpt_inst_dcdr cpt(clk,rst,cpt_en,pm_ps_op[25:5], ps_alu_en,ps_mul_en, ps_shf_en, ps_alu_log, ps_mul_otreg, ps_alu_hc, ps_mul_cls, ps_mul_sc, ps_shf_cls, ps_alu_sc, ps_xb_w_cuEn,ps_mul_dtsts, ps_xb_rd_a0, ps_xb_raddy, ps_xb_wrt_a);
 
 //Condition decoding hardware
 cnd_dcdr cnd(cnd_en,opc_cnd,cnd_stat,astat_bts);
@@ -174,7 +175,8 @@ always @(*) begin
 
 	//Compute decoding
 	cpt_en= pm_ps_op[30] & cnd_tru;
-	bt_5t25= pm_ps_op[25:5];
+	ps_alu_ci= ps_astat[3];
+	ps_alu_sat= ps_mode1;
 
 	//DM
 	ps_dm_cslt= ps_dminst;
@@ -233,9 +235,12 @@ always @(*) begin
 		ps_bc_dt= {15'b0,ps_pshstck_dly};
 	else if( (ps_rd_add==5'b11110) & (ps_pshstck_dly | ps_popstck_dly) )
 		ps_bc_dt= {13'b0, (ps_stcky[1] & ps_pshstck_dly) ,ps_pshstck_dly, ps_popstck_dly};
-	else if( (ps_rd_add== 5'b11100) & ps_cmpt_dly )
-		ps_bc_dt=  { /*ps_astat[15:8] */ 8'b0 , shf_ps_sz, shf_ps_sv, mul_ps_mv, mul_ps_mn, alu_ps_ac, alu_ps_an, alu_ps_av, alu_ps_az };
-	else
+	else if( (ps_rd_add== 5'b11100) & ps_cmpt_dly ) begin
+		if(alu_ps_compd)
+			ps_bc_dt= {  !alu_ps_an & !alu_ps_av, ps_astat[15:9] , shf_ps_sz, shf_ps_sv, mul_ps_mv, mul_ps_mn, alu_ps_ac, alu_ps_an, alu_ps_av, alu_ps_az };
+		else
+			ps_bc_dt= {  ps_astat[15:8] , shf_ps_sz, shf_ps_sv, mul_ps_mv, mul_ps_mn, alu_ps_ac, alu_ps_an, alu_ps_av, alu_ps_az };
+	end else
 		ps_bc_dt= ps_rd_dt;
 
 end
@@ -302,7 +307,10 @@ always@(posedge clk or negedge rst) begin
 		if( (ps_wrt_add==5'b11100) & ps_wrt_en ) begin
 	       		ps_astat<= bc_dt;
 		end else begin
-	       		ps_astat<= { 8'b0 , shf_ps_sz, shf_ps_sv, mul_ps_mv, mul_ps_mn, alu_ps_ac, alu_ps_an, alu_ps_av, alu_ps_az };     //Update 6'b0 with compare logic later on	 
+			if(alu_ps_compd) begin
+				ps_astat[15:8]<= { !alu_ps_an & !alu_ps_av, ps_astat[15:9] };
+			end
+			ps_astat[7:0]<= { shf_ps_sz, shf_ps_sv, mul_ps_mv, mul_ps_mn, alu_ps_ac, alu_ps_an, alu_ps_av, alu_ps_az };     //Update 6'b0 with compare logic later on	 
 		end
 
 	       	//ps_mode1 writing

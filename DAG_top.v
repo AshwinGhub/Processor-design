@@ -161,7 +161,7 @@ always@(*) begin
 		dg_rd_dt=m[ps_dg_rd_add[3:0]];    
 	end
 
-	if(ps_dg_wrt_add==ps_dg_rd_add) begin  
+	if( (ps_dg_wrt_add==ps_dg_rd_add) & ps_dg_wrt_en) begin  
 		dg_bc_dt=bc_dt;
 	end else begin
 		dg_bc_dt=dg_rd_dt;
