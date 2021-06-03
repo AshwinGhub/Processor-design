@@ -1,0 +1,17 @@
+# uui product saturation (py verified)
+R4=9000 
+R5=0001 
+R6=F002 
+MR=R4*R5 UUI	# 00 0000 9000
+R7=SAT MR UI 	# 00 0000 (9000)
+MR=R4*R6 UUI	# 00 8701 2000
+R8=SAT MR UI 	# 00 0000 (ffff)
+I0=0 
+M0=1 
+DM(I0,M0)=R7	# dm(0) = 9000
+DM(I0,M0)=R8	# dm(1) = ffff
+FINISH 
+ 
+.MEMCHECK 
+0000 9000 
+0001 FFFF 

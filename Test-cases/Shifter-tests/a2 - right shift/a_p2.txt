@@ -1,0 +1,10 @@
+i1 =0002
+m3 =0001
+r0 =f000
+r1 =fffc
+r5 =ashift r0 by r1
+dm(i1,m3) =r5
+finish
+
+.memcheck
+0002 ff00

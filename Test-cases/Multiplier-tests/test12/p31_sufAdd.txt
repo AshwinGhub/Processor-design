@@ -1,0 +1,24 @@
+# suf acc add and mr slicing (py verified)
+R12=BEEF 
+R13=BEEF 
+R14=R12*R13 SUF	# ff (cf78) a321
+MR=MR+R12*R13 SUF	# ff cf78 a321
+MR=MR+R12*R13 SUF	# ff 9ef1 4642
+MR=MR+R12*R13 SUF	# ff 6e69 e963
+MR=MR+R12*R13 SUF	# ff 3de2 8c85 (python predicted 8c85 but simulation gives 8c84-less accurate)
+R15=MR0 
+R0=MR1 
+R1=SAT MR SF 	# ff (8000) 0000
+I0=9 
+M0=1 
+DM(I0,M0)=R14
+DM(I0,M0)=R15
+DM(I0,M0)=R0
+DM(I0,M0)=R1
+FINISH 
+ 
+.MEMCHECK 
+0009 CF78 
+000A 8C84 
+000B 3DE2 
+000C 8000 

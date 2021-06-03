@@ -1,0 +1,24 @@
+# uuf acc sub saturation (py verified)
+R12=9000 
+R13=7000 
+R14=F002 
+MR=R12*R13 UUF	# 00 3f00 0000
+MR=MR-R12*R14 UUF	# ff b7fe e000
+R15=MR2 	# ffff
+R1=MR1 	# b7fe
+R2=MR0 	# e000
+R0=SAT MR UF 	# 00 (ffff) ffff
+I0=0 
+M1=1 
+M2=2 
+DM(I0,M2)=R0	# ffff
+DM(I0,M1)=R15	# ffff
+DM(I0,M1)=R1	# b7fe
+DM(I0,M1)=R2	# e000
+FINISH 
+ 
+.MEMCHECK 
+0000 FFFF 
+0002 FFFF 
+0003 B7FE 
+0004 E000 

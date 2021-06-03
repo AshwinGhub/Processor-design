@@ -1,0 +1,30 @@
+# usi acc sub (py verified)
+r0=9000
+r1=7000
+r2=f002
+mr=r0*r1 usi		# 00 3f00 0000
+r3=mr2
+r4=mr1
+r5=mr0
+mr=mr-r0*r2 usi		# 00 47fe e000
+mr=mr-r1*r4 usi		# 00 2c6e e000
+r6=sat mr si		# 00 0000 7fff
+r7=mr1			# 2c6e
+r8=mr0			# e000
+i0=0
+m0=1
+dm(i0,m0)=r6	# 7fff
+dm(i0,m0)=r3	# 0000
+dm(i0,m0)=r4	# 3f00
+dm(i0,m0)=r5	# 0000
+dm(i0,m0)=r7	# 2c6e
+dm(i0,m0)=r8	# e000
+finish
+
+.memcheck
+0000	7fff
+0001	0000
+0002	3f00
+0003	0000
+0004	2c6e
+0005	e000
