@@ -30,12 +30,12 @@ module   core_top	#(parameter PMA_SIZE, PMD_SIZE, DMA_SIZE, DMD_SIZE, RF_DATASIZ
 		wire shf_ps_sv, shf_ps_sz;
 
 		//ALU signals from PS
-		wire ps_alu_en, ps_alu_log;
+		wire ps_alu_en, ps_alu_log, ps_alu_ci;
 		wire[1:0] ps_alu_hc;
 		wire[2:0] ps_alu_sc;
 
-		//ALU to PS flags
-		wire alu_ps_az, alu_ps_an, alu_ps_ac, alu_ps_av;
+		//ALU to PS flags and signals
+		wire alu_ps_az, alu_ps_an, alu_ps_ac, alu_ps_av, alu_ps_compd;
 
 
 		cu_top #(.RF_DATASIZE(RF_DATASIZE), .ADDRESS_WIDTH(ADDRESS_WIDTH), .SIGNAL_WIDTH(SIGNAL_WIDTH))
@@ -71,9 +71,13 @@ module   core_top	#(parameter PMA_SIZE, PMD_SIZE, DMA_SIZE, DMD_SIZE, RF_DATASIZ
 					ps_alu_hc,
 					ps_alu_sc,
 					ps_alu_sat,
+					ps_alu_ci,
 			
 					//ALU flags
-					alu_ps_az, alu_ps_an, alu_ps_ac, alu_ps_av
+					alu_ps_az, alu_ps_an, alu_ps_ac, alu_ps_av,
+
+					//ALU compare true signal
+					alu_ps_compd
 				);
 
 		
@@ -135,7 +139,7 @@ module   core_top	#(parameter PMA_SIZE, PMD_SIZE, DMA_SIZE, DMD_SIZE, RF_DATASIZ
 					//flags
 					shf_ps_sz , shf_ps_sv,
 					mul_ps_mv, mul_ps_mn,
-					alu_ps_ac , alu_ps_an , alu_ps_av , alu_ps_az,
+					alu_ps_ac , alu_ps_an , alu_ps_av , alu_ps_az, alu_ps_compd,
 
 
 					//pm_ps
@@ -148,7 +152,7 @@ module   core_top	#(parameter PMA_SIZE, PMD_SIZE, DMA_SIZE, DMD_SIZE, RF_DATASIZ
 					ps_pm_cslt, ps_pm_wrb, ps_pm_add, 
 
 					//ps_cu	
-					ps_alu_en, ps_mul_en, ps_shf_en, ps_alu_log, ps_mul_otreg, ps_alu_hc, ps_mul_cls, ps_mul_sc, ps_shf_cls, ps_alu_sc, ps_mul_dtsts, 
+					ps_alu_en, ps_mul_en, ps_shf_en, ps_alu_log, ps_mul_otreg, ps_alu_ci, ps_alu_sat, ps_alu_hc, ps_mul_cls, ps_mul_sc, ps_shf_cls, ps_alu_sc, ps_mul_dtsts, 
 
 
 					ps_xb_raddy, 
