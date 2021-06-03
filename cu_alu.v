@@ -196,7 +196,7 @@ begin
 		{alu_log,alu_hc,alu_sc}==6'b001_011 ));
 		//{alu_log,alu_hc,alu_sc[2:1]}==6'b001_100 ));
 
-	//AV is reset for all logical, COMP, MIN and MAX instructions
+	//AV is reset for all logical, COMP, MIN and MAX instructions	(NOTE: AV flag shows overflow of value before saturation)
 	alu_ps_av = (cout[DATA_WIDTH-1]^cout[DATA_WIDTH-2]) & (~alu_log) & (~(
 		{alu_log,alu_hc,alu_sc}==6'b000_101 | 
 		{alu_log,alu_hc,alu_sc}==6'b001_001 | 
