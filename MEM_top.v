@@ -18,24 +18,24 @@ module memory #(parameter PMA_SIZE, PMD_SIZE, DMA_SIZE, DMD_SIZE, PM_LOCATE, DM_
 //------------------------------------------------------------------------------------------------------------------------------------
 		reg [PMD_SIZE-1:0] pmInsts [(2**PMA_SIZE)-1:0];
 		reg [PMD_SIZE-1:0] pmWithCall [(2**PMA_SIZE)-1:0];	
-		integer address, calladdress;
+		integer address, calladdress=0;
 		integer file, i;
-		integer stop;
 		initial
 		begin
 			$readmemb(PM_LOCATE,pmInsts);
-			stop=0;
-			for(address=0;stop!=1;address=address+1)
+			//stop iterating at 32'hx. Compare with 32'hffffffff instead.
+			//verilog can't seem to compare 32'hx.
+			for(address=0; pmInsts[address[PMA_SIZE-1:0]]!=32'hffffffff;address=address+1)		
 			begin
-				if(&( pmInsts [address[PMA_SIZE-1:0]] [PMD_SIZE-1:PMD_SIZE/2] ))		//if we detect MSB 16 bits as 1s, it means lsb bits represent call pm address if(&( pmInsts [address[15:0]] [31:16] ))
+				//if we detect MSB 16 bits as 1s, it means lsb bits 
+				//represent call pm address if(&( pmInsts [address[15:0]] [31:16] ))
+				if(&( pmInsts [address[PMA_SIZE-1:0]] [PMD_SIZE-1:PMD_SIZE/2] ))		
 				begin
 					calladdress=pmInsts[address[PMA_SIZE-1:0]];	//32 bit integer
 					address=address+1;				//32 bit integer
 				end
 				
 				pmWithCall[calladdress[PMA_SIZE-1:0]]=pmInsts[address[PMA_SIZE-1:0]];
-				if (calladdress[PMA_SIZE-1:0]==16'hffff)
-					stop=1;
 				calladdress=calladdress+1;
 			end
 
@@ -44,7 +44,7 @@ module memory #(parameter PMA_SIZE, PMD_SIZE, DMA_SIZE, DMD_SIZE, PM_LOCATE, DM_
 			for(i=0;i<2**PMA_SIZE;i=i+1)
 			begin
 				//$fdisplay(file, i[PMA_SIZE-1:0]);
-				$fdisplayb(file,  pmWithCall[i[PMA_SIZE-1:0]]);
+				$fdisplayb(file, i[PMA_SIZE-1:0], "\t", pmWithCall[i[PMA_SIZE-1:0]]);
 			end
 			$fclose(file);*/
 		end
