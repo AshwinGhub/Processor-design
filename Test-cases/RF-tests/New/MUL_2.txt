@@ -1,0 +1,19 @@
+r0=9000
+r1=0001
+r2=f002
+mr=r0*r1 uuf	
+r3=sat mr uf	
+mr=r0*r2 uuf	
+r4=sat mr uf	
+r5=mr0
+i0=0
+m0=1
+dm(i0,m0)=r3	
+dm(i0,m0)=r4	
+dm(i0,m0)=r5	
+finish
+
+.memcheck
+0000	0000
+0001	8701
+0002	2000
