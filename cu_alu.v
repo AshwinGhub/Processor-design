@@ -23,23 +23,21 @@
 
 
 module alu #(parameter DATA_WIDTH)
-	(clk, reset, xb_dtx, xb_dty, ps_alu_en, ps_alu_log, ps_alu_hc, ps_alu_sc, alu_xb_dt, ps_alu_sat, alu_ps_az, alu_ps_an, alu_ps_ac, alu_ps_av);
+	(clk, reset, xb_dtx, xb_dty, ps_alu_en, ps_alu_log, ps_alu_hc, ps_alu_sc, alu_xb_dt, ps_alu_sat, ps_alu_ci, alu_ps_az, alu_ps_an, alu_ps_ac, alu_ps_av, alu_ps_compd);
 
-input clk, reset, xb_dtx, xb_dty ,ps_alu_en, ps_alu_log, ps_alu_sat, ps_alu_hc, ps_alu_sc;      
-wire clk;
-wire reset;                                                                                        
+input clk, reset, xb_dtx, xb_dty ,ps_alu_en, ps_alu_log, ps_alu_sat, ps_alu_hc, ps_alu_sc, ps_alu_ci;
+wire clk, reset, ps_alu_ci;                  
 wire [(DATA_WIDTH-1):0]xb_dtx;
 wire [(DATA_WIDTH-1):0]xb_dty;
 wire ps_alu_en, ps_alu_log;
 wire [1:0]ps_alu_hc;
 wire [2:0]ps_alu_sc;
-wire ps_alu_sat;
+wire ps_alu_sat, alu_ps_compd;
 
-output alu_xb_dt, alu_ps_az, alu_ps_an, alu_ps_ac, alu_ps_av;
+output alu_xb_dt, alu_ps_az, alu_ps_an, alu_ps_ac, alu_ps_av, alu_ps_compd;
 reg [(DATA_WIDTH-1):0]alu_xb_dt;
 reg alu_ps_az,alu_ps_an,alu_ps_ac,alu_ps_av;
 
-reg  [(DATA_WIDTH):0]value;
 reg  [(DATA_WIDTH-1):0]x;
 reg  [(DATA_WIDTH-1):0]y;
 reg alu_en;
@@ -47,295 +45,201 @@ reg alu_log;
 reg [1:0]alu_hc;
 reg [2:0]alu_sc;
 
+reg [DATA_WIDTH-1:0]value;
+reg alu_sat;
+wire satEn;
+
+reg [DATA_WIDTH-1:0] a, b;
+wire [DATA_WIDTH-1:0] sum, cout;
 
 always@(posedge clk or negedge reset)
 begin
-      if(~reset)
-        begin
-            alu_en=1'b0;
-            alu_log<=1'b0;
-            alu_hc<=2'b00;
-            alu_sc<=3'b000;
-         end 
+	if(~reset)
+	      	alu_en = 1'b0;
+	else
+		alu_en <= ps_alu_en; 
+end
 
-else
-          alu_en<= ps_alu_en; 
-end 
-
-
-always@(posedge clk)
+always@(posedge clk or negedge reset)
 begin
-         if(ps_alu_en)
+	if(~reset)
+	begin
+		alu_log <= 1'b0;
+            	alu_hc <= 2'b00;
+        	alu_sc <= 3'b000;
+    	end
+        else 
+		if(ps_alu_en)
                 begin
-                      alu_log<= ps_alu_log;
-                      alu_hc<= ps_alu_hc;
-                      alu_sc<= ps_alu_sc;
+                      alu_log <= ps_alu_log;
+                      alu_hc <= ps_alu_hc;
+                      alu_sc <= ps_alu_sc;
                 end 
-
-end  
-
+end
 
 
 always@(posedge clk or negedge reset)
 begin
         if(~reset)
-            begin
+	begin
                 x<=16'h0001;
                 y<=16'h0000;
-             end 
-
-      else
-           begin
-		x<= ps_alu_en? xb_dtx:x;
-		y<= (ps_alu_en&~ps_alu_hc[1])? xb_dty:y;
-
-            end
+        end 
+      	
+	else
+        begin
+		x <= ps_alu_en? xb_dtx:x;
+		y <= (ps_alu_en&~ps_alu_hc[1])? xb_dty:y;
+        end
 end 
 
+assign alu_ps_compd = {alu_log,alu_hc,alu_sc}==6'b000101 & alu_en;
 
 always@(*)
 begin
-
-          if(alu_log) 
-             begin 
-                                      
-                      case(alu_hc)
- 
-                          2'b00: begin
-                                  
-                                     case(alu_sc) 
-                                       
-                                        3'b000:  //Rx AND Ry
-			                          begin
-				                   
-				                      value=x&y;
-                                                      alu_xb_dt= value;
-                                                      
-			                           end
-
-			                3'b001:	//Rx OR Ry
-			                          begin
-				                     
-				                      value=x|y;
-                                                      alu_xb_dt= value;
-                                                      
-			                          end
-
-			                3'b010:	//Rx XOR Ry
-			                          begin
-                                                     
-				                      value=x^y;
-                                                      alu_xb_dt= value;
-                                                      
-                                                 end
-                                     endcase 
-                                   end 
- 
-                            2'b10:   begin 
- 
-                                         case(alu_sc)
-                
-                                         3'b000:  // REG_AND RX
-                                                  begin 
-                                                      
-                                                      value= &x;
-                                                      alu_xb_dt= value;
-                                                      
-                                                   end 
-
-                                          3'b001:  // REG_OR RX
-                                                  begin 
-                                                     
-                                                      value= |x;
-                                                      alu_xb_dt= value;
-                                                      
-                                                   end 
-                                          endcase 
- 
-                                      end 
-
-                              2'b11:   begin 
- 
-                                          case(alu_sc)
-
-                                             3'b000:  // NOT Rx
-			                               begin				                           
-				                          value=~x;
-                                                          alu_xb_dt= value;
-                                                          
-			                               end
-                                          endcase 
-			                end 
-                          endcase 
-                      end
-
-
-               else
-
-               begin 
-                   case(alu_hc)
-			2'b00:	
-			        begin
-                                    case(alu_sc)
-                                          3'b000:                     //x+y 
-                                                   begin
-						   value=x+ (y^{16{alu_sc[0]}}) + alu_sc[0];
-						   alu_xb_dt=value;
-                                                   
-			                           end
-
-			                  3'b001:	              //x-y
-			                           begin
-				                   value=x+ (y^{16{alu_sc[0]}}) + alu_sc[0];
-						   alu_xb_dt=value;
-                                                   
-			                           end
+	if(alu_log) 
+	begin
+		case(alu_hc)
+ 			2'b00: 
+				case(alu_sc[1:0]) 
+                                	2'b00:  //Rx AND Ry
+			                        alu_xb_dt=x&y;
+                                                
+			                2'b01:	//Rx OR Ry
+			                        alu_xb_dt=x|y;
+                                                
+			                2'b10:	//Rx XOR Ry
+			                        alu_xb_dt=x^y;
+                                                
+					default: alu_xb_dt=16'h1;
+                                endcase
 			
-			                  3'b010: 	             //x+y+CI 
-			                           begin 
-				                   value=x+ (y^{16{alu_sc[0]}}) + alu_sc[0]+ alu_ps_ac ;
-						   alu_xb_dt=value;
-                                                   
-			                           end
+			2'b10:  //REG_OR, REG_AND
+				alu_xb_dt = alu_sc[0] ? (|x) : &x;
 
-			                 3'b011: 	            //x-y+CI-1
-			                           begin
-				                   value=x+ (y^{16{alu_sc[0]}}) + alu_sc[0]+ alu_ps_ac - alu_sc[0] ;
-						   alu_xb_dt=value;
-                                                   
-			                           end
+			2'b11:  //NOT Rx
+			        alu_xb_dt=~x;
 
-			                3'b101:	   begin 
-                                                                    //comp(rx,ry) 
-				                   if(x==y)
-					             alu_ps_az=1; 
-				                   else
-					             alu_ps_az=0;
+			default: alu_xb_dt=16'h1;
+		endcase
+	end
+	
+	else
+	begin 
+        	case(alu_hc)
+			2'b00:
+				begin	
+					a=x;
+					if(alu_sc[2])		//comp
+					begin
+						b=y;
+						if($signed(a)<$signed(b))
+							alu_xb_dt=16'hffff;
+						else
+							alu_xb_dt=(a==b)?16'h0:16'h1;
+						//alu_xb_dt=(|sum)&~(b==16'h8000) ? sum^{{DATA_WIDTH-1{cout[DATA_WIDTH-1]^cout[DATA_WIDTH-2]}},(cout[DATA_WIDTH-1]^cout[DATA_WIDTH-2])} : sum;	//if sum is 0 then we make alu_xb_dt=sum
+					end
 
-                                                   if(x<y)
-                                                      alu_ps_an = 1'b1;
-                                                   else
-                                                      alu_ps_an = 1'b0;
+					else
+					begin
+						if(alu_sc[1])	//rx+ry+ci, rx-ry+borrow(ci-1)
+							b = (y^{16{alu_sc[0]}})+alu_sc[0] + (ps_alu_ci^alu_sc[0]);
+						else		//rx+ry, rx-ry
+							b = (y^{16{alu_sc[0]}})+alu_sc[0];
+						alu_xb_dt=value;
+					end
+				end
 
-                                                   end 
+			2'b01:  
+				begin
+					a=x;
+					b=(y^{16{alu_sc[0]}})+alu_sc[0];
+					if(alu_sc[1]) 	//max(rx,ry)	here we check whether x and y are same or different signs and then perform operation
+						alu_xb_dt=(x[DATA_WIDTH-1]^y[DATA_WIDTH-1])?(x[DATA_WIDTH-1]?y:x):(sum[DATA_WIDTH-1]?y:x);
+					else		//min(rx,ry)
+						alu_xb_dt=(x[DATA_WIDTH-1]^y[DATA_WIDTH-1])?(x[DATA_WIDTH-1]?x:y):(sum[DATA_WIDTH-1]?x:y);
+				end
 
-                                    endcase 
-			         end
+			2'b10:	// Rn= -Rx 
+				begin
+					a=x^{16{alu_sc[0]}};
+					b={{DATA_WIDTH-1{1'h0}},alu_sc[0]};
+					alu_xb_dt=value;
+				end
 
-                      2'b01:  begin
-                                
-                                case(alu_sc)
-
-                                   3'b001: begin                                 //min(rx,ry)
-				           value=x+(y^{16{alu_sc[0]}})+ alu_sc[0];	
-				                begin
-					           if(value[DATA_WIDTH-1]==1) begin
-						         alu_xb_dt=x;
-                                                         
-                                                         end 
-					           else
-                                                         begin
-						        alu_xb_dt=y;
-                                                        
-                                                         end 
-				                end
-			                   end
-
-                                   3'b011: begin                               //max(rx,ry)                                            
-				           value=x+(y^{16{alu_sc[0]}})+ alu_sc[0];	
-				                begin
-					             if(value[DATA_WIDTH-1]==1) 
-						         alu_xb_dt=y;
-                                                                     
-					             else
-                                                          
-						         alu_xb_dt=x;
-                                                         
-				                end
-			                   end
-                                 endcase 
-                              end 
-
-
-                    2'b10:  begin
-                                 
-                              case(alu_sc) 
-                        
-                                  3'b001:  begin                                // Rn= -Rx 
-				           value=(x^{16{alu_sc[0]}})+ alu_sc[0];
-					   alu_xb_dt=value;
-                                           
-			                   end
-                              endcase 
-                            end 
-
-
-		    2'b11:	                         //Rn = ABS Rx
-                             begin
-                                    
-                                case(alu_sc)
-                  
-                                  3'b001:  begin 
-				           if(x[DATA_WIDTH-1]==1) 
-				                   begin
-					              value=(x^{16{alu_sc[0]}})+ alu_sc[0];
-						      alu_xb_dt=value;
-                                                      
-					           end
-				           else
-				                   begin
-					             value=x;
-						     alu_xb_dt=value;
-                                                     
-				                   end
-			                   end
-                                 endcase 
-                             end 
-
-
-
-
- endcase 
- end  
+			2'b11:	//Rn = ABS Rx
+				begin
+					a=x^{16{x[DATA_WIDTH-1]}};
+			        	b={{DATA_WIDTH-1{1'h0}},x[DATA_WIDTH-1]};
+					alu_xb_dt=value;
+				end
+		endcase 
+	end
 end
 
+always@(posedge clk or negedge reset)
+begin
+	if(~reset)
+		alu_sat<=0;
+	else
+		alu_sat<=satEn;
+end
+
+assign satEn = alu_en ? ps_alu_sat : alu_sat;
+
 always@(*)
 begin
-		 begin                                                              // Flag Updation
-			
-		       alu_ps_az= (alu_xb_dt==16'h0000);
-                       alu_ps_an= (alu_xb_dt[DATA_WIDTH-1]==1);
-                       alu_ps_ac= (value[DATA_WIDTH]==1);
-                       alu_ps_av=(value[DATA_WIDTH]^value[DATA_WIDTH-1]==1);
+	// Flag Updation
+	alu_ps_az = alu_xb_dt==16'h0;
+	alu_ps_an = alu_xb_dt[DATA_WIDTH-1];
 
-       
+	//AC is reset for logical, COMP, MIN and MAX instructions
+	alu_ps_ac = cout[DATA_WIDTH-1] & (~alu_log) & (~(
+		{alu_log,alu_hc,alu_sc}==6'b000_101 | 
+		{alu_log,alu_hc,alu_sc}==6'b001_001 | 
+		{alu_log,alu_hc,alu_sc}==6'b001_011 ));
+		//{alu_log,alu_hc,alu_sc[2:1]}==6'b001_100 ));
+
+	//AV is reset for all logical, COMP, MIN and MAX instructions	(NOTE: AV flag shows overflow of value before saturation)
+	alu_ps_av = (cout[DATA_WIDTH-1]^cout[DATA_WIDTH-2]) & (~alu_log) & (~(
+		{alu_log,alu_hc,alu_sc}==6'b000_101 | 
+		{alu_log,alu_hc,alu_sc}==6'b001_001 | 
+		{alu_log,alu_hc,alu_sc}==6'b001_011 )) ;
 	
-                  end 
+	//Saturation	       
+	if(satEn) 
+	begin
+		if(alu_ps_av) 
+                begin
+			if(sum[DATA_WIDTH-1])
+				value = 16'h7fff;
+			else
+				value = 16'h8000;
+                end 
+	end
+	
+	else
+		value=sum;
+end
 
-                                                                   //Saturation 
-        begin
-			if(ps_alu_sat) begin
-
-                                  if(alu_ps_av) 
-                                               begin
-
- 				                       if(value[DATA_WIDTH-1]==1)
-					                        alu_xb_dt= 16'h7fff;
-				                       else
-					                        alu_xb_dt= 16'h8000;
-
-                                                end 
-                                   
-			              end 
-      end
-
-
-end 	
+genvar i;
+generate
+	full_adder #(.SIZE(DATA_WIDTH)) f (a[0],b[0],1'b0,sum[0],cout[0]);
+	for(i=1;i<DATA_WIDTH;i=i+1)
+		full_adder #(.SIZE(DATA_WIDTH)) f (a[i],b[i],cout[i-1],sum[i],cout[i]);
+endgenerate
 
 endmodule
-		
 
-	
+module full_adder # (parameter SIZE=16)
+	(
+		input wire a,b,c,
+		output wire sum,cout
+	);
+	assign sum=a^b^c;
+	assign cout=(a&b)|(b&c)|(a&c);
+endmodule
+
 
 /*module afinalbench #(parameter DATA_WIDTH=16)();
 reg  clk;
