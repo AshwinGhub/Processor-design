@@ -18,22 +18,31 @@ module memory #(parameter PMA_SIZE, PMD_SIZE, DMA_SIZE, DMD_SIZE, PM_LOCATE, DM_
 //------------------------------------------------------------------------------------------------------------------------------------
 		reg [PMD_SIZE-1:0] pmInsts [(2**PMA_SIZE)-1:0];
 		reg [PMD_SIZE-1:0] pmWithCall [(2**PMA_SIZE)-1:0];	
-		integer address, calladdress;
+		integer address, calladdress=0;
+		integer file, i;
 		initial
 		begin
 			$readmemb(PM_LOCATE,pmInsts);
-			for(address=0;pmInsts[address[PMA_SIZE-1:0]]!=32'b00000000010000000000000000000000;address=address+1)
+			for(address=0;address<(2**PMA_SIZE)-1;address=address+1)
 			begin
-				if(&(pmInsts[address[PMA_SIZE-1:0]][PMD_SIZE-1:PMD_SIZE/2]))		//if we detect MSB 16 bits as 1s, it means lsb bits represent call pm address
+				if(&( pmInsts [address[PMA_SIZE-1:0]] [PMD_SIZE-1:PMD_SIZE/2] ))		//if we detect MSB 16 bits as 1s, it means lsb bits represent call pm address if(&( pmInsts [address[15:0]] [31:16] ))
 				begin
-					calladdress={16'b0,pmInsts[address[PMA_SIZE-1:0]][(PMD_SIZE/2)-1:0]};
-					address=address+1;
+					calladdress=pmInsts[address[PMA_SIZE-1:0]];	//32 bit integer
+					address=address+1;				//32 bit integer
 				end
-
+				
 				pmWithCall[calladdress[PMA_SIZE-1:0]]=pmInsts[address[PMA_SIZE-1:0]];
 				calladdress=calladdress+1;
 			end
-			pmWithCall[calladdress[PMA_SIZE-1:0]]=pmInsts[address[PMA_SIZE-1:0]];	//to include finish
+
+			//below commented part used for checking opcode location after rearranging based on CALL. Ignore....
+			/*file=$fopen("C:\\Users\\Ashwin-Pradeep\\Desktop\\Project-Final-Year\\GIT-repo\\memory_files\\pm_CALL\\calling\\pm_file.txt","w");
+			for(i=0;i<2**PMA_SIZE;i=i+1)
+			begin
+				//$fdisplay(file, i[PMA_SIZE-1:0]);
+				$fdisplayb(file,  pmWithCall[i[PMA_SIZE-1:0]]);
+			end
+			$fclose(file);*/
 		end
 
 		always@(posedge clk or negedge reset)
@@ -61,7 +70,6 @@ module memory #(parameter PMA_SIZE, PMD_SIZE, DMA_SIZE, DMD_SIZE, PM_LOCATE, DM_
 		reg [DMD_SIZE-1:0] dmData [(2**DMA_SIZE)-1:0];
 		reg [DMD_SIZE-1:0] dm [2*(2**DMA_SIZE)-1:0];	//with address
 
-		integer file, i;
 		reg dm_cslt;
 		reg dm_wrb;
 		reg [DMA_SIZE-1:0] dm_add;
