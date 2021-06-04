@@ -1,0 +1,25 @@
+nop
+nop
+nop
+R10=000a
+R9=000c
+R8=0012
+R2=R9 OR R8
+r3=-r2
+r4=ABS r3
+I5=0000
+M0=0003
+DM(I5,M0)=R2
+DM(I5,M0)=R10
+DM(I5,M0)=R3
+DM(I5,M0)=R4
+nop
+nop
+nop
+FINISH
+
+.MEMCHECK
+0000	001e
+0003	000a
+0006	ffe2
+0009	001e
