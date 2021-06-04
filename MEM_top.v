@@ -16,10 +16,24 @@ module memory #(parameter PMA_SIZE, PMD_SIZE, DMA_SIZE, DMD_SIZE, PM_LOCATE, DM_
 //------------------------------------------------------------------------------------------------------------------------------------
 //					PM reading
 //------------------------------------------------------------------------------------------------------------------------------------
-		reg [PMD_SIZE-1:0] pmInsts [(2**PMA_SIZE)-1:0];	
+		reg [PMD_SIZE-1:0] pmInsts [(2**PMA_SIZE)-1:0];
+		reg [PMD_SIZE-1:0] pmWithCall [(2**PMA_SIZE)-1:0];	
+		integer address, calladdress;
 		initial
 		begin
 			$readmemb(PM_LOCATE,pmInsts);
+			for(address=0;pmInsts[address[PMA_SIZE-1:0]]!=32'b00000000010000000000000000000000;address=address+1)
+			begin
+				if(&(pmInsts[address[PMA_SIZE-1:0]][PMD_SIZE-1:PMD_SIZE/2]))		//if we detect MSB 16 bits as 1s, it means lsb bits represent call pm address
+				begin
+					calladdress={16'b0,pmInsts[address[PMA_SIZE-1:0]][(PMD_SIZE/2)-1:0]};
+					address=address+1;
+				end
+
+				pmWithCall[calladdress[PMA_SIZE-1:0]]=pmInsts[address[PMA_SIZE-1:0]];
+				calladdress=calladdress+1;
+			end
+			pmWithCall[calladdress[PMA_SIZE-1:0]]=pmInsts[address[PMA_SIZE-1:0]];	//to include finish
 		end
 
 		always@(posedge clk or negedge reset)
@@ -32,7 +46,7 @@ module memory #(parameter PMA_SIZE, PMD_SIZE, DMA_SIZE, DMD_SIZE, PM_LOCATE, DM_
 					//PM reading
 					if(~ps_pm_wrb)
 					begin
-						pm_ps_op<=pmInsts[ps_pm_add];
+						pm_ps_op<=pmWithCall[ps_pm_add];
 					end
 					else;	//writing condition. data from assembler or PM(I,M)=ureg instruction (future expansion scope)
 			end
