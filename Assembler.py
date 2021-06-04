@@ -293,7 +293,7 @@ while(i<len(l)):
         print(instr)
         instr_list.append(instr)
         if(re.match(".CALL[ ]?[(][ ]?[0-9]+[ ]?[)][ ]?",instr.upper())):
-            f.write(16*"1"+format(int(re.findall("[0-9]+",instr)[0]),"016b")+"\n")
+            f.write(16*"1"+format(int(re.findall("[0-9]+",instr)[0],16),"016b")+"\n")
             instr=l[i]
             i=i+1
             print(instr)
