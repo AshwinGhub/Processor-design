@@ -3,6 +3,8 @@ module test_core();
 reg clk, reset,interrupt;
 reg[2:0] count,rand;
 
+integer i;
+
 core_top #(.PMA_SIZE(16), .PMD_SIZE(32), .DMA_SIZE(16), .DMD_SIZE(16), .RF_DATASIZE(16), .ADDRESS_WIDTH(4), .SIGNAL_WIDTH(3), .PM_LOCATE("C:/Users/Ashwin Pradeep/Desktop/Project Final Year/GIT repo/memory_files/pm_file.txt"), .DM_LOCATE("C:/Users/Ashwin Pradeep/Desktop/Project Final Year/GIT repo/memory_files/dm_file.txt"))
 	core_obj	(
 				clk,
@@ -47,6 +49,19 @@ always@(*) begin
 		#50;
 		$system("python C:/modeltech64_10.5/examples/SAC/a_test_script.py");                          //Command to run a_test_script.py - Update its location if neccessary
 		#50;
+		$stop;
+	end
+
+	if(core_obj.ps_obj.ps_stcky[2]) begin
+		for(i=0;i<100;i=i+1) begin
+			$write("/");
+		end
+		$write("\n");
+		$display("ERROR: PCSTCK OVERFLOW. RESET REQUIRED");
+		for(i=0;i<100;i=i+1) begin
+			$write("/");
+		end
+		$write("\n");
 		$stop;
 	end
 end
