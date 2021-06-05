@@ -292,10 +292,12 @@ while(i<len(l)):
             break
         print(instr)
         instr_list.append(instr)
-        if(re.match(".CALL[ ]?[(][ ]?[0-9]+[ ]?[)][ ]?",instr.upper())):
-            f.write(16*"1"+format(int(re.findall("[0-9]+",instr)[0],16),"016b")+"\n")
+        if(re.match(".CALL[ ]?[(][ ]?[0-9,A-F]+[ ]?[)][ ]?",instr.upper())):
+            f.write(16*"1"+format(int(re.findall("[0-9,A-F]+",instr)[1],16),"016b")+"\n")
             instr=l[i]
             i=i+1
+            if(re.match(".memcheck[ ]?",instr.lower())):
+                break
             print(instr)
             instr_list.append(instr)
         if("#" in instr):
