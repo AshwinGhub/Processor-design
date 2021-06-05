@@ -1,4 +1,5 @@
 //Synthesised RTL (unconnected PM)
+`define IGNORE
 module memory #(parameter 
            `ifdef IGNORE
                    PM_LOCATE, DM_LOCATE,
