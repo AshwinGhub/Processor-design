@@ -1,0 +1,40 @@
+r1 = 8000
+r2 = 5555
+i0 = 0
+m0 = 1
+r0 = r1 - r2
+dm(i0,m0) = r0      #2aab
+dm(i0,m0) = astat   #000a
+mode1 = 0001
+r0 = r1 - r2
+dm(i0,m0) = r0      #8000
+dm(i0,m0) = astat   #000e
+r0 = r1 - r1
+dm(i0,m0) = r0      #8000
+dm(i0,m0) = astat   #000e
+mode1 = 0000
+r0 = r1 - r1
+dm(i0,m0) = r0      #0000
+dm(i0,m0) = astat   #000b
+r0 = r2 - r1
+dm(i0,m0) = r0      #d555
+dm(i0,m0) = astat   #0004
+mode1 = 0001
+r0 = r2 - r1
+dm(i0,m0) = r0      #d555
+dm(i0,m0) = astat   #0004
+finish
+
+.MEMCHECK
+0000	2aab
+0001	000a
+0002	8000
+0003	000e
+0004	8000
+0005	000e
+0006	0000
+0007	000b
+0008	d555
+0009	0004
+000a	d555
+000b	0004
