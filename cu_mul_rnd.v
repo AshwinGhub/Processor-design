@@ -1,5 +1,6 @@
+//Synthesised RTL
 module mul_rnd	
-		#(parameter SIZE)
+		#(parameter SIZE=16)
 		(
 			input wire[2*SIZE-1:0] data_in,		//mul32_product
 			input wire ps_mul_rndPrdt,

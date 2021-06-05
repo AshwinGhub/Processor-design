@@ -1,28 +1,5 @@
-//***************************************************************
-//-----------------------------------------------------------------------------ALU HARDWARE MODULE-------------------------------------------------------------------------------------------
-//***************************************************************
-
-//Control Signals :clk
-//                :reset
-//	          :ps_alu_en
-//                :ps_alu_log
-//                :ps_alu_hc     (bits 21-20) 
-//                :ps_alu_sc     (bits 19-18-17)
-//                :ps_alu_hc[1]   21st bit of opcode 
-//                :ps_alu_sc[0]    17th bit of opcode
-//                :alu_sat
-
-
-
-
-//Flags:alu_ps_az(Zero)
-//     :alu_ps_an(Negative)
-//     :alu_ps_an(Carry)
-//     :alu_ps_av(Overflow)
-
-
-
-module alu #(parameter DATA_WIDTH)
+//Synthesised RTL
+module alu #(parameter DATA_WIDTH=16)
 	(clk, reset, xb_dtx, xb_dty, ps_alu_en, ps_alu_log, ps_alu_hc, ps_alu_sc, alu_xb_dt, ps_alu_sat, ps_alu_ci, alu_ps_az, alu_ps_an, alu_ps_ac, alu_ps_av, alu_ps_compd);
 
 input clk, reset, xb_dtx, xb_dty ,ps_alu_en, ps_alu_log, ps_alu_sat, ps_alu_hc, ps_alu_sc, ps_alu_ci;
@@ -99,6 +76,8 @@ always@(*)
 begin
 	if(alu_log) 
 	begin
+	   a=16'h0;
+	   b=16'h1;
 		case(alu_hc)
  			2'b00: 
 				case(alu_sc[1:0]) 
@@ -170,7 +149,7 @@ begin
 			2'b11:	//Rn = ABS Rx
 				begin
 					a=x^{16{x[DATA_WIDTH-1]}};
-			        	b={{DATA_WIDTH-1{1'h0}},x[DATA_WIDTH-1]};
+			        b={{DATA_WIDTH-1{1'h0}},x[DATA_WIDTH-1]};
 					alu_xb_dt=value;
 				end
 		endcase 
@@ -205,7 +184,7 @@ begin
 		{alu_log,alu_hc,alu_sc}==6'b000_101 | 
 		{alu_log,alu_hc,alu_sc}==6'b001_001 | 
 		{alu_log,alu_hc,alu_sc}==6'b001_011 )) ;
-	
+
 	//Saturation	       
 	if(satEn) 
 	begin
@@ -215,7 +194,9 @@ begin
 				value = 16'h7fff;
 			else
 				value = 16'h8000;
-                end 
+                end
+        else
+            value=sum; 
 	end
 	
 	else
@@ -226,7 +207,9 @@ genvar i;
 generate
 	full_adder #(.SIZE(DATA_WIDTH)) f (a[0],b[0],1'b0,sum[0],cout[0]);
 	for(i=1;i<DATA_WIDTH;i=i+1)
+	begin
 		full_adder #(.SIZE(DATA_WIDTH)) f (a[i],b[i],cout[i-1],sum[i],cout[i]);
+    end
 endgenerate
 
 endmodule
@@ -395,4 +378,28 @@ end
 
 
 endmodule */
+
+//***************************************************************
+//-----------------------------------------------------------------------------ALU HARDWARE MODULE-------------------------------------------------------------------------------------------
+//***************************************************************
+
+//Control Signals :clk
+//                :reset
+//	          :ps_alu_en
+//                :ps_alu_log
+//                :ps_alu_hc     (bits 21-20) 
+//                :ps_alu_sc     (bits 19-18-17)
+//                :ps_alu_hc[1]   21st bit of opcode 
+//                :ps_alu_sc[0]    17th bit of opcode
+//                :alu_sat
+
+
+
+
+//Flags:alu_ps_az(Zero)
+//     :alu_ps_an(Negative)
+//     :alu_ps_an(Carry)
+//     :alu_ps_av(Overflow)
+
+
 
