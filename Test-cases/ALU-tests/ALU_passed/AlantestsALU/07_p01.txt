@@ -1,0 +1,41 @@
+r1 = 2021
+r2 = 2021
+r3 = 5555
+i0 = 0
+m0 = 1
+r4 = max(r1,r2)
+dm(i0,m0) = r4      #2021
+dm(i0,m0) = astat   #0000
+r5 = max(r1,r3)
+dm(i0,m0) = r5      #5555
+dm(i0,m0) = astat   #0000
+r1 = 0000
+r0 = max(r1,r2)
+dm(i0,m0) = r0      #2021
+dm(i0,m0) = astat   #0000
+r2 = 8000
+r3 = abcd
+r0 = max(r1,r2)
+dm(i0,m0) = r0      #0000
+dm(i0,m0) = astat   #0001
+r0 = max(r2,r3)
+dm(i0,m0) = r0      #abcd
+dm(i0,m0) = astat   #0004
+r0 = max(r2,r4)
+dm(i0,m0) = r0      #2021
+dm(i0,m0) = astat   #0000
+finish
+
+.MEMCHECK
+0000	2021
+0001	0000
+0002	5555
+0003	0000
+0004	2021
+0005	0000
+0006	0000
+0007	0001
+0008	abcd
+0009	0004
+000a	2021
+000b	0000

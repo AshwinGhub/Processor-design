@@ -1,6 +1,6 @@
-//updated design with MR<->Rn
+//Synthesised RTL
 module multiplier
-			#(parameter RF_DATASIZE)
+			#(parameter RF_DATASIZE=16)
 			(	
 				//data below
 				input wire[RF_DATASIZE-1:0] xb_dtx, xb_dty, 
@@ -28,7 +28,15 @@ module multiplier
 			if(~reset)
 			begin
 				mul_en <= 1'b0;
-				mul_otreg <= 1'b0;
+			end
+			else
+				mul_en <= ps_mul_en;
+		end	
+		always@(posedge clk or negedge reset)
+		begin
+		    if(~reset)
+		    begin
+		        mul_otreg <= 1'b0;
 				mul_ryUbS <= 1'b0;
 				mul_rxUbS <= 1'b0;
 				mul_IbF <= 1'b0;
@@ -36,12 +44,7 @@ module multiplier
 				mul_cls <= 2'b00;
 				mul_sc <= 2'b00;
 			end
-			else
-				mul_en <= ps_mul_en;
-		end	
-		always@(posedge clk)
-		begin
-			if(ps_mul_en)
+			else if(ps_mul_en)
 			begin
 				mul_otreg <= ps_mul_otreg;
 				mul_ryUbS <= ps_mul_dtsts[3];
@@ -67,7 +70,6 @@ module multiplier
 		begin
 			if(~reset)
 			begin
-				Rx16_latched <= 16'h0;
 				Ry16_latched <= 16'h0;
 			end
 			else
@@ -75,9 +77,13 @@ module multiplier
 					Ry16_latched <= xb_dty;
 		end
 
-		always@(posedge clk)
+		always@(posedge clk or negedge reset)
 		begin
-			if( ps_mul_en & ~(ps_mul_cls==2'b00 & (~ps_mul_otreg|(&ps_mul_sc))) )
+		    if(~reset)
+		    begin
+		          Rx16_latched <= 16'h0;
+		    end
+			else if( ps_mul_en & ~(ps_mul_cls==2'b00 & (~ps_mul_otreg|(&ps_mul_sc))) )
 				Rx16_latched <= xb_dtx;
 		end
 	//=======================================================================================
@@ -152,30 +158,39 @@ module multiplier
 			casex(mul_cls)
 				
 				2'b00:	//saturate and MR<->Rn transfers
-					casex(mul_sc)			//mul40_out_data and mr_slice are 2 different muxes with same select line
+					case(mul_sc)			//mul40_out_data and mr_slice are 2 different muxes with same select line
 						2'b00:			//MR0 (no sign extension as per sharc)
 							begin	
-								mul40_out_data <= { {RF_DATASIZE*3/2{1'h0}}, Rx16_latched };
-								mr_slice <= mr40_data[RF_DATASIZE-1:0];	
+								mul40_out_data = { {RF_DATASIZE*3/2{1'h0}}, Rx16_latched };
+								mr_slice = mr40_data[RF_DATASIZE-1:0];	
 							end
 						2'b01:			//MR1 (sign extended)
 							begin
 								mul40_out_data = { {RF_DATASIZE/2{Rx16_latched[RF_DATASIZE-1]}}, Rx16_latched, {RF_DATASIZE{1'h0}} };	
-								mr_slice <= mr40_data[RF_DATASIZE*2-1:RF_DATASIZE];
+								mr_slice = mr40_data[RF_DATASIZE*2-1:RF_DATASIZE];
 							end
 						2'b10:	
 							begin		//MR2 (sign extend)
 								mul40_out_data = { Rx16_latched[RF_DATASIZE/2-1:0], {RF_DATASIZE*2{1'h0}} };
-								mr_slice <= {{RF_DATASIZE/2{mr40_data[RF_DATASIZE*5/2-1]}}, mr40_data[RF_DATASIZE*5/2-1 : RF_DATASIZE*2]};
+								mr_slice = {{RF_DATASIZE/2{mr40_data[RF_DATASIZE*5/2-1]}}, mr40_data[RF_DATASIZE*5/2-1 : RF_DATASIZE*2]};
 							end				
-						2'b11:	mul40_out_data = sat_out;	//SAT MR
+						2'b11:	
+						    begin
+						          mul40_out_data = sat_out;	//SAT MR
+					              mr_slice = {RF_DATASIZE{1'h0}};
+					        end
 					endcase
 
 				2'b01:	//product
-					mul40_out_data = { { RF_DATASIZE/2 {(mul_rxUbS|mul_ryUbS) & rnd32_out[2*RF_DATASIZE-1]} }, rnd32_out };		//sign extend 32 bit product to 40 bits.
-
+				    begin
+    					mul40_out_data = { { RF_DATASIZE/2 {(mul_rxUbS|mul_ryUbS) & rnd32_out[2*RF_DATASIZE-1]} }, rnd32_out };		//sign extend 32 bit product to 40 bits.
+                        mr_slice = {RF_DATASIZE{1'h0}};
+                    end
 				2'b1X:	//accumulate
-					mul40_out_data = mr40_data + mul_cls[0] + ( { { RF_DATASIZE/2 {(mul_rxUbS|mul_ryUbS) & rnd32_out[2*RF_DATASIZE-1]} }, rnd32_out } ^ { RF_DATASIZE*5/2 {mul_cls[0]} } ) ;	//sign extend product to 40 bits and then find 2's complement and add to mr
+					begin
+    					mul40_out_data = mr40_data + mul_cls[0] + ( { { RF_DATASIZE/2 {(mul_rxUbS|mul_ryUbS) & rnd32_out[2*RF_DATASIZE-1]} }, rnd32_out } ^ { RF_DATASIZE*5/2 {mul_cls[0]} } ) ;	//sign extend product to 40 bits and then find 2's complement and add to mr
+                        mr_slice = {RF_DATASIZE{1'h0}};
+                    end
 			endcase
 		end
 	//======================================================================

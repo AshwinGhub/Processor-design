@@ -1,0 +1,34 @@
+i0 = 0
+m0 = 1
+r0 = 1011
+r1 = 0100
+r0 = r0 + r1	# 5th instruction
+dm(i0,m0) = r0		#0000 1111, cnvz 0000
+dm(i0,m0) = astat	#0001 0000
+r0 = r0 + r0
+dm(i0,m0) = r0		#0002 2222, cnvz 0000
+dm(i0,m0) = astat	#0003 0000
+r1 = 8000
+r0 = r1 + r1	# 13th instruction
+dm(i0,m0) = r0		#0004 0000, cnvz 1011
+dm(i0,m0) = astat	#0005 000b
+mode1 = 0001
+r0 = r1 + r1
+dm(i0,m0) = r0		#0006 8000, cnvz 1110
+dm(i0,m0) = astat	#0007 000e
+#
+mode1 = 0
+r0 = r1 + r1
+dm(i0,m0) = r0
+finish
+
+.MEMCHECK
+0000	1111
+0001	0000
+0002	2222
+0003	0000
+0004	0000
+0005	000b
+0006	8000
+0007	000e
+0008	0000
