@@ -4,7 +4,7 @@ module memory #(parameter
            `ifdef IGNORE
                    PM_LOCATE, DM_LOCATE,
            `endif
-                    PMA_SIZE=3, PMD_SIZE=32, DMA_SIZE=3, DMD_SIZE=16)
+                    PMA_SIZE=3, PMD_SIZE=8, DMA_SIZE=3, DMD_SIZE=4)
 			(
 				input wire clk, reset,
 				input wire ps_pm_cslt, ps_dm_cslt,
@@ -79,11 +79,8 @@ module memory #(parameter
 					begin
 						pm_ps_op<=pmWithCall[ps_pm_add];
 					end
-					else   //writing condition. data from assembler or PM(I,M)=ureg instruction (future expansion scope)
-					   pm_ps_op<=32'h0;
-			end
-			else
-			     pm_ps_op<=32'h0;
+					//else   //writing condition. data from assembler or PM(I,M)=ureg instruction (future expansion scope)
+		    	end
 		end
 		
 
@@ -243,3 +240,4 @@ end
 
 endmodule
 */
+
