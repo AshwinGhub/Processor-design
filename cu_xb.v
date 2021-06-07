@@ -68,12 +68,12 @@ begin
 			0:xb_dty<=rf_xb_dty;
 			1:begin
 				case(xb_rf_w_En)
-					0:xb_dty<=rf_xb_dtx;
+					0:xb_dty<=rf_xb_dty;
 					1:xb_dty<=xb_rf_dt;
 					default:xb_dty<=0;
 				endcase
 			end
-			default:xb_dtx<=0;
+			default:xb_dty<=0;
 		endcase
 	end
 end

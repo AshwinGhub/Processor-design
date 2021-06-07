@@ -1,5 +1,6 @@
+//Synthesised RTL
 module mul_sat	
-		#(parameter SIZE)
+		#(parameter SIZE=16)
 		(
 		input wire mul_satEn,	
 		input wire[(SIZE*5/2)-1:0] data_in, 	//40 bit data from MR

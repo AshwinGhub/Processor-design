@@ -1,0 +1,13 @@
+nop
+nop
+nop
+R1=ffff
+R2=ffca
+R0=R2+R1  
+I0=0010
+M0=0010
+DM(I0,M0)=R0
+FINISH
+
+.MEMCHECK
+0010	ffc9
