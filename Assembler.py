@@ -105,7 +105,7 @@ def compute(com):
     sign=signed(com.split(" ")[-1])
     if(re.match("R[0-9]+[ ]?=[ ]?R[0-9]+[ ]?[+][ ]?R[0-9]+[ ]?[+][ ]?CI[ ]?",com)):
         Comp_code = "000000010"
-    elif(re.match("R[0-9]+[ ]?=[ ]?R[0-9]+[ ]?-[ ]?R[0-9]+[ ]?[+][ ]?CI[ ]*-[ ]?1[ ]?",com)):
+    elif(re.match("R[0-9]+[ ]?=[ ]?R[0-9]+[ ]?-[ ]?R[0-9]+[ ]?[+][ ]?CI[]*-[ ]?1[ ]?",com)):
         Comp_code = "000000011"
     elif(re.match("R[0-9]+[ ]?=[ ]?R[0-9]+[ ]?[+][ ]?R[0-9]+[ ]?",com)):
         Comp_code = "000000000"
