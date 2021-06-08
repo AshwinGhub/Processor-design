@@ -385,7 +385,10 @@ if(comple()):
 else:
     print("Compilation Error, bye bye!!")
 if(file_count!=valid_count): print("\n\nFailed Files due to faulty instructions : ", *fail_afile, sep="\n")
-if(len(fail_mfile)): print("\n\nFailed Files due to memcheck data mismatch : ", *fail_mfile, sep="\n")
+if(len(fail_mfile)): 
+    print("\n\nFailed Files due to memcheck data mismatch : ", *fail_mfile, sep="\n")
+else:
+    print("\n\nAll tests successfully passed in MEMCHECK\n")
 flmdfy("$system","test_core.v",cmnt,0,0)
 os.system('pause')
 
