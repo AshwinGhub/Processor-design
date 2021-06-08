@@ -120,7 +120,7 @@ def compute(com):
     sign=signed(com.split(" ")[-1])
     if(re.match("R[0-9]+[ ]?=[ ]?R[0-9]+[ ]?[+][ ]?R[0-9]+[ ]?[+][ ]?CI[ ]?",com)):
         Comp_code = "000000010"
-    elif(re.match("R[0-9]+[ ]?=[ ]?R[0-9]+[ ]?-[ ]?R[0-9]+[ ]?[+][ ]?CI[]*-[ ]?1[ ]?",com)):
+    elif(re.match("R[0-9]+[ ]?=[ ]?R[0-9]+[ ]?-[ ]?R[0-9]+[ ]?[+][ ]?CI[ ]*-[ ]?1[ ]?",com)):
         Comp_code = "000000011"
     elif(re.match("R[0-9]+[ ]?=[ ]?R[0-9]+[ ]?[+][ ]?R[0-9]+[ ]?",com)):
         Comp_code = "000000000"
@@ -385,7 +385,10 @@ if(comple()):
 else:
     print("Compilation Error, bye bye!!")
 if(file_count!=valid_count): print("\n\nFailed Files due to faulty instructions : ", *fail_afile, sep="\n")
-if(len(fail_mfile)): print("\n\nFailed Files due to memcheck data mismatch : ", *fail_mfile, sep="\n")
+if(len(fail_mfile)): 
+    print("\n\nFailed Files due to memcheck data mismatch : ", *fail_mfile, sep="\n")
+else:
+    print("\n\nAll tests successfully passed in MEMCHECK\n")
 flmdfy("$system","test_core.v",cmnt,0,0)
 os.system('pause')
 
