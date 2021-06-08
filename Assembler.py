@@ -276,7 +276,7 @@ a=input("Enter name of file containing instructions:")
 g=open(INST_LOCATE+a,"rt")                                  #Changed
 #b=input("Enter name of OpCode Destination file:")
 f=open(PM_LOCATE,"wt")                                      #Changed
-f.write(16*"1"+16*"0"+"\n")
+f.write(format(int(16*"1"+16*"0",2),"08X")+"\n")
 l=[]
 rewrite=False
 instr_list=[]
