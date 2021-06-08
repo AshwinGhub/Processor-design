@@ -287,13 +287,13 @@ while(i<len(l)):
     time.sleep(.1)
     instr=l[i]
     i=i+1
-    if(instr!=" " and instr!="\n" and instr!="\t" and instr!=""):
+    if(instr!=" " and instr!="\n" or instr!="\t" or instr!=""):
         if(re.match(".memcheck[ ]?",instr.lower())):
             break
         print(instr)
         instr_list.append(instr)
         if(re.match(".CALL[ ]?[(][ ]?[0-9,A-F]+[ ]?[)][ ]?",instr.upper())):
-            f.write(16*"1"+format(int(re.findall("[0-9,A-F]+",instr)[1],16),"016b")+"\n")
+            f.write(format(int(16*"1"+format(int(re.findall("[0-9,A-F]+",instr)[1],16),"016b"),2),"08X")+"\n")
             instr=l[i]
             i=i+1
             if(re.match(".memcheck[ ]?",instr.lower())):
@@ -340,7 +340,7 @@ while(i<len(l)):
             l[i]=instr
             rewrite=True
         else:
-            f.write(OpCode)
+            f.write(format(int(OpCode,2),"08X"))
             f.write("\n")
         if("/*" in instr):
             while("*/" not in instr):
