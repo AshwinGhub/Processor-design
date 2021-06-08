@@ -1,3 +1,4 @@
+#08 June
 import time
 import os
 import re
@@ -293,14 +294,12 @@ def assembler(INST_LOCATE):
         if(instr!=" " and instr!="\n" and instr!="\t" and instr!=""):
             if(re.match(".memcheck[ ]?",instr.lower())):
                 break
-            #print(instr)
             if(re.match(".CALL[ ]?[(][ ]?[0-9,A-F]+[ ]?[)][ ]?",instr.upper())):
                 f.write(16*"1"+format(int(re.findall("[0-9,A-F]+",instr)[1],16),"016b")+"\n")
                 instr=l[i]
                 i=i+1
                 if(re.match(".memcheck[ ]?",instr.lower())):
                     break
-                #print(instr)
             if("#" in instr):
                 inst = re.split("#",instr)[0]
                 if(re.match("^[ ]*#",instr)):
