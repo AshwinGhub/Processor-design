@@ -1,0 +1,24 @@
+i0 = 0
+m0 = 1
+r3 = 2021
+r4 = abcd
+r2 = r4 - r3
+dm(i0,m0) = r2		# 8bac, cnvz 1100
+dm(i0,m0) = astat	# 000c
+r3 = 7fff
+r2 = r4 - r3
+dm(i0,m0) = r2		# 2bce, cnvz 1010
+dm(i0,m0) = astat	# 000a
+mode1 = 1
+r2 = r4 - r3
+dm(i0,m0) = r2		# 8000, cnvz 1110
+dm(i0,m0) = astat	# 000e
+finish
+
+.MEMCHECK
+0000	8bac
+0001	000c
+0002	2bce
+0003	000a
+0004	8000
+0005	000e

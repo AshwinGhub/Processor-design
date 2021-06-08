@@ -1,0 +1,19 @@
+r10 = 2021
+r11 = 5555
+i0 = 0
+m0 = 1
+comp(r11,r10)
+dm(i0,m0) = astat   #8000
+comp(r10,r10)
+dm(i0,m0) = astat   #4001
+comp(r10,r10)
+dm(i0,m0) = astat   #2001
+comp(r10,r11)
+dm(i0,m0) = astat   #1004
+finish
+
+.MEMCHECK
+0000	8000
+0001	4001
+0002	2001
+0003	1004

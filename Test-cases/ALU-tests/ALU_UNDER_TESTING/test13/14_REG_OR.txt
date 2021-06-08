@@ -1,0 +1,35 @@
+r14 = 0000
+r15 = ffff
+r0 = aaaa
+r1 = 6666
+r2 = abcd
+i0 = 0
+m0 = 1
+r13 = REG_OR r14
+dm(i0,m0) = r13      #0000
+dm(i0,m0) = astat   #0001
+r13 = REG_OR r15
+dm(i0,m0) = r13      #0001
+dm(i0,m0) = astat   #0000
+r13 = REG_OR r0
+dm(i0,m0) = r13      #0001
+dm(i0,m0) = astat   #0000
+r13 = REG_OR r1
+dm(i0,m0) = r13      #0001
+dm(i0,m0) = astat   #0000
+r13 = REG_OR r2
+dm(i0,m0) = r13      #0001
+dm(i0,m0) = astat   #0000
+finish
+
+.MEMCHECK
+0000	0000
+0001	0001
+0002	0001
+0003	0000
+0004	0001
+0005	0000
+0006	0001
+0007	0000
+0008	0001
+0009	0000

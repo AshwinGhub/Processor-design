@@ -1,0 +1,24 @@
+i0 = 0
+m0 = 1
+r0 = 7fff
+r1 = abcd
+r15 = r1 - r0 + CI - 1
+dm(i0,m0) = r15		# 2bcd, cnvz 1010
+dm(i0,m0) = astat	# 000a
+mode1 = 1
+r15 = r1 - r0 + CI - 1
+dm(i0,m0) = r15		# 8000, cnvz 1110
+dm(i0,m0) = astat	# 000e
+r0 = 2021
+r15 = r1 - r0 + CI - 1
+dm(i0,m0) = r15		# 8bac, cnvz 1100
+dm(i0,m0) = astat	# 000c
+finish
+
+.MEMCHECK
+0000	2bcd
+0001	000a
+0002	8000
+0003	000e
+0004	8bac
+0005	000c
