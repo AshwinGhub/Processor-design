@@ -121,8 +121,8 @@ begin
 
 					else
 					begin
-						if(alu_sc[1])	//rx+ry+ci, rx-ry+borrow(ci-1)
-							b = (y^{16{alu_sc[0]}})+alu_sc[0] + (ps_alu_ci^alu_sc[0]);
+						if(alu_sc[1])	//rx+ry+ci, rx-ry+borrow(ci-1)	(y^{16{alu_sc[0]}})+alu_sc[0] + ps_alu_ci-alu_sc[0];
+							b = (y^{16{alu_sc[0]}}) + ps_alu_ci;
 						else		//rx+ry, rx-ry
 							b = (y^{16{alu_sc[0]}})+alu_sc[0];
 						alu_xb_dt=value;
