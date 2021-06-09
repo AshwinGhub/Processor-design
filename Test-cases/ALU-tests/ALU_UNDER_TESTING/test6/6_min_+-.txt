@@ -1,0 +1,13 @@
+i0 = 0
+m0 = 1
+r7 = 2021
+r8 = bcde
+r6 = min(r8,r7)
+dm(i0,m0) = r6	    #bcde
+dm(i0,m0) = astat   #0004
+finish
+
+.MEMCHECK
+0000	bcde
+0001	0004
+

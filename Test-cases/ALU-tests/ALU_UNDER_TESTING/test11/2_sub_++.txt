@@ -1,0 +1,35 @@
+i0 = 0
+m0 = 1
+r12 = 0000
+r13 = 5433
+r11 = r12 - r12
+dm(i0,m0) = r11		# 0000, cnvz 0001
+dm(i0,m0) = astat	# 0001
+r11 = r12 - r13
+dm(i0,m0) = r11		# abcd, cnvz 0100
+dm(i0,m0) = astat	# 0004
+r12 = 2555
+r11 = r12 - r13
+dm(i0,m0) = r11		# d122, cnvz 0100
+dm(i0,m0) = astat	# 0004
+r12 = 7fff
+r11 = r12 - r13
+dm(i0,m0) = r11		# 2bcc, cnvz 1000
+dm(i0,m0) = astat	# 0008
+mode1 = 1
+r11 = r12 - r13
+dm(i0,m0) = r11		# 2bcc, cnvz 1000
+dm(i0,m0) = astat	# 0008
+finish
+
+.MEMCHECK
+0000	0000
+0001	0001
+0002	abcd
+0003	0004
+0004	d122
+0005	0004
+0006	2bcc
+0007	0008
+0008	2bcc
+0009	0008

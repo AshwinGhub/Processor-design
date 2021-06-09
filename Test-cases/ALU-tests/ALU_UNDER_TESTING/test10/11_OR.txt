@@ -1,0 +1,45 @@
+r11 = 0000
+r12 = ffff
+r13 = aaaa
+r14 = 6666
+r15 = abcd
+i0 = 0
+m0 = 1
+r10 = r11 OR r11
+dm(i0,m0) = r10      #0000
+dm(i0,m0) = astat   #0001
+r10 = r12 OR r12
+dm(i0,m0) = r10      #ffff
+dm(i0,m0) = astat   #0004
+r10 = r11 OR r12
+dm(i0,m0) = r10      #ffff
+dm(i0,m0) = astat   #0004
+r10 = r12 OR r13
+dm(i0,m0) = r10      #ffff
+dm(i0,m0) = astat   #0004
+r10 = r13 OR r14
+dm(i0,m0) = r10      #eeee
+dm(i0,m0) = astat   #0004
+r10 = r14 OR r15
+dm(i0,m0) = r10      #efef
+dm(i0,m0) = astat   #0004
+r10 = r15 OR r15
+dm(i0,m0) = r10      #abcd
+dm(i0,m0) = astat   #0004
+finish
+
+.MEMCHECK
+0000	0000
+0001	0001
+0002	ffff
+0003	0004
+0004	ffff
+0005	0004
+0006	ffff
+0007	0004
+0008	eeee
+0009	0004
+000a	efef
+000b	0004
+000c	abcd
+000d	0004

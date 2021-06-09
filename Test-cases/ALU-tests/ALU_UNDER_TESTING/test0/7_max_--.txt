@@ -1,0 +1,14 @@
+i0 = 0
+m0 = 1
+r1 = abcd
+r2 = bcde
+r0 = max(r2,r1)
+dm(i0,m0) = r0	    #bcde
+dm(i0,m0) = astat   #0004
+finish
+
+.MEMCHECK
+0000	bcde
+0001	0004
+
+
