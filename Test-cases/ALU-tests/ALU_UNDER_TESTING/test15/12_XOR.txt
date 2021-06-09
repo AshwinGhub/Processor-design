@@ -1,0 +1,45 @@
+r0 = 0000
+r1 = ffff
+r2 = aaaa
+r3 = 6666
+r4 = abcd
+i0 = 0
+m0 = 1
+r15 = r0 XOR r0
+dm(i0,m0) = r15      #0000
+dm(i0,m0) = astat   #0001
+r15 = r1 XOR r1
+dm(i0,m0) = r15      #0000
+dm(i0,m0) = astat   #0001
+r15 = r0 XOR r1
+dm(i0,m0) = r15      #ffff
+dm(i0,m0) = astat   #0004
+r15 = r1 XOR r2
+dm(i0,m0) = r15      #5555
+dm(i0,m0) = astat   #0000
+r15 = r2 XOR r3
+dm(i0,m0) = r15      #cccc
+dm(i0,m0) = astat   #0004
+r15 = r3 XOR r4
+dm(i0,m0) = r15      #cdab
+dm(i0,m0) = astat   #0004
+r15 = r4 XOR r4
+dm(i0,m0) = r15      #0000
+dm(i0,m0) = astat   #0001
+finish
+
+.MEMCHECK
+0000	0000
+0001	0001
+0002	0000
+0003	0001
+0004	ffff
+0005	0004
+0006	5555
+0007	0000
+0008	cccc
+0009	0004
+000a	cdab
+000b	0004
+000c	0000
+000d	0001

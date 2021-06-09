@@ -1,0 +1,19 @@
+i0 = 0
+m0 = 1
+r3 = 0000
+r4 = 2021
+r2 = -r3
+dm(i0,m0) = r2	    #0000
+dm(i0,m0) = astat   #0009
+r2 = -r4
+dm(i0,m0) = r2	    #dfdf
+dm(i0,m0) = astat   #0004
+finish
+
+.MEMCHECK
+0000	0000
+0001	0009
+0002	dfdf
+0003	0004
+
+

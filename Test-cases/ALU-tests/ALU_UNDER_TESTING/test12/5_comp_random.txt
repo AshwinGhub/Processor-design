@@ -1,0 +1,35 @@
+r13 = 2021
+r14 = 2021
+r15 = 5555
+i0 = 0
+m0 = 1
+comp(r15,r13)
+dm(i0,m0) = astat   #8000
+comp(r13,r14)
+dm(i0,m0) = astat   #4001
+comp(r13,r13)
+dm(i0,m0) = astat   #2001
+comp(r13,r15)
+dm(i0,m0) = astat   #1004
+r13 = abcd
+r14 = bcde
+r15 = 8000
+comp(r15,r13)
+dm(i0,m0) = astat   #0804
+comp(r13,r14)
+dm(i0,m0) = astat   #0404
+comp(r13,r13)
+dm(i0,m0) = astat   #0201
+comp(r13,r15)
+dm(i0,m0) = astat   #8100
+finish
+
+.MEMCHECK
+0000	8000
+0001	4001
+0002	2001
+0003	1004
+0004	0804
+0005	0404
+0006	0201
+0007	8100

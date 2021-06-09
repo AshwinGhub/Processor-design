@@ -1,0 +1,19 @@
+i0 = 0
+m0 = 1
+r3 = 7fff
+r4 = abcd
+r2 = r3 - r4 + CI - 1
+dm(i0,m0) = r2		# d431, cnvz 0110
+dm(i0,m0) = astat	# 0006
+mode1 = 1
+r2 = r3 - r4 + CI - 1
+dm(i0,m0) = r2		# 7fff, cnvz 0010
+dm(i0,m0) = astat	# 0002
+finish
+
+.MEMCHECK
+0000	d431
+0001	0006
+0002	7fff
+0003	0002
+

@@ -1,0 +1,22 @@
+i0 = 0
+m0 = 1
+r8 = 9000
+r9 = abcd
+r7 = r8 + r8
+dm(i0,m0) = r7		# 2000, cnvz 1010
+dm(i0,m0) = astat	# 000a
+r7 = r8 - r9 + CI - 1
+dm(i0,m0) = r7		# e433, cnvz 0100
+dm(i0,m0) = astat	# 0004
+r7 = r8 - r9 + CI - 1
+dm(i0,m0) = r7		# e432, cnvz 0100
+dm(i0,m0) = astat	# 0004
+finish
+
+.MEMCHECK
+0000	2000
+0001	000a
+0002	e433
+0003	0004
+0004	e432
+0005	0004

@@ -272,28 +272,28 @@ def clear():
         _=system('cls')
     else:
         _=system("clear")
-a=input("Enter name of file containing instructions:")
-g=open(INST_LOCATE+a,"rt")                                  #Changed
-#b=input("Enter name of OpCode Destination file:")
-f=open(PM_LOCATE,"wt")                                      #Changed
-f.write(16*"1"+16*"0"+"\n")
-l=[]
-rewrite=False
-instr_list=[]
-for i in g:
-    l.append(i.strip("\n"))
-i=0
-while(i<len(l)):
-    time.sleep(.1)
-    instr=l[i]
-    i=i+1
-    if(instr!=" " and instr!="\n" and instr!="\t" and instr!=""):
+if(__name__=="__main__"):
+    a=input("Enter name of file containing instructions:")
+    g=open(INST_LOCATE+a,"rt")                                  #Changed
+    #b=input("Enter name of OpCode Destination file:")
+    f=open(PM_LOCATE,"wt")                                      #Changed
+    f.write(format(int(16*"1"+16*"0",2),"08X")+"\n")
+    l=[]
+    rewrite=False
+    instr_list=[]
+    for i in g:
+        l.append(i.strip("\n"))
+    i=0
+    while(i<len(l)):
+        time.sleep(.1)
+        instr=l[i]
+        i=i+1
         if(re.match(".memcheck[ ]?",instr.lower())):
             break
         print(instr)
         instr_list.append(instr)
         if(re.match(".CALL[ ]?[(][ ]?[0-9,A-F]+[ ]?[)][ ]?",instr.upper())):
-            f.write(16*"1"+format(int(re.findall("[0-9,A-F]+",instr)[1],16),"016b")+"\n")
+            f.write(format(int(16*"1"+format(int(re.findall("[0-9,A-F]+",instr)[1],16),"016b"),2),"08X")+"\n")
             instr=l[i]
             i=i+1
             if(re.match(".memcheck[ ]?",instr.lower())):
@@ -316,7 +316,8 @@ while(i<len(l)):
                 continue
         else:
             inst = instr
-        if(len(instr)>2):
+        if(len(inst)>2 and inst!=" " and inst!="\n" and inst!="\t" and inst!=""):
+            print(inst)
             OpCode=Primary(inst)
         else:
             continue
@@ -340,7 +341,7 @@ while(i<len(l)):
             l[i]=instr
             rewrite=True
         else:
-            f.write(OpCode)
+            f.write(format(int(OpCode,2),"08X"))
             f.write("\n")
         if("/*" in instr):
             while("*/" not in instr):
@@ -349,13 +350,13 @@ while(i<len(l)):
                 instr_list.append(instr)
                 print(instr,end='')
                 i=i+1
-print("\nOpcodes saved in "+ PM_LOCATE)                     #Changed
-f.close()
-g.close()
-if(rewrite==True):
-    g=open(INST_LOCATE+a,"wt")                              #Changed
-    for i in range(len(l)):
-        g.write(l[i])
-        g.write('\n')
+    print("\nOpcodes saved in "+ PM_LOCATE)                     #Changed
+    f.close()
     g.close()
-time.sleep(2)
+    if(rewrite==True):
+        g=open(INST_LOCATE+a,"wt")                              #Changed
+        for i in range(len(l)):
+            g.write(l[i])
+            g.write('\n')
+        g.close()
+

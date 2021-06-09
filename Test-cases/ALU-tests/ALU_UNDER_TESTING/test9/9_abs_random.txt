@@ -1,0 +1,35 @@
+r10 = 0000
+r11 = 2021
+r12 = abcd
+r13 = 8000
+i0 = 0
+m0 = 1
+r9 = abs r10
+dm(i0,m0) = r9      #0000
+dm(i0,m0) = astat   #0001
+r9 = abs r11
+dm(i0,m0) = r9      #2021
+dm(i0,m0) = astat   #0000
+r9 = abs r12
+dm(i0,m0) = r9      #5433
+dm(i0,m0) = astat   #0000
+r9 = abs r13
+dm(i0,m0) = r9      #8000
+dm(i0,m0) = astat   #0006
+mode1 = 0001
+r9 = abs r13
+dm(i0,m0) = r9      #7fff
+dm(i0,m0) = astat   #0002
+finish
+
+.MEMCHECK
+0000	0000
+0001	0001
+0002	2021
+0003	0000
+0004	5433
+0005	0000
+0006	8000
+0007	0006
+0008	7fff
+0009	0002
