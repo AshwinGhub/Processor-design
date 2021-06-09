@@ -1,0 +1,19 @@
+i0 = 0
+m0 = 1
+r12 = abcd
+r13 = bcde
+r11 = abs r12
+dm(i0,m0) = r11	    #5433
+dm(i0,m0) = astat   #0000
+r11 = abs r13
+dm(i0,m0) = r11	    #4322
+dm(i0,m0) = astat   #0000
+finish
+
+.MEMCHECK
+0000	5433
+0001	0000
+0002	4322
+0003	0000
+
+

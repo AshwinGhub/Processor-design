@@ -1,0 +1,25 @@
+i0 = 0
+m0 = 1
+r2 = 7fff
+r3 = 8000
+r1 = -r2
+dm(i0,m0) = r1	    #8001
+dm(i0,m0) = astat   #0004
+r1 = -r3
+dm(i0,m0) = r1	    #8000
+dm(i0,m0) = astat   #0006
+mode1 = 1
+r1 = -r3
+dm(i0,m0) = r1	    #7fff
+dm(i0,m0) = astat   #0002
+finish
+
+.MEMCHECK
+0000	8001
+0001	0004
+0002	8000
+0003	0006
+0004	7fff
+0005	0002
+
+

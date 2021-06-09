@@ -1,0 +1,20 @@
+i0 = 0
+m0 = 1
+r15 = abcd
+r0 = bcde
+comp(r0,r15)
+dm(i0,m0) = astat   #8000
+comp(r15,r0)
+dm(i0,m0) = astat   #4004
+comp(r15,r15)
+dm(i0,m0) = astat   #2001
+comp(r0,r15)
+dm(i0,m0) = astat   #9000
+finish
+
+.MEMCHECK
+0000	8000
+0001	4004
+0002	2001
+0003	9000
+

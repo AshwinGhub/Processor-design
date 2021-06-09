@@ -1,0 +1,13 @@
+i0 = 0
+m0 = 1
+r6 = 2021
+r7 = bcde
+r5 = max(r7,r6)
+dm(i0,m0) = r5	    #2021
+dm(i0,m0) = astat   #0000
+finish
+
+.MEMCHECK
+0000	2021
+0001	0000
+

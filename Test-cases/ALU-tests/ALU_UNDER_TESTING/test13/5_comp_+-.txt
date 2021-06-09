@@ -1,0 +1,16 @@
+r14 = 2021
+r15 = abcd
+i0 = 0
+m0 = 1
+comp(r14,r15)
+dm(i0,m0) = astat   #8000
+comp(r14,r14)
+dm(i0,m0) = astat   #4001
+comp(r15,r14)
+dm(i0,m0) = astat   #2004
+finish
+
+.MEMCHECK
+0000	8000
+0001	4001
+0002	2004
