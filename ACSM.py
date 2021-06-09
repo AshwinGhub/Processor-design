@@ -9,7 +9,6 @@ DIR="C:/modeltech64_10.5/examples/SAC/Instructions"
 PM_LOCATE="C:/modeltech64_10.5/examples/memory_files/pm_file.txt"
 DM_LOCATE="C:/modeltech64_10.5/examples/memory_files/dm_file.txt"
 DMrdfl_LOCATE="C:/modeltech64_10.5/examples/SAC/DMrd_files/"
-file_temp="C:/modeltech64_10.5/examples/SAC/file_temp"
 
 idntfr="_"
 avoid=['dm_file.txt','pm_file.txt']
