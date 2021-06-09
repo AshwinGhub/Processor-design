@@ -30,7 +30,7 @@ module memory #(parameter
 `ifdef IGNORE
 		initial
 		begin
-			$readmemb(PM_LOCATE,pmInsts);
+			$readmemh(PM_LOCATE,pmInsts);
 			//stop iterating at 32'hx. Compare with 32'haaaa_aaaa (unused opcode) instead.
 			//verilog can't seem to compare 32'hx.
 			for(address=0; pmInsts[address[PMA_SIZE-1:0]]!=32'haaaa_aaaa;address=address+1)		
