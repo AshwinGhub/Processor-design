@@ -1,0 +1,12 @@
+I1=0009
+M0=0000
+R7=0abc
+R8=0004
+R9=ASHIFT R7 BY R8 
+DM(I1,M0)=R9
+NOP
+NOP
+FINISH
+
+.memcheck
+0009	abc0

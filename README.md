@@ -11,8 +11,13 @@ Steps to follow -
         b. INST_LOCATE - provide path to folder containing instruction file
 
 2. In test_core.v file, edit the following :
-        a. PM_LOCATE - path to pm file
-        b. DM_LOCATE - path to dm file
+        a. core_top #( ,,,,,, .PM_LOCATE( "<path to pm_file.txt>" ), .DM_LOCATE( "<path to dm_file.txt>" ) )
+        b. $system('python <filepath>');        [ Replace <filepath> with full path of the file a_test_script.py in your local machine. ]
+        
+3. In a_test_script.py file, edit the following :
+        a. dm_loc - path to dm file
+        b. memck_loc - path to folder containing test instructions
+        c. file_name - test instruction assembly language txt file (containing .memcheck function)
 
 ---------------------------------------------------------------
 

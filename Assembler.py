@@ -1,8 +1,7 @@
-# 14nth may 12:35 AM
-
+# 24th may
 # -------------------------------------------------------------------------------------------------------------------------------------
 
-PM_LOCATE="../memory_files/pm_file"                         # Provide path to PM file and instructions here
+PM_LOCATE="../memory_files/pm_file.txt"                         # Provide path to PM file and instructions here
 INST_LOCATE="../test_instructions/"
 
 #-------------------------------------------------------------------------------------------------------------------------------------
@@ -106,7 +105,7 @@ def compute(com):
     sign=signed(com.split(" ")[-1])
     if(re.match("R[0-9]+[ ]?=[ ]?R[0-9]+[ ]?[+][ ]?R[0-9]+[ ]?[+][ ]?CI[ ]?",com)):
         Comp_code = "000000010"
-    elif(re.match("R[0-9]+[ ]?=[ ]?R[0-9]+[ ]?-[ ]?R[0-9]+[ ]?[+][ ]?CI[]*-[ ]?1[ ]?",com)):
+    elif(re.match("R[0-9]+[ ]?=[ ]?R[0-9]+[ ]?-[ ]?R[0-9]+[ ]?[+][ ]?CI[ ]*-[ ]?1[ ]?",com)):
         Comp_code = "000000011"
     elif(re.match("R[0-9]+[ ]?=[ ]?R[0-9]+[ ]?[+][ ]?R[0-9]+[ ]?",com)):
         Comp_code = "000000000"
@@ -118,7 +117,7 @@ def compute(com):
         Comp_code = "000001001"
     elif(re.match("R[0-9]+[ ]?=[ ]?MAX[ ]?[(][ ]?R[0-9]+[ ]?,[ ]?R[0-9]+[ ]?[)][ ]?",com)):
         Comp_code = "000001011"
-    elif(re.match("R[0-9]+[ ]?=[ ]?-R[0-9]+[ ]?",com)):
+    elif(re.match("R[0-9]+[ ]?=[ ]?-[ ]?R[0-9]+[ ]?",com)):
         Comp_code = "000010001"
     elif(re.match("R[0-9]+[ ]?=[ ]?ABS[ ]?R[0-9]+[ ]?",com)):
         Comp_code = "000011001"
@@ -160,7 +159,6 @@ def compute(com):
         Comp_code = "01010"+sign
     elif(re.match("MR[ ]?=[ ]?R[0-9]+[ ]?[*][ ]?R[0-9]+[ ]?",com)):
         Comp_code = "01011"+sign
-        #print("1")
     elif(re.match("R[0-9]+[ ]?=[ ]?MR[ ]?[+][ ]?R[0-9]+[ ]?[*][ ]?R[0-9]+[ ]?",com)):
         Comp_code = "01100"+sign
     elif(re.match("MR[ ]?=[ ]?MR[ ]?[+][ ]?R[0-9]+[ ]?[*][ ]?R[0-9]+[ ]?",com)):
@@ -197,9 +195,11 @@ def compute(com):
         return Comp_code
 ur1="^[ ]?[A,C,D,F,I,L,M,P,S,U][A,C,M,O,R,S,T,U][A,D,I,K,N,R,S,T]?[A,D,E,L,S,T,Y]?[C,K,L,R,T,1,2]?[N,P,1,2]?[T]?[R]?[ ]?$"
 d="^[ ]?DM[ ]?[(][ ]?I[0-7][ ]?,[ ]?M[0-7][ ]?[)][ ]?$"
-def Assembler(x):
+def Primary(x):
     OpCode = "00000000000000000000000000000000"
     x=x.upper()
+    while(x[-1]==" " or x[-1]=="\t"):
+        x=x[0:-1]
     if(x=="NOP"):
         OpCode = "00000000000000000000000000000000"
     elif(x=="IDLE"):
@@ -245,18 +245,18 @@ def Assembler(x):
             else:
                 OpCode=OpCode[0]+"0000100"+register(x.split("=")[0])+register(x.split("=")[-1])+"000"+conditions(condition)
         elif(re.match("^DM[ ]?[(][ ]?I[0-7][ ]?,[ ]?M[0-7][ ]?[)][ ]?$",x.split("=")[0])):
-            OpCode=OpCode[0]+"0100100"+register(x.split("=")[-1])+"000"+register(re.findall("I[0-7]",x)[0])[5:]+register(re.findall("M[0-7]",x)[0])[5:]+"10"+conditions(condition)
+            OpCode=OpCode[0]+"0100100"+register(x.split("=")[-1])+"000"+register(re.findall("I[0-7]",x.split("=")[0])[0])[5:]+register(re.findall("M[0-7]",x.split("=")[0])[0])[5:]+"10"+conditions(condition)
         elif(re.match("^[ ]?DM[ ]?[(][ ]?I[0-7][ ]?,[ ]?M[0-7][ ]?[)][ ]?$",x.split("=")[-1])):
             temp=x.split("=")[0]
             if(("FADDR" in temp) or ("DADDR" in temp) or (re.match("^[ ]?PC[ ]?$",temp)) or ("STKY" in temp) or ("PCSTKP" in temp)):
                 OpCode="ERROR"
             else:
-                OpCode=OpCode[0]+"0100100"+register(x.split("=")[0])+"000"+register(re.findall("I[0-7]",x)[0])[5:]+register(re.findall("M[0-7]",x)[0])[5:]+"00"+conditions(condition)
+                OpCode=OpCode[0]+"0100100"+register(x.split("=")[0])+"000"+register(re.findall("I[0-7]",x.split("=")[-1])[0])[5:]+register(re.findall("M[0-7]",x.split("=")[-1])[0])[5:]+"00"+conditions(condition)
         elif(re.match("MODIFY[ ]?[(][ ]?I[0-7][ ]?,[ ]?M[0-7][ ]?[)][ ]?$",x)):
             OpCode=OpCode[0]+"01000"+OpCode[6:19]+register(re.findall("I[0-7]",x)[0])[5:]+register(re.findall("M[0-7]",x)[0])[5:]+"00"+conditions(condition)
         elif(re.match("JUMP[ ]?[(][ ]?M[1,8,9][0-5]*[ ]?,[ ]?I[1,8,9][0-5]*[ ]?[)][ ]?$",x)):
             OpCode=OpCode[0]+"01100"+OpCode[6:19]+register(re.findall("I[1,8,9][0-5]*",x)[0])[5:]+register(re.findall("M[1,8,9][0-5]*",x)[0])[5:]+"00"+conditions(condition)
-        elif(re.match("JUMPR[ ]?[(][ ]?M[1,8,9][0-5]*[ ]?,[ ]?I[1,8,9][0-5]*[ ]?[)][ ]?$",x)):
+        elif(re.match("CALL[ ]?[(][ ]?M[1,8,9][0-5]*[ ]?,[ ]?I[1,8,9][0-5]*[ ]?[)][ ]?$",x)):
             OpCode=OpCode[0]+"01101"+OpCode[6:19]+register(re.findall("I[1,8,9][0-5]*",x)[0])[5:]+register(re.findall("M[1,8,9][0-5]*",x)[0])[5:]+"00"+conditions(condition)
         else:
             OpCode=OpCode[0]+"10000"+compute(x)+conditions(condition)
@@ -272,23 +272,34 @@ def clear():
         _=system('cls')
     else:
         _=system("clear")
-a=input("Enter name of file containing instructions:")
-g=open(INST_LOCATE+a,"rt")                                  #Changed
-#b=input("Enter name of OpCode Destination file:")
-f=open(PM_LOCATE,"wt")                                      #Changed
-l=[]
-rewrite=False
-instr_list=[]
-for i in g:
-    l.append(i.strip("\n"))
-i=0
-while(i<len(l)):
-    time.sleep(.1)
-    instr=l[i]
-    i=i+1
-    if(instr!=" "):
+if(__name__=="__main__"):
+    a=input("Enter name of file containing instructions:")
+    g=open(INST_LOCATE+a,"rt")                                  #Changed
+    #b=input("Enter name of OpCode Destination file:")
+    f=open(PM_LOCATE,"wt")                                      #Changed
+    f.write(format(int(16*"1"+16*"0",2),"08X")+"\n")
+    l=[]
+    rewrite=False
+    instr_list=[]
+    for i in g:
+        l.append(i.strip("\n"))
+    i=0
+    while(i<len(l)):
+        time.sleep(.1)
+        instr=l[i]
+        i=i+1
+        if(re.match(".memcheck[ ]?",instr.lower())):
+            break
         print(instr)
         instr_list.append(instr)
+        if(re.match(".CALL[ ]?[(][ ]?[0-9,A-F]+[ ]?[)][ ]?",instr.upper())):
+            f.write(format(int(16*"1"+format(int(re.findall("[0-9,A-F]+",instr)[1],16),"016b"),2),"08X")+"\n")
+            instr=l[i]
+            i=i+1
+            if(re.match(".memcheck[ ]?",instr.lower())):
+                break
+            print(instr)
+            instr_list.append(instr)
         if("#" in instr):
             inst = re.split("#",instr)[0]
             if(re.match("^[ ]*#",instr)):
@@ -305,7 +316,11 @@ while(i<len(l)):
                 continue
         else:
             inst = instr
-        OpCode=Assembler(inst)
+        if(len(inst)>2 and inst!=" " and inst!="\n" and inst!="\t" and inst!=""):
+            print(inst)
+            OpCode=Primary(inst)
+        else:
+            continue
         if("ERROR" in OpCode):
             clear()
             instr_list.pop()
@@ -326,7 +341,7 @@ while(i<len(l)):
             l[i]=instr
             rewrite=True
         else:
-            f.write(OpCode)
+            f.write(format(int(OpCode,2),"08X"))
             f.write("\n")
         if("/*" in instr):
             while("*/" not in instr):
@@ -335,13 +350,13 @@ while(i<len(l)):
                 instr_list.append(instr)
                 print(instr,end='')
                 i=i+1
-print("\nOpcodes saved in "+ PM_LOCATE)                     #Changed
-f.close()
-g.close()
-if(rewrite==True):
-    g=open(INST_LOCATE+a,"wt")                              #Changed
-    for i in range(len(l)):
-        g.write(l[i])
-        g.write('\n')
+    print("\nOpcodes saved in "+ PM_LOCATE)                     #Changed
+    f.close()
     g.close()
-time.sleep(2)
+    if(rewrite==True):
+        g=open(INST_LOCATE+a,"wt")                              #Changed
+        for i in range(len(l)):
+            g.write(l[i])
+            g.write('\n')
+        g.close()
+

@@ -1,0 +1,19 @@
+i0 = 0
+m0 = 1
+r1 = 7fff
+r2 = 8000
+comp(r2,r1)
+dm(i0,m0) = astat   #0004
+comp(r1,r2)
+dm(i0,m0) = astat   #8000
+comp(r1,r1)
+dm(i0,m0) = astat   #4001
+comp(r2,r1)
+dm(i0,m0) = astat   #2004
+finish
+
+.MEMCHECK
+0000	0004
+0001	8000
+0002	4001
+0003	2004

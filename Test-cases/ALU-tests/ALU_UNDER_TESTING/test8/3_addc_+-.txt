@@ -1,0 +1,18 @@
+i0 = 0
+m0 = 1
+r9 = 7fff
+r10 = abcd
+r8 = r9 + r10 + CI
+dm(i0,m0) = r8		# 2bcc, cnvz 1000
+dm(i0,m0) = astat	# 0008
+r9 = 2021
+r8 = r9 + r10 + CI
+dm(i0,m0) = r8		# cbef, cnvz 0100
+dm(i0,m0) = astat	# 0004
+finish
+
+.MEMCHECK
+0000	2bcc
+0001	0008
+0002	cbef
+0003	0004

@@ -1,0 +1,18 @@
+i0 = 0
+m0 = 1
+r5 = 7fff
+r6 = 8000
+r4 = max(r6,r5)
+dm(i0,m0) = r4	    #7fff
+dm(i0,m0) = astat   #0000
+r5 = 0000
+r4 = max(r6,r5)
+dm(i0,m0) = r4	    #0000
+dm(i0,m0) = astat   #0001
+finish
+
+.MEMCHECK
+0000	7fff
+0001	0000
+0002	0000
+0003	0001

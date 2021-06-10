@@ -1,0 +1,23 @@
+# ssi acc add saturation (py verified)
+r0=9000
+r1=7000
+r2=f002
+mr=r0*r1 ssi	# ff cf00 0000
+mr=mr+r0*r2 ssi	# ff d5ff 2000
+r3=mr2
+r4=mr1
+r5=mr0
+r6=sat mr si	# ff ffff 8000
+i0=0
+m0=1
+dm(i0,m0)=r6	# dm(0)=8000
+dm(i0,m0)=r3	# dm(1)=d5ff
+dm(i0,m0)=r4
+dm(i0,m0)=r5
+finish
+
+.memcheck
+0000	8000
+0001	ffff
+0002	d5ff
+0003	2000

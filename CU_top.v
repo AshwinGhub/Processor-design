@@ -32,10 +32,13 @@ module cu_top 	#(parameter RF_DATASIZE, ADDRESS_WIDTH, SIGNAL_WIDTH)
 			input wire ps_alu_en, ps_alu_log,
 			input wire [1:0]ps_alu_hc,
 			input wire [2:0]ps_alu_sc,
-			input wire ps_alu_sat,
+			input wire ps_alu_sat, ps_alu_ci,
 			
 			//ALU flags
-			output wire alu_ps_az, alu_ps_an, alu_ps_ac, alu_ps_av
+			output wire alu_ps_az, alu_ps_an, alu_ps_ac, alu_ps_av,
+
+			//ALU compare true signal
+			output wire alu_ps_compd
 		);
 
 			
@@ -70,7 +73,7 @@ module cu_top 	#(parameter RF_DATASIZE, ADDRESS_WIDTH, SIGNAL_WIDTH)
 				xb_dtx, xb_dty, mul_xb_dt,
 				ps_mul_en, ps_mul_otreg,
 				ps_mul_dtsts,
-				ps_mul_cls,
+				ps_mul_cls, ps_mul_sc,
 				clk, reset,
 				mul_ps_mv,
 				mul_ps_mn
@@ -92,7 +95,9 @@ module cu_top 	#(parameter RF_DATASIZE, ADDRESS_WIDTH, SIGNAL_WIDTH)
 				ps_alu_en, ps_alu_log, ps_alu_hc, ps_alu_sc, 
 				alu_xb_dt, 
 				ps_alu_sat, 
-				alu_ps_az, alu_ps_an, alu_ps_ac, alu_ps_av
+				ps_alu_ci,
+				alu_ps_az, alu_ps_an, alu_ps_ac, alu_ps_av,
+				alu_ps_compd
 			);
 
 endmodule

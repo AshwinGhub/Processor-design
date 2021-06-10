@@ -1,0 +1,14 @@
+i0 = 0
+m0 = 1
+r6 = abcd
+r7 = bcde
+r5 = min(r7,r6)
+dm(i0,m0) = r5	    #abcd
+dm(i0,m0) = astat   #0004
+finish
+
+.MEMCHECK
+0000	abcd
+0001	0004
+
+
