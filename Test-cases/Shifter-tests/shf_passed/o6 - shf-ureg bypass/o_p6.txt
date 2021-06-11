@@ -1,0 +1,10 @@
+i2=0003
+m1=0001
+r4=ff3a
+r5=lefto r4
+astat=r5
+dm(i2,m1)=astat
+finish
+
+.memcheck
+0003 0008

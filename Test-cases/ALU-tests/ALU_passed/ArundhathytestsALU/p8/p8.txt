@@ -1,0 +1,16 @@
+i3=0001
+m3=0001
+r10=0bae
+r9=fffe
+r8=ashift r10 by r9
+r7=r8 xor r8
+r6=leftz r7
+dm(i3,m3)=r8
+dm(i3,m3)=r7
+dm(i3,m3)=r6
+finish
+
+.memcheck
+0001 02eb
+0002 0000
+0003 0010
