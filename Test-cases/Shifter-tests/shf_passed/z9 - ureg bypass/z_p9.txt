@@ -1,0 +1,10 @@
+i1=0000
+m2=0001
+astat=1bcd
+r6=astat
+r7=leftz r6
+dm(i1,m2)=r7
+finish
+
+.memcheck
+0000 0003
