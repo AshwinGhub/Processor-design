@@ -4,21 +4,21 @@ r5 = 7fff
 r6 = 8000
 astat = 0008
 r4 = r5 - r6 + CI - 1
-dm(i0,m0) = r4		# ffff, cnvz 0100
+dm(i0,m0) = r4		# ffff
 dm(i0,m0) = astat	# 0004
 r4 = r6 - r6 + CI - 1
-dm(i0,m0) = r4		# ffff, cnvz 0110
-dm(i0,m0) = astat	# 0006
+dm(i0,m0) = r4		# ffff
+dm(i0,m0) = astat	# 0004
 mode1 = 1
 r4 = r6 - r6 + CI - 1
-dm(i0,m0) = r4		# 8000, cnvz 0110
-dm(i0,m0) = astat	# 0006
+dm(i0,m0) = r4		# ffff
+dm(i0,m0) = astat	# 0004
 finish
 
 .MEMCHECK
 0000	ffff
 0001	0004
 0002	ffff
-0003	0006
-0004	8000
-0005	0006
+0003	0004
+0004	ffff
+0005	0004
