@@ -1,0 +1,12 @@
+i1=0000
+m2=0001
+r10=00ab
+r11=leftz r10
+r12=r11*r10
+dm(i1,m2)=r11
+dm(i1,m2)=r12
+finish
+
+.memcheck
+0000 0008
+0001 0558

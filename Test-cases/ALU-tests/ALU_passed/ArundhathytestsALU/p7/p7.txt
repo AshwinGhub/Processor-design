@@ -1,0 +1,21 @@
+i3=0004
+m2=0001
+m4=0000
+r1=0004
+r3=beef
+r4=r3 and r1
+dm(i3,m4)=r4
+r5 = dm(i3,m2)
+r6 = reg_or r5
+r7 = r6*r5
+r8 = reg_and r7
+dm(i3,m2)=r6
+dm(i3,m2)=r7
+dm(i3,m2)=r8
+finish
+
+.memcheck
+0004 0004
+0005 0001
+0006 0004
+0007 0000

@@ -5,7 +5,7 @@ reg[2:0] count,rand;
 
 integer i;
 
-core_top #(.PMA_SIZE(16), .PMD_SIZE(32), .DMA_SIZE(16), .DMD_SIZE(16), .RF_DATASIZE(16), .ADDRESS_WIDTH(4), .SIGNAL_WIDTH(3), .PM_LOCATE("C:/Users/Ashwin Pradeep/Desktop/Project Final Year/GIT repo/memory_files/pm_file.txt"), .DM_LOCATE("C:/Users/Ashwin Pradeep/Desktop/Project Final Year/GIT repo/memory_files/dm_file.txt"))
+core_top #(.PMA_SIZE(16), .PMD_SIZE(32), .DMA_SIZE(16), .DMD_SIZE(16), .RF_DATASIZE(16), .ADDRESS_WIDTH(4), .SIGNAL_WIDTH(3), .PM_LOCATE("C:/Users/Dell/Desktop/Arundhathy-files/Processor-design/memory_files/pm_file.txt"), .DM_LOCATE("C:/Users/Dell/Desktop/Arundhathy-files/Processor-design/memory_files/dm_file.txt"))
 	core_obj	(
 				clk,
 				reset,
@@ -47,7 +47,8 @@ end
 always@(*) begin
 	if(core_obj.mem_obj.pm_ps_op[31:22]==10'b1) begin
 		#50;
-		$system("python C:/modeltech64_10.5/examples/SAC/a_test_script.py");                          //Command to run a_test_script.py - Update its location if neccessary
+		//////$system("python C:/Users/Dell/Desktop/Arundhathy-files/Processor-design/Processor-design/a_test_script.py");                          
+		//Command to run a_test_script.py - Update its location if neccessary
 		#50;
 		$stop;
 	end
