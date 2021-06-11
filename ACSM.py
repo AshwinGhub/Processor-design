@@ -1,20 +1,13 @@
-#08 June
+#10th June
 import time
 import os
 import re
+import configparser
 import subprocess
+import sys
 import shutil
 from shutil import copyfile
 from Assembler import* 
-
-DIR="C:/Users/Dell/Desktop/Arundhathy-files/Processor-design/test_instructions"
-PM_LOCATE="C:/Users/Dell/Desktop/Arundhathy-files/Processor-design/memory_files/pm_file.txt"
-DM_LOCATE="C:/Users/Dell/Desktop/Arundhathy-files/Processor-design/memory_files/dm_file.txt"
-DMrdfl_LOCATE="C:/Users/Dell/Desktop/Arundhathy-files/Processor-design/Processor-design/Test-cases/Shifter-tests/DMrd_files/"
-MEMfail_LOCATE="C:/Users/Dell/Desktop/Arundhathy-files/Processor-design/Processor-design/Test-cases/Shifter-tests/MEMfail_files/"
-
-idntfr="_"
-avoid=['dm_file.txt','pm_file.txt']
 
 def flmdfy(idnt,floc,xtr,ofst,choice):
     with open(floc, "r+") as f:
@@ -103,6 +96,31 @@ fail_mfile=[]
 cmnt="//"
 frd="/*"
 bck="*/"
+cnfg = configparser.ConfigParser()
+cnfg.optionxform = str
+cnfg.read('Path.ini')
+if cnfg.has_section('PATHS'):
+    DIR=cnfg.get('PATHS','DIR',raw=True)
+    PM_LOCATE=cnfg.get('PATHS','PM_LOCATE',raw=True)
+    DM_LOCATE=cnfg.get('PATHS','DM_LOCATE',raw=True)
+    DMrdfl_LOCATE=cnfg.get('PATHS','DMrdfl_LOCATE',raw=True)
+    MEMfail_LOCATE=cnfg.get('PATHS','MEMfail_LOCATE',raw=True)
+else:
+    print("Error! PATHS configurations not found. Run Confiqure_Path.py.")
+    os.system('pause')
+    sys.exit()
+if cnfg.has_section('IDENTIFIER'):
+    idntfr=cnfg.get('IDENTIFIER','idntfr',raw=True)
+else:
+    print("Error! IDENTIFIER configurations not found. Run Confiqure_Path.py.")
+    os.system('pause')
+    sys.exit()
+if cnfg.has_section('AVOID'):
+    avoid=cnfg.options('AVOID')
+else:
+    print("Error! AVOID configurations not found. Run Confiqure_Path.py.")
+    os.system('pause')
+    sys.exit()
 flmdfy("$system","test_core.v",cmnt,0,1)
 try:
     shutil.rmtree(MEMfail_LOCATE)
@@ -121,11 +139,14 @@ if(comple()):
                         flmdfy("file=$fopen(DM_LOCATE,\"w\");\n			$fclose(file);","MEM_top.v",frd,0,1)
                         flmdfy("file=$fopen(DM_LOCATE,\"w\");\n			$fclose(file);","MEM_top.v",bck,45,1)
                         comple()
-                        copyfile(DMrdfl_LOCATE+name,DM_LOCATE)
+                        try:
+                            copyfile(os.path.join(DMrdfl_LOCATE,name),DM_LOCATE)
+                        except Exception as e:
+                            print(e)
                     subprocess.run("vsim -novopt -c -do \"run -all ; quit\" test_core")
                     if memchk(os.path.join(root,name)):
                         fail_mfile.append(os.path.join(root,name))
-                        copyfile(DM_LOCATE,MEMfail_LOCATE+"DMfail_"+re.split(r'/|\\',os.path.join(root,name))[-2]+"_"+name)
+                        copyfile(DM_LOCATE,os.path.join(MEMfail_LOCATE,"DMfail_"+re.split(r'/|\\',os.path.join(root,name))[-2]+"_"+name))
                     if(name[0]==idntfr):
                         flmdfy("file=$fopen(DM_LOCATE,\"w\");\n			$fclose(file);","MEM_top.v",bck,47,0)
                         flmdfy("file=$fopen(DM_LOCATE,\"w\");\n			$fclose(file);","MEM_top.v",frd,0,0)
