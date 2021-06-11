@@ -84,10 +84,13 @@ def memchk(MEM_LOCATE):
     dm_file=open(DM_LOCATE,'r')
     tlines = [line.replace(' ', '').replace('\t','').strip() for line in mem_file.readlines()]
     dlines = [line.replace(' ', '').replace('\t','').strip() for line in dm_file.readlines()]
-    slines=list(filter(None,[x.lower() for x in tlines[[line.lower() for line in tlines].index(find)+1:]]))
-    if not len(set(slines)-set(dlines)):
-        return 0
-    else:
+    try:
+        slines=list(filter(None,[x.lower() for x in tlines[[line.lower() for line in tlines].index(find)+1:]]))
+        if not len(set(slines)-set(dlines)):
+            return 0
+        else:
+            return 1
+    except Exception as e:
         return 1
 file_count=0
 valid_count=0
