@@ -1,8 +1,0 @@
-I1=1
-M1=2
-R1=aaaa
-DM(I1,M1)=R1
-FINISH
-
-.MEMCHECK
-0001	aaaa
