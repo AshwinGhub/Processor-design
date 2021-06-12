@@ -1,0 +1,15 @@
+nop
+nop
+nop
+R1=fffe
+R2=0002
+R3=R1*R2 UUI
+R4=ROT R3 BY R1 
+I0=0008
+M0=0000
+DM(I0,M0)=R4 
+NOP
+FINISH
+
+.MEMCHECK
+0008	3fff
