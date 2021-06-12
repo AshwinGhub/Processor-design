@@ -161,17 +161,20 @@ module multiplier
 					case(mul_sc)			//mul40_out_data and mr_slice are 2 different muxes with same select line
 						2'b00:			//MR0 (no sign extension as per sharc)
 							begin	
-								mul40_out_data = { {RF_DATASIZE*3/2{1'h0}}, Rx16_latched };
+								//mul40_out_data = { {RF_DATASIZE*3/2{1'h0}}, Rx16_latched };
+								mul40_out_data = { mr40_data[RF_DATASIZE*5/2-1:RF_DATASIZE], Rx16_latched };
 								mr_slice = mr40_data[RF_DATASIZE-1:0];	
 							end
 						2'b01:			//MR1 (sign extended)
 							begin
-								mul40_out_data = { {RF_DATASIZE/2{Rx16_latched[RF_DATASIZE-1]}}, Rx16_latched, {RF_DATASIZE{1'h0}} };	
+								//mul40_out_data = { {RF_DATASIZE/2{Rx16_latched[RF_DATASIZE-1]}}, Rx16_latched, {RF_DATASIZE{1'h0}} };	
+								mul40_out_data = { {RF_DATASIZE/2{Rx16_latched[RF_DATASIZE-1]}}, Rx16_latched, mr40_data[RF_DATASIZE-1:0] };
 								mr_slice = mr40_data[RF_DATASIZE*2-1:RF_DATASIZE];
 							end
 						2'b10:	
 							begin		//MR2 (sign extend)
-								mul40_out_data = { Rx16_latched[RF_DATASIZE/2-1:0], {RF_DATASIZE*2{1'h0}} };
+								//mul40_out_data = { Rx16_latched[RF_DATASIZE/2-1:0], {RF_DATASIZE*2{1'h0}} };
+								mul40_out_data = { Rx16_latched[RF_DATASIZE/2-1:0], mr40_data[RF_DATASIZE*2-1:0] };
 								mr_slice = {{RF_DATASIZE/2{mr40_data[RF_DATASIZE*5/2-1]}}, mr40_data[RF_DATASIZE*5/2-1 : RF_DATASIZE*2]};
 							end				
 						2'b11:	
@@ -183,12 +186,14 @@ module multiplier
 
 				2'b01:	//product
 				    begin
-    					mul40_out_data = { { RF_DATASIZE/2 {(mul_rxUbS|mul_ryUbS) & rnd32_out[2*RF_DATASIZE-1]} }, rnd32_out };		//sign extend 32 bit product to 40 bits.
-                        mr_slice = {RF_DATASIZE{1'h0}};
+    					//mul40_out_data = { { RF_DATASIZE/2 {(mul_rxUbS|mul_ryUbS) & rnd32_out[2*RF_DATASIZE-1]} }, rnd32_out };		//sign extend 32 bit product to 40 bits.
+                        mul40_out_data = { { RF_DATASIZE/2 { S_x[RF_DATASIZE]^S_y[RF_DATASIZE] } }, rnd32_out };
+						mr_slice = {RF_DATASIZE{1'h0}};
                     end
 				2'b1X:	//accumulate
 					begin
-    					mul40_out_data = mr40_data + mul_cls[0] + ( { { RF_DATASIZE/2 {(mul_rxUbS|mul_ryUbS) & rnd32_out[2*RF_DATASIZE-1]} }, rnd32_out } ^ { RF_DATASIZE*5/2 {mul_cls[0]} } ) ;	//sign extend product to 40 bits and then find 2's complement and add to mr
+    					//mul40_out_data = mr40_data + mul_cls[0] + ( { { RF_DATASIZE/2 {(mul_rxUbS|mul_ryUbS) & rnd32_out[2*RF_DATASIZE-1]} }, rnd32_out } ^ { RF_DATASIZE*5/2 {mul_cls[0]} } ) ;	//sign extend product to 40 bits and then find 2's complement and add to mr
+                        mul40_out_data = mr40_data + mul_cls[0] + ( { { RF_DATASIZE/2 { S_x[RF_DATASIZE]^S_y[RF_DATASIZE] } }, rnd32_out } ^ { RF_DATASIZE*5/2 {mul_cls[0]} } ) ;	//sign extend product to 40 bits and then find 2's complement and add to mr
                         mr_slice = {RF_DATASIZE{1'h0}};
                     end
 			endcase
