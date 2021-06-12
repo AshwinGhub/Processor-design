@@ -174,7 +174,7 @@ module multiplier
 						2'b10:	
 							begin		//MR2 (sign extend)
 								//mul40_out_data = { Rx16_latched[RF_DATASIZE/2-1:0], {RF_DATASIZE*2{1'h0}} };
-								mul40_out_data = { Rx16_latched[RF_DATASIZE/2-1:0], mr40_data[RF_DATASIZE*2-1:0]] };
+								mul40_out_data = { Rx16_latched[RF_DATASIZE/2-1:0], mr40_data[RF_DATASIZE*2-1:0] };
 								mr_slice = {{RF_DATASIZE/2{mr40_data[RF_DATASIZE*5/2-1]}}, mr40_data[RF_DATASIZE*5/2-1 : RF_DATASIZE*2]};
 							end				
 						2'b11:	
