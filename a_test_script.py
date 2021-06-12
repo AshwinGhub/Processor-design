@@ -13,7 +13,6 @@ dm_file=open(dm_loc,'r')
 
 tlines = [line.replace(' ', '').replace('\t','').strip() for line in tst_file.readlines()]
 dlines = [line.replace(' ', '').replace('\t','').strip() for line in dm_file.readlines()]
-slines=list(filter(None,[x.lower() for x in tlines[[line.lower() for line in tlines].index(find)+1:]]))
 
 ##Just for highlights - start
 print('/' * 140)
@@ -23,7 +22,11 @@ print("\nMM          MM  EEEEEEEEEEEEEE  MM          MM  CCCCCCCCCCCCCC  HH     
 print('/' * 140)
 ##Just for highlights - end
 
-print("TEST PASSED") if not len(set(slines)-set(dlines)) else None
-[print("Address {}: {}".format(dl[:4], "fail")) if dl not in dlines else None for dl in slines]
+try:
+    slines=list(filter(None,[x.lower() for x in tlines[[line.lower() for line in tlines].index(find)+1:]]))
+    print("TEST PASSED") if not len(set(slines)-set(dlines)) else None
+    [print("Address {}: {}".format(dl[:4], "fail")) if dl not in dlines else None for dl in slines]
+except Exception as e:
+    print(str(e).upper())
 
 time.sleep(5)
