@@ -1,10 +1,10 @@
 0000	xxxx
-0001	abcd
-0002	000c
-0003	dabc
-0004	000d
-0005	9b57
-0006	xxxx
+0001	xxxx
+0002	xxxx
+0003	xxxx
+0004	fffd
+0005	xxxx
+0006	fffe
 0007	xxxx
 0008	xxxx
 0009	xxxx
