@@ -1,8 +1,8 @@
 # 24th may
 # -------------------------------------------------------------------------------------------------------------------------------------
 
-PM_LOCATE="C:/Users/Dell/Desktop/Arundhathy-files/Processor-design/memory_files/pm_file.txt"                         # Provide path to PM file and instructions here
-INST_LOCATE="C:/Users/Dell/Desktop/Arundhathy-files/Processor-design/test_instructions/"
+PM_LOCATE="../memory_files/pm_file.txt"                         # Provide path to PM file and instructions here
+INST_LOCATE="../test_instructions/"
 
 #-------------------------------------------------------------------------------------------------------------------------------------
 
