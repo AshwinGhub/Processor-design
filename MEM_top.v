@@ -60,11 +60,18 @@ module memory #(parameter
 			for(i=0;i<2**PMA_SIZE;i=i+1)
 			begin
 				//$fdisplay(file, i[PMA_SIZE-1:0]);
-				$fdisplayb(file, i[PMA_SIZE-1:0], "\t", pmWithCall[i[PMA_SIZE-1:0]]);
+				$fdisplayh(file, i[PMA_SIZE-1:0], "\t", pmWithCall[i[PMA_SIZE-1:0]]);
 			end
 			$fclose(file);*/
 		//================================================================================================================================================	
 	    end
+
+`else
+        initial
+        begin
+            for(address=0;address<2**PMA_SIZE;address=address+1)
+               pmWithCall[address[PMA_SIZE-1:0]]={PMA_SIZE{1'h0}};
+        end
 `endif
 
 		always@(posedge clk or negedge reset)

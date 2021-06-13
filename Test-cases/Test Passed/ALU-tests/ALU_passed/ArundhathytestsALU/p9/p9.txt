@@ -1,0 +1,10 @@
+I1 = 0001
+M2= 0001
+R0 = 9876
+R1=NOT R0
+comp(r0,r1)
+dm(i1,m2)=r1
+finish
+
+.memcheck
+0001 6789

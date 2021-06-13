@@ -1,0 +1,24 @@
+i0 = 0
+m0 = 1
+r12 = 7fff
+r13 = 8000
+astat = 0008
+r11 = r12 - r13 + CI - 1
+dm(i0,m0) = r11		
+dm(i0,m0) = astat	
+r11 = r13 - r13 + CI - 1
+dm(i0,m0) = r11		
+dm(i0,m0) = astat	
+mode1 = 1
+r11 = r13 - r13 + CI - 1
+dm(i0,m0) = r11		
+dm(i0,m0) = astat	
+finish
+
+.MEMCHECK
+0000	ffff
+0001	0004
+0002	ffff
+0003	0004
+0004	ffff
+0005	0004
