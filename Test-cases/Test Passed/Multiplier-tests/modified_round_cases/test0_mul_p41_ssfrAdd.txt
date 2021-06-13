@@ -1,0 +1,20 @@
+# ssfr acc add (py verified, cces verified)
+r15=beef
+r12=fafa
+mr=r15*r12 ssf		# 00 028d b6cc (python predicted b6cb due to higher resolution)
+r0=mr1			# 028d
+r1=ffff
+r2=mr+r0*r1 ssfr	# round(00 028d b1b1) = 00 (0028e) 0000
+r3=mr0			# b6cc
+i0=f000
+m0=ffff
+dm(i0,m0)=r0		# dm(f000)=028d
+dm(i0,m0)=r3		# dm(efff)=b6cc
+dm(i0,m0)=r2		# dm(effe)=028e
+finish
+
+
+.MEMCHECK
+f000	028d
+efff	b6cc
+effe	028e
