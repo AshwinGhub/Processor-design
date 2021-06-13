@@ -6,4 +6,4 @@ dm(i2,m3) =r1
 finish
 
 .memcheck
-0006 0000
+0006 0010

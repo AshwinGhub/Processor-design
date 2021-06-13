@@ -5,6 +5,7 @@ import re
 import configparser
 import subprocess
 import sys
+from datetime import datetime
 import shutil
 from shutil import copyfile
 from Assembler import* 
@@ -21,7 +22,11 @@ def flmdfy(idnt,floc,xtr,ofst,choice):
         f.truncate()
 def assembler(INST_LOCATE):
     print(INST_LOCATE+"\n")
-    g=open(INST_LOCATE,"rt")
+    try:
+        g=open(INST_LOCATE,"rt")
+    except Exception as e:
+        print(e)
+        return 0
     f=open(PM_LOCATE,"wt")
     f.write(format(int(16*"1"+16*"0",2),"08X")+"\n")
     l=[]
@@ -92,6 +97,7 @@ def memchk(MEM_LOCATE):
             return 1
     except Exception as e:
         return 1
+startTime = datetime.now()
 file_count=0
 valid_count=0
 fail_afile=[]
@@ -165,5 +171,6 @@ if(comple()):
 else:
     print("Compilation Error, bye bye!!")
 flmdfy("$system","test_core.v",cmnt,0,0)
+print("\n\nTime Analysis:\nStart time: {}\nStop Time: {}\nTime taken to execute the script: {}".format(startTime,datetime.now(),(datetime.now() - startTime)))
 os.system('pause')
 
