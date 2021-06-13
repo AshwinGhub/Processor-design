@@ -1,8 +1,0 @@
-I1=1
-M1=2
-ASTAT=ffff
-DM(I1,M1)=ASTAT
-FINISH
-
-.MEMCHECK
-0001	ffff

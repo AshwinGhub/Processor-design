@@ -1,0 +1,15 @@
+nop
+nop
+nop
+R9=fffe
+R10=LEFTO R9 
+R11=LEFTO R10 
+I0=0001
+M0=0000
+DM(I0,M0)=R11 
+NOP
+FINISH
+
+
+.memcheck
+0001	0000

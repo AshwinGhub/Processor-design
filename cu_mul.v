@@ -161,20 +161,20 @@ module multiplier
 					case(mul_sc)			//mul40_out_data and mr_slice are 2 different muxes with same select line
 						2'b00:			//MR0 (no sign extension as per sharc)
 							begin	
-								mul40_out_data = { {RF_DATASIZE*3/2{1'h0}}, Rx16_latched };
-								//mul40_out_data = { mr40_data[RF_DATASIZE*5/2-1:RF_DATASIZE], Rx16_latched };
+								//mul40_out_data = { {RF_DATASIZE*3/2{1'h0}}, Rx16_latched };
+								mul40_out_data = { mr40_data[RF_DATASIZE*5/2-1:RF_DATASIZE], Rx16_latched };
 								mr_slice = mr40_data[RF_DATASIZE-1:0];	
 							end
 						2'b01:			//MR1 (sign extended)
 							begin
-								mul40_out_data = { {RF_DATASIZE/2{Rx16_latched[RF_DATASIZE-1]}}, Rx16_latched, {RF_DATASIZE{1'h0}} };	
-								//mul40_out_data = { {RF_DATASIZE/2{Rx16_latched[RF_DATASIZE-1]}}, Rx16_latched, mr40_data[RF_DATASIZE-1:0] };
+								//mul40_out_data = { {RF_DATASIZE/2{Rx16_latched[RF_DATASIZE-1]}}, Rx16_latched, {RF_DATASIZE{1'h0}} };	
+								mul40_out_data = { {RF_DATASIZE/2{Rx16_latched[RF_DATASIZE-1]}}, Rx16_latched, mr40_data[RF_DATASIZE-1:0] };
 								mr_slice = mr40_data[RF_DATASIZE*2-1:RF_DATASIZE];
 							end
 						2'b10:	
 							begin		//MR2 (sign extend)
-								mul40_out_data = { Rx16_latched[RF_DATASIZE/2-1:0], {RF_DATASIZE*2{1'h0}} };
-								//mul40_out_data = { Rx16_latched[RF_DATASIZE/2-1:0], mr40_data[RF_DATASIZE*2-1:0]] };
+								//mul40_out_data = { Rx16_latched[RF_DATASIZE/2-1:0], {RF_DATASIZE*2{1'h0}} };
+								mul40_out_data = { Rx16_latched[RF_DATASIZE/2-1:0], mr40_data[RF_DATASIZE*2-1:0] };
 								mr_slice = {{RF_DATASIZE/2{mr40_data[RF_DATASIZE*5/2-1]}}, mr40_data[RF_DATASIZE*5/2-1 : RF_DATASIZE*2]};
 							end				
 						2'b11:	
