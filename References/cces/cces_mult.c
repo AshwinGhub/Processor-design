@@ -20,10 +20,6 @@ void main(void)
 	//3fffffff = 1073741823 in unsigned int
 	//7fffffff = 2147483647 in signed int
   	mr=A_mul_usf(1073741823,2147483647);		//0000 1fffffff 40000001
-	printf("%lr\n",mr2(mr));
-	printf("%lr\n",mr1(mr));
-	printf("%lr\n",mr0(mr));
-
 	
 	//Refer below for few more examples
 	
@@ -32,5 +28,9 @@ void main(void)
 	mr=A_mul_usf(53084160,-24816);		//MR = 032a0000*ffff9f10 usf
 	mr=A_mac_uuf(mr,53084160,40720);	//MR = MR + 032a0000*00009f10 uuf
 	
+	//Use below part to print the result in mr2, mr1, mr0
+	printf("%lr\n",mr2(mr));
+	printf("%lr\n",mr1(mr));
+	printf("%lr\n",mr0(mr));
 }
 
