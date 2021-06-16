@@ -31,6 +31,7 @@ void main(void)
 	mr=A_mul_usf(53084160,-24816);		//MR = 032a0000*ffff9f10 USF
 	mr=A_mac_ssfr(mr,53084160,-24816);	//MR = MR + 032a0000*ffff9f10 ssfr
 
+	mr=A_mul_ssf(53084160,-24816);		//MR = 032a0000*ffff9f10 SSF
 	
 	//Use below part to print the result in mr2, mr1, mr0
 	printf("%lr\n",mr2(mr));
