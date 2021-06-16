@@ -37,6 +37,8 @@ void main(void)
 	mr=A_mul_ssf(810,-24816);		//MR = 032a*9f10 ssf
 	mr=A_msub_usi(mr,810,-24816);		//MR = MR - 032a*9f10 usi
 	
+	mr=A_mul_ssf(-1091633152,-1286);		//MR = beef0000*fffffafa ssf
+	
 	//Use below part to print the result in mr2, mr1, mr0
 	printf("%lr\n",mr2(mr));
 	printf("%lr\n",mr1(mr));
