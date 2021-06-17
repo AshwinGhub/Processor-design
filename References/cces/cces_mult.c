@@ -43,7 +43,13 @@ void main(void)
 	mr=A_mr0(mr,3203334144);		//MR0 = beef0000
 	mr=A_mr1(mr,-1091633152);		//MR1 = beef0000
 	mr=A_mr2(mr,-1091637521);		//MR2 = beeeeeef
-
+	//After above operation MR = eeef beef0000 beef0000
+	
+	mr=A_zero();			//MR = 0
+	mr=A_mr0(mr,539012045);		//MR0 = 2020abcd
+	mr=A_mr1(mr,539012045);		//MR1 = 2020abcd
+	mr=A_mr2(mr,539012045);		//MR2 = 2020abcd
+	//after above operation MR=abcd 2020abcd 2020abcd
 	
 	//Use below part to print the result in mr2, mr1, mr0
 	printf("%lr\n",mr2(mr));
