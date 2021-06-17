@@ -39,6 +39,12 @@ void main(void)
 	
 	mr=A_mul_ssf(-1091633152,-1286);		//MR = beef0000*fffffafa ssf
 	
+	mr=A_zero();				//MR = 0
+	mr=A_mr0(mr,3203334144);		//MR0 = beef0000
+	mr=A_mr1(mr,-1091633152);		//MR1 = beef0000
+	mr=A_mr2(mr,-1091637521);		//MR2 = beeeeeef
+
+	
 	//Use below part to print the result in mr2, mr1, mr0
 	printf("%lr\n",mr2(mr));
 	printf("%lr\n",mr1(mr));
