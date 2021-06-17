@@ -39,6 +39,9 @@ void main(void)
 	
 	mr=A_mul_ssf(-1091633152,-1286);		//MR = beef0000*fffffafa ssf
 	
+	mr=A_mul_ssfr(-1413873664,-16657);		//MR = abba0000*ffffbeef ssfr
+	
+	
 	mr=A_zero();				//MR = 0
 	mr=A_mr0(mr,3203334144);		//MR0 = beef0000
 	mr=A_mr1(mr,-1091633152);		//MR1 = beef0000
