@@ -55,8 +55,8 @@ void main(void)
 	//after above operation MR=abcd 2020abcd 2020abcd
 	
 	//Use below part to print the result in mr2, mr1, mr0
-	printf("%lr\n",mr2(mr));
-	printf("%lr\n",mr1(mr));
-	printf("%lr\n",mr0(mr));
+	printf("%r\n",mr2(mr));
+	printf("%r\n",mr1(mr));
+	printf("%r\n",mr0(mr));
 }
 
