@@ -145,9 +145,9 @@ module multiplier
 		defparam sat1.SIZE=RF_DATASIZE;
 		
 		
-		wire[2*RF_DATASIZE-1:0] rnd32_out;
+		wire[RF_DATASIZE*5/2-1:0] rnd40_out;
 
-		mul_rnd rnd1(mul32_product_data, mul_rndPrdt, rnd32_out);
+		mul_rnd rnd1(mul40_out_data, mul_rndPrdt, rnd40_out);
 		defparam rnd1.SIZE=RF_DATASIZE;
 		
 		
@@ -186,14 +186,14 @@ module multiplier
 
 				2'b01:	//product
 				    begin
-    					//mul40_out_data = { { RF_DATASIZE/2 {(mul_rxUbS|mul_ryUbS) & rnd32_out[2*RF_DATASIZE-1]} }, rnd32_out };		//sign extend 32 bit product to 40 bits.
-                        mul40_out_data = { { RF_DATASIZE/2 { S_x[RF_DATASIZE]^S_y[RF_DATASIZE] } }, rnd32_out };
+    					//mul40_out_data = { { RF_DATASIZE/2 {(mul_rxUbS|mul_ryUbS) & rnd40_out[2*RF_DATASIZE-1]} }, rnd40_out };		//sign extend 32 bit product to 40 bits.
+                        mul40_out_data = { { RF_DATASIZE/2 { S_x[RF_DATASIZE]^S_y[RF_DATASIZE] } }, mul32_product_data };
 						mr_slice = {RF_DATASIZE{1'h0}};
                     end
 				2'b1X:	//accumulate
 					begin
-    					//mul40_out_data = mr40_data + mul_cls[0] + ( { { RF_DATASIZE/2 {(mul_rxUbS|mul_ryUbS) & rnd32_out[2*RF_DATASIZE-1]} }, rnd32_out } ^ { RF_DATASIZE*5/2 {mul_cls[0]} } ) ;	//sign extend product to 40 bits and then find 2's complement and add to mr
-                        mul40_out_data = mr40_data + mul_cls[0] + ( { { RF_DATASIZE/2 { S_x[RF_DATASIZE]^S_y[RF_DATASIZE] } }, rnd32_out } ^ { RF_DATASIZE*5/2 {mul_cls[0]} } ) ;	//sign extend product to 40 bits and then find 2's complement and add to mr
+    					//mul40_out_data = mr40_data + mul_cls[0] + ( { { RF_DATASIZE/2 {(mul_rxUbS|mul_ryUbS) & rnd40_out[2*RF_DATASIZE-1]} }, rnd40_out } ^ { RF_DATASIZE*5/2 {mul_cls[0]} } ) ;	//sign extend product to 40 bits and then find 2's complement and add to mr
+                        mul40_out_data = mr40_data + mul_cls[0] + ( { { RF_DATASIZE/2 { S_x[RF_DATASIZE]^S_y[RF_DATASIZE] } }, mul32_product_data } ^ { RF_DATASIZE*5/2 {mul_cls[0]} } ) ;	//sign extend product to 40 bits and then find 2's complement and add to mr
                         mr_slice = {RF_DATASIZE{1'h0}};
                     end
 			endcase
@@ -203,7 +203,7 @@ module multiplier
 		
 	
 		//multiplexer at input of mr to decide whether data is to be written into MR
-		assign mr_in_data = (mul_otreg & mul_en) ? mul40_out_data : mr40_data;
+		assign mr_in_data = (mul_otreg & mul_en) ? rnd40_out : mr40_data;
 		
 		//ANDing mul_otreg with mul_en ensures that mul_otreg signal goes low when multiplier 
 		//is disabled and avoids unnecessary MR updates 
@@ -227,7 +227,7 @@ module multiplier
 		wire [RF_DATASIZE-1:0] mul_out;
 		
 		//16 bit data extraction from mul40_out_data for passing to output mux
-		assign mul_out = mul_IbF ? mul40_out_data[(2*RF_DATASIZE-1):RF_DATASIZE] : mul40_out_data[RF_DATASIZE-1:0];
+		assign mul_out = mul_IbF ? rnd40_out[(2*RF_DATASIZE-1):RF_DATASIZE] : rnd40_out[RF_DATASIZE-1:0];
 		
 		
 
@@ -246,21 +246,21 @@ module multiplier
 			case( {mul_rxUbS|mul_ryUbS , mul_IbF} )		
 			
 					2'b00:	//UI	[39:16]== 24 zeros
-						mul_mv = ~(mul40_out_data[(RF_DATASIZE*5/2)-1:RF_DATASIZE]=={24{1'h0}}); 
+						mul_mv = ~(rnd40_out[(RF_DATASIZE*5/2)-1:RF_DATASIZE]=={24{1'h0}}); 
 				
 					2'b01:	//UF	[39:32]==8'h00
-						mul_mv = ~(mul40_out_data[(RF_DATASIZE*5/2)-1:RF_DATASIZE*2]==8'h00);
+						mul_mv = ~(rnd40_out[(RF_DATASIZE*5/2)-1:RF_DATASIZE*2]==8'h00);
 				
 					2'b10:	//SI 	[39:15]== 25 ones or 25 zeros
-						mul_mv = ~(mul40_out_data[(RF_DATASIZE*5/2)-1:RF_DATASIZE-1]=={25{1'h1}} | mul40_out_data[(RF_DATASIZE*5/2)-1:RF_DATASIZE-1]=={25{1'h0}});	
+						mul_mv = ~(rnd40_out[(RF_DATASIZE*5/2)-1:RF_DATASIZE-1]=={25{1'h1}} | mul40_out_data[(RF_DATASIZE*5/2)-1:RF_DATASIZE-1]=={25{1'h0}});	
 					2'b11:	//SF	[39:31]== 9 ones or 9 zeros
-						mul_mv = ~(mul40_out_data[(RF_DATASIZE*5/2)-1:RF_DATASIZE*2-1]=={9{1'h1}} | mul40_out_data[(RF_DATASIZE*5/2)-1:RF_DATASIZE*2-1]=={9{1'h0}});
+						mul_mv = ~(rnd40_out[(RF_DATASIZE*5/2)-1:RF_DATASIZE*2-1]=={9{1'h1}} | mul40_out_data[(RF_DATASIZE*5/2)-1:RF_DATASIZE*2-1]=={9{1'h0}});
 			endcase
 		end
 		
 		
 		//sign flag internal
-		assign mul_mn = (mul_rxUbS|mul_ryUbS) & mul40_out_data[(RF_DATASIZE*5/2)-1];
+		assign mul_mn = (mul_rxUbS|mul_ryUbS) & rnd40_out[(RF_DATASIZE*5/2)-1];
 
 
 

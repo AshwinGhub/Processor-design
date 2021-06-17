@@ -1,0 +1,60 @@
+# CCES verified
+R0=032A
+R1=9F10
+I7=0
+M7=1
+MR=R0*R1 USF		# ff fecd 48a0
+R2=MR2			# ffff
+R3=MR1			# fecd
+R4=MR0			# 48a0
+R8=MR+R0*R1 UUF		# 00 (00c4) 9140
+R9=MR+R0*R1 UUFR	# 00 (00c5) 0000 accumulated result rounded
+R10=MR+R0*R1 SUI	# 00 00C4 (9140)
+R11=MR+R0*R1 SUF	# 00 (00c4) 9140
+R12=MR+R0*R1 SUFR	# 00 (00c5) 0000 accumulated result rounded
+R13=MR+R0*R1 USI	# FF FD9A (9140)
+R14=MR+R0*R1 USF	# ff (fd9a) 9140
+R15=MR+R0*R1 USFR	# ff (fd9b) 0000 acc result rounded
+DM(I7,M7)=R4	#48a0
+DM(I7,M7)=R3	#fecd
+DM(I7,M7)=R2	#ffff
+R4=MR+R0*R1 SSI		# FF FD9A (9140)
+R3=MR+R0*R1 SSF		# FF (FC67) D9E0
+MR=R0*R1 USFR		# ff fecd 0000
+R5=MR2			# ffff
+R6=MR1			# fecd
+R7=MR0			# 0000
+DM(I7,M7)=R7	#0000
+DM(I7,M7)=R6	#fecd
+DM(I7,M7)=R5	#ffff
+DM(I7,M7)=R8	#00c4
+DM(I7,M7)=R9	#00c5
+DM(I7,M7)=R10	#9140
+DM(I7,M7)=R11	#00c4
+DM(I7,M7)=R12	#00c5
+DM(I7,M7)=R13	#9140
+DM(I7,M7)=R14	#fd9a
+DM(I7,M7)=R15	#fd9b
+DM(I7,M7)=R4	#9140
+DM(I7,M7)=R3	#fc67
+#
+
+FINISH
+
+.MEMCHECK
+0000	48a0
+0001	fecd
+0002	ffff
+0003	0000
+0004	fecd
+0005	ffff
+0006	00c4
+0007	00c5
+0008	9140
+0009	00c4
+000a	00c5
+000b	9140
+000c	fd9a
+000d	fd9b
+000e	9140
+000f	fc67

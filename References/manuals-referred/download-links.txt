@@ -1,0 +1,1 @@
+SHARC MANUAL - https://www.analog.com/media/en/dsp-documentation/processor-manuals/50836807228561adsp2106xsharcprocessorusersmanual_revision2_1.pdf
