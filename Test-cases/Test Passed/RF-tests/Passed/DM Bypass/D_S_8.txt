@@ -1,0 +1,15 @@
+R1=1111
+I0=0002
+M0=0000
+DM(I0,M0)=R1
+R2=DM(I0,M0)
+R3=LEFTO R2 
+i0=0003
+M0=0001
+DM(I0,M0)=R3
+nop
+finish
+
+.memcheck
+0002	1111
+0003	0000

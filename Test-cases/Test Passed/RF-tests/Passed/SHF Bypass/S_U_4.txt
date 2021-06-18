@@ -1,0 +1,15 @@
+nop
+nop
+nop
+R15=0003
+R12=aaaa
+R10=ROT R12 BY R15 
+I3=R10
+I0=0009
+M0=0000
+DM(I0,M0)=R10
+NOP
+FINISH
+
+.memcheck
+0009	5555
