@@ -1,0 +1,10 @@
+I1=0007
+M0=0000
+R0=ccca
+DM(I1,M0)=R0
+NOP
+NOP
+FINISH
+
+.memcheck
+0007	ccca

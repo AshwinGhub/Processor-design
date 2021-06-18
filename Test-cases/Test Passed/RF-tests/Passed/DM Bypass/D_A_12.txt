@@ -1,0 +1,20 @@
+nop
+nop
+nop
+R0=0001
+R1=0023
+I0=0002
+M0=0000
+DM(I0,M0)=R0
+R7=DM(I0,M0)
+R15=-R7
+I0=0004
+M0=0000
+DM(I0,M0)=R15
+nop
+nop
+FINISH
+
+.memcheck
+0002	0001
+0004	ffff
