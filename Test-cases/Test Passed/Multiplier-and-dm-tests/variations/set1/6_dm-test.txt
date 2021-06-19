@@ -1,0 +1,28 @@
+	# TESTING MEMORY (VERIFIED)
+R10=ABCD
+R1=BCDE
+R9=CDEF
+R4=11FF
+R2=FEFA
+I0=1
+M0=1
+M1=0
+DM(I0,M0)=R10 	#1
+DM(I0,M0)=R1 	#2
+DM(I0,M0)=R9 	#3
+DM(I0,M1)=R4 	#4
+R3=DM(I0,M0) 	#4
+DM(I0,M1)=R2 	#5
+R7=DM(I0,M0) 	#5
+DM(I0,M0)=R3 	#6
+DM(I0,M0)=R7 	#7
+FINISH
+
+.memcheck
+0001	abcd
+0002	bcde
+0003	cdef
+0004	11ff
+0005	fefa
+0006	11ff
+0007	fefa

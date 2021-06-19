@@ -1,0 +1,16 @@
+R12=0aaa
+r13=ffcf
+I0=0002
+M0=0000
+DM(I0,M0)=R12
+R2=DM(I0,M0)
+R13=LEFTZ R2 
+i0=0003
+M0=0001
+DM(I0,M0)=R13
+nop
+finish
+
+.memcheck
+0002	0aaa
+0003	0004

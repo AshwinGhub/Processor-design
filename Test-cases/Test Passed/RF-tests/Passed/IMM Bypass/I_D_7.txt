@@ -1,0 +1,10 @@
+I1=0004
+M0=0000
+R7=aaaa
+DM(I1,M0)=R7
+NOP
+NOP
+FINISH
+
+.memcheck
+0004	aaaa
