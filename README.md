@@ -18,15 +18,14 @@ Steps to follow -
 
 Below are required only when testing individual files
 =======================================
-3. In Assembler.py file, edit the following : 
+1. In Assembler.py file, edit the following : 
         a. PM_LOCATE - provide path to pm file in your computer
         b. INST_LOCATE - provide path to folder containing instruction file
         
-4. In memchecker.py file, edit the following :
+2. In memchecker.py file, edit the following :
         a. dm_loc - path to dm file
         b. memck_loc - path to folder containing test instructions
         c. file_name - test instruction assembly language txt file (containing .memcheck function)
-========================================
 
 ---------------------------------------------------------------
 
