@@ -17,6 +17,7 @@ Steps to follow -
         b. $system('python <filepath>');        [ Replace <filepath> with full path of the file memchecker.py in your local machine. ]
 
 Below are required only when testing individual files
+=======================================
 3. In Assembler.py file, edit the following : 
         a. PM_LOCATE - provide path to pm file in your computer
         b. INST_LOCATE - provide path to folder containing instruction file
@@ -25,6 +26,7 @@ Below are required only when testing individual files
         a. dm_loc - path to dm file
         b. memck_loc - path to folder containing test instructions
         c. file_name - test instruction assembly language txt file (containing .memcheck function)
+========================================
 
 ---------------------------------------------------------------
 
