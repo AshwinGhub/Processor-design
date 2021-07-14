@@ -29,6 +29,9 @@ Below are required only when testing individual files
         a. dm_loc - path to dm file
         b. memck_loc - path to folder containing test instructions
         c. file_name - test instruction assembly language txt file (containing .memcheck function)
+        
+To test individual file in batch mode of ModelSim
+3. Execute the run.py file after editing the sim_run_commands.do file with the correct paths.
 
 ---------------------------------------------------------------
 
