@@ -7,8 +7,8 @@ reg[9:0] timeout;
 integer i;
 
 core_top #(.PMA_SIZE(16), .PMD_SIZE(32), .DMA_SIZE(16), .DMD_SIZE(16), .RF_DATASIZE(16), .ADDRESS_WIDTH(4), .SIGNAL_WIDTH(3), 
-			.PM_LOCATE("C:/Users/Ashwin Pradeep/Desktop/Project Final Year/GIT repo/memory_files/pm_file.txt"), 
-			.DM_LOCATE("C:/Users/Ashwin Pradeep/Desktop/Project Final Year/GIT repo/memory_files/dm_file.txt")
+			.PM_LOCATE("C:\\Users\\Ashwin-Pradeep\\Desktop\\Project-Final-Year\\GIT-repo\\Processor-design\\Processor-design\\pm_file.txt"), 
+			.DM_LOCATE("C:\\Users\\Ashwin-Pradeep\\Desktop\\Project-Final-Year\\GIT-repo\\Processor-design\\Processor-design\\dm_file.txt")
 			)
 	core_obj	(
 				clk,
@@ -68,7 +68,7 @@ always@(*) begin
 		end
 		$write("\n");
 		#50;
-		$system("python C:/modeltech64_10.5/examples/SAC/a_test_script.py");                          //Command to run a_test_script.py - Update its location if neccessary
+		$system("python C:\\Users\\Ashwin-Pradeep\\Desktop\\Project-Final-Year\\GIT-repo\\Processor-design\\Processor-design\\memchecker.py");                          //Command to run a_test_script.py - Update its location if neccessary
 		#50;
 		$stop;
 	end

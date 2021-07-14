@@ -1,8 +1,8 @@
 # 24th may
 # -------------------------------------------------------------------------------------------------------------------------------------
 
-PM_LOCATE="../memory_files/pm_file.txt"                         # Provide path to PM file and instructions here
-INST_LOCATE="../test_instructions/"
+PM_LOCATE="pm_file.txt"                         # Provide path to PM file and instructions here
+INST_LOCATE="C:\\Users\\Ashwin-Pradeep\\Desktop\\Project-Final-Year\\GIT-repo\\Processor-design\\Processor-design\\Test-cases\\Test Passed\\ALU-tests\\AshwintestsALU\\test0\\"
 
 #-------------------------------------------------------------------------------------------------------------------------------------
 
@@ -294,7 +294,7 @@ if(__name__=="__main__"):
         i=i+1
         if(re.match(".memcheck[ ]?",instr.lower())):
             break
-        print(instr)
+        #print(instr)       commented
         instr_list.append(instr)
         if(re.match(".CALL[ ]?[(][ ]?[0-9,A-F]+[ ]?[)][ ]?",instr.upper())):
             f.write(format(int(16*"1"+format(int(re.findall("[0-9,A-F]+",instr)[1],16),"016b"),2),"08X")+"\n")
@@ -302,7 +302,7 @@ if(__name__=="__main__"):
             i=i+1
             if(re.match(".memcheck[ ]?",instr.lower())):
                 break
-            print(instr)
+            #print(instr)       commented
             instr_list.append(instr)
         if("#" in instr):
             inst = re.split("#",instr)[0]
@@ -315,7 +315,7 @@ if(__name__=="__main__"):
                     time.sleep(.5)
                     instr=l[i]
                     instr_list.append(instr)
-                    print(instr,end='')
+                    #print(instr,end='')        commented
                     i=i+1
                 continue
         else:
